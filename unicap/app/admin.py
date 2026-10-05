@@ -177,14 +177,20 @@ class BackupAdmin(admin.ModelAdmin):
         "section",
         "chapter",
         "chapter_name",
-        "file",
+        "download",
         "size",
         "created_at",
         "created_by",
     )
+    exclude = ("file",)  # kept out of the served media: it has no address of its own
 
     def has_add_permission(self, request: HttpRequest) -> bool:
         return False
+
+    @admin.display(description=_("file"))
+    def download(self, obj: Backup) -> str:
+        """The backup's file, through the app's download page."""
+        return format_html('<a href="{}">{}</a>', obj.get_download_url(), obj.file.name)
 
 
 @admin.register(ReportTemplate)

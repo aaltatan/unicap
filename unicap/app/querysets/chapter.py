@@ -1,7 +1,8 @@
-from django.db.models import Count, Prefetch, Q
+from django.db.models import Prefetch
 from typing_extensions import Self
 
 from ..constants import chapter as constants
+from ..utils.query import related_count
 from .base import BaseQuerySet
 
 
@@ -27,20 +28,20 @@ class ChapterQuerySet(BaseQuerySet):
                     Prefetch("shares", queryset=share.objects.select_related("specialization")),
                 ),
             ),
-            "employees__specialization",
             "employees__excluded_faculties",
             "contracts",
         )
 
     def annotate_counts(self) -> Self:
         """How many faculties, employees and (signed) contracts each chapter holds."""
+        faculties, employees, contracts = (
+            self.model._meta.get_field(name).related_model.objects.all()  # noqa: SLF001
+            for name in ("faculties", "employees", "contracts")
+        )
+
         return self.annotate(
-            faculties_count=Count("faculties", distinct=True),
-            employees_count=Count("employees", distinct=True),
-            contracts_count=Count("contracts", distinct=True),
-            signed_count=Count(
-                "contracts",
-                filter=Q(contracts__faculty__isnull=False),
-                distinct=True,
-            ),
+            faculties_count=related_count(faculties, "chapter"),
+            employees_count=related_count(employees, "chapter"),
+            contracts_count=related_count(contracts, "chapter"),
+            signed_count=related_count(contracts.filter(faculty__isnull=False), "chapter"),
         )

@@ -13,3 +13,6 @@ urlpatterns: list[URLPattern | URLResolver] = [
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if "silk" in settings.INSTALLED_APPS:  # development only: the SQL profiler
+    urlpatterns += [path("silk/", include("silk.urls", namespace="silk"))]

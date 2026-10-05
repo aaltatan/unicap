@@ -24,6 +24,7 @@ def default_language() -> Iterator[None]:
 def fresh_settings() -> Iterator[None]:
     """django-solo caches the settings singletons: each test reads its own database."""
     caches[settings.SOLO_CACHE].clear()
+    caches[settings.REPORTS_CACHE].clear()  # no test reads another's converted PDF
     yield
     caches[settings.SOLO_CACHE].clear()
 

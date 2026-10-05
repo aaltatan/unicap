@@ -142,7 +142,7 @@ def optimize(request: ChapterRequest) -> HttpResponse:
 
         return trigger(HttpResponse(""), refresh=True, **{"close-modal": True})
 
-    strategy = Strategy(request.GET.get("strategy") or Strategy.MAXIMIZE_STUDENTS)
+    strategy = _strategy(request.GET.get("strategy"))
 
     snapshot = Chapter.objects.get_snapshot(request.chapter.pk)
 
@@ -212,15 +212,28 @@ def _contract_of(request: ChapterRequest, employee_id: str | None) -> Contract:
     )
 
 
+def _strategy(value: str | None) -> Strategy:
+    """The strategy the select sent; anything else is the default one."""
+    return Strategy(value) if value in StrategyChoices.values else Strategy.MAXIMIZE_STUDENTS
+
+
 def _placements(value: str) -> dict[int, int | None]:
-    """`{"12": 3, "13": null}` (contract id -> faculty id) from the preview's form."""
+    """`{"12": 3, "13": null}` (contract id -> faculty id) from the preview's form.
+
+    Anything else (not JSON, not an object, ids that are not numbers) places nothing.
+    """
     try:
         raw = json.loads(value)
     except json.JSONDecodeError:
         return {}
 
-    return {
-        int(contract): (int(faculty) if faculty is not None else None)
-        for contract, faculty in raw.items()
-        if str(contract).isdigit()
-    }
+    if not isinstance(raw, dict):
+        return {}
+
+    try:
+        return {
+            int(contract): (int(faculty) if faculty is not None else None)
+            for contract, faculty in raw.items()
+        }
+    except (TypeError, ValueError):
+        return {}

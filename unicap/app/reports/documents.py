@@ -1,11 +1,19 @@
 """The Word / PDF documents a user downloads: the data, the (uploaded or built-in) template, filled.
 
+A PDF is kept for an hour (`REPORTS_CACHE`): the same report asked for again is not converted again.
+
 Imported as `from ..reports import documents` (it reads models; the package does not).
 """
 
+import hashlib
+import json
 from collections.abc import Callable
+from io import BytesIO
+from pathlib import Path
 from typing import Any
 
+from django.conf import settings
+from django.core.cache import caches
 from django.utils.translation import gettext as _
 
 from unicap.domain import ChapterReport, FacultyReport
@@ -95,6 +103,25 @@ def faculty_document(
 
 
 def _document(report: str, language: str, extension: str, context: Context) -> bytes:
-    docx = render(ReportTemplate.objects.get_source(report, language), context)
+    source = ReportTemplate.objects.get_source(report, language)
 
-    return to_pdf(docx) if extension == "pdf" else docx
+    if extension != "pdf":
+        return render(source, context)
+
+    template = source.read_bytes() if isinstance(source, Path) else source.read()
+
+    return caches[settings.REPORTS_CACHE].get_or_set(
+        _pdf_key(template, context),
+        lambda: to_pdf(render(BytesIO(template), context)),
+    )
+
+
+def _pdf_key(template: bytes, context: Context) -> str:
+    """The same template filled with the same values is the same PDF: converted once.
+
+    The values hold today's date and every number shown, so a change in the chapter (or a
+    new day, or a new template) is another key.
+    """
+    values = json.dumps(context, sort_keys=True, default=str, ensure_ascii=False).encode()
+
+    return f"report-pdf:{hashlib.sha256(template + values).hexdigest()}"

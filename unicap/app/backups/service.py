@@ -5,16 +5,22 @@ restoring that one.
 """
 
 import json
+from collections.abc import Iterator
+from contextlib import contextmanager
 from datetime import date, datetime
 from decimal import Decimal
 from typing import Any
 
+from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.files.uploadedfile import UploadedFile
-from django.db import transaction
+from django.db import DataError, IntegrityError, transaction
 from django.utils import timezone
 from django.utils.text import get_valid_filename
 from django.utils.translation import gettext as _
+from django.utils.translation import gettext_lazy
+
+from unicap.domain import DomainError
 
 from ..choices import BackupScopeChoices
 from ..exceptions import UserError
@@ -23,6 +29,7 @@ from .payload import (
     FORMAT,
     SECTIONS,
     VERSION,
+    check_chapter,
     dump_chapter,
     dump_settings,
     load_chapter,
@@ -30,6 +37,8 @@ from .payload import (
 )
 
 MAX_UPLOAD = 50 * 1024 * 1024  # 50 MB
+
+_BAD_VALUES = gettext_lazy("this backup holds values that cannot be saved: %(error)s")
 
 
 def create(
@@ -122,7 +131,7 @@ def restore(
         notes=_("before restoring: %(backup)s") % {"backup": backup},
     )
 
-    with Chapter.objects.validated(target.pk):
+    with _refusing_bad_values(), Chapter.objects.validated(target.pk):
         load_chapter(target, payload, settings=backup.scope == BackupScopeChoices.CHAPTER)
 
     return safety
@@ -135,7 +144,7 @@ def _restore_system(data: dict[str, Any], user: User | None) -> Backup:
         notes=_("before restoring the whole system"),
     )
 
-    with transaction.atomic():
+    with _refusing_bad_values(), transaction.atomic():
         Chapter.objects.all().delete()
 
         for payload in data["chapters"]:
@@ -155,7 +164,7 @@ def _restore_as_new(payload: dict[str, Any], name: str, user: User | None) -> Ba
     if Chapter.objects.filter(name=name).exists():
         raise UserError(_("a chapter named %(name)s exists already.") % {"name": name})
 
-    with transaction.atomic():
+    with _refusing_bad_values(), transaction.atomic():
         chapter = Chapter.objects.create(name=name)
 
         with Chapter.objects.validated(chapter.pk):
@@ -260,7 +269,30 @@ def _parse(content: bytes) -> dict[str, Any]:
     if data["scope"] != BackupScopeChoices.SYSTEM and len(data["chapters"]) != 1:
         raise UserError(_("this backup is incomplete."))
 
+    for chapter in data["chapters"]:
+        check_chapter(chapter)
+
     return data
+
+
+@contextmanager
+def _refusing_bad_values() -> Iterator[None]:
+    """A file's values the database or the domain cannot read refuse the restore, by name.
+
+    The file may come from anywhere (an upload): a text where a number goes, an unknown
+    choice, the same name twice. Raised around the transaction, so nothing is saved.
+
+    Raises:
+        UserError: with what could not be saved.
+    """
+    try:
+        yield
+    except DomainError:
+        raise  # a broken rule (also a ValueError): the caller shows the rule
+    except ValidationError as error:
+        raise UserError(_BAD_VALUES % {"error": " ".join(error.messages)}) from error
+    except (ValueError, TypeError, IntegrityError, DataError) as error:
+        raise UserError(_BAD_VALUES % {"error": error}) from error
 
 
 def _json(value: object) -> object:

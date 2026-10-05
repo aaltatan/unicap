@@ -16,7 +16,7 @@
   {% elif kind == "checkboxes" or kind == "radios" %}
   <fieldset x-data="{ q: '' }">
     <legend class="label">{{ field.label }}</legend>
-    {% if field.field.choices|length > 8 %}
+    {% if field|length > 8 %}{# the bound field's options: read once, then drawn below #}
     <input type="search" class="input mb-1 py-1 text-xs" x-model="q" placeholder="{% translate 'type to search' %}…" aria-label="{% translate 'search' %} {{ field.label }}" />
     {% endif %}
     <div class="scroll max-h-40 space-y-0.5 overflow-y-auto rounded-md border border-neutral-200 p-1.5 dark:border-neutral-700">

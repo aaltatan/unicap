@@ -2,6 +2,7 @@
 
 import json
 
+import pytest
 from django.test import Client
 from django.urls import reverse
 from pytest_mock import MockerFixture
@@ -264,3 +265,105 @@ def test_each_move_tells_the_teachers_specialization_and_type(
         assert move.employee.name in text
         assert move.employee.specialization.name in text
         assert item.css_first(".badge").text(strip=True) == kind.value
+
+
+# --- input that is not what the page sends ------------------------------------------------
+
+
+def test_an_unknown_strategy_previews_the_default_one(
+    admin_client: Client, chapter: Chapter
+) -> None:
+    response = admin_client.get(reverse("board:optimize"), {"strategy": "no-such"}, **htmx())
+
+    assert response.status_code == 200
+    assert HTMLParser(response.content).css_first("input[name=placements]") is not None
+
+
+@pytest.mark.parametrize("placements", ["[1, 2]", "null", "{", '{"%(contract)s": "x"}', "7"])
+def test_placements_that_cannot_be_read_move_nothing(
+    admin_client: Client, chapter: Chapter, placements: str
+) -> None:
+    karim = Contract.objects.get(chapter=chapter, employee__name="Dr. Karim")
+
+    response = admin_client.post(
+        reverse("board:optimize"), {"placements": placements % {"contract": karim.pk}}, **htmx()
+    )
+
+    assert response.status_code == 200
+    karim.refresh_from_db()
+    assert karim.faculty is None
+
+
+def test_placements_on_a_faculty_that_is_not_the_chapters_move_nothing(
+    admin_client: Client, chapter: Chapter
+) -> None:
+    karim = Contract.objects.get(chapter=chapter, employee__name="Dr. Karim")
+    pharmacy = Faculty.objects.get(chapter=chapter, name="Pharmacy")
+    elsewhere = Faculty.objects.create(
+        chapter=Chapter.objects.create(name="other"), name="Elsewhere", students_per_phd=10
+    )
+
+    for faculty_id in (elsewhere.pk, 999_999):
+        response = admin_client.post(
+            reverse("board:optimize"),
+            {"placements": json.dumps({karim.pk: faculty_id})},
+            **htmx(),
+        )
+
+        assert response.status_code == 200
+        karim.refresh_from_db()
+        assert karim.faculty is None
+
+    admin_client.post(reverse("board:move"), {"employee": karim.employee_id, "faculty": 999_999})
+    karim.refresh_from_db()
+    assert karim.faculty is None
+
+    admin_client.post(
+        reverse("board:move"), {"employee": karim.employee_id, "faculty": pharmacy.pk}
+    )
+    karim.refresh_from_db()
+    assert karim.faculty == pharmacy
+
+
+# --- a chapter whose stored rows break a rule ----------------------------------------------
+
+
+@pytest.fixture
+def broken(chapter: Chapter) -> Chapter:
+    """The sample chapter, with a max the faculties cannot hold (saved behind the rules)."""
+    Chapter.objects.filter(pk=chapter.pk).update(max_students=10_000)
+    return chapter
+
+
+@pytest.mark.parametrize(
+    "url_name",
+    ["board:index", "hr:contracts:index", "hr:employees:index", "edu:faculties:index"],
+)
+def test_a_broken_chapter_shows_its_problem_instead_of_the_page(
+    admin_client: Client, broken: Chapter, url_name: str
+) -> None:
+    response = admin_client.get(reverse(url_name))
+
+    assert response.status_code == 409
+    assert "cannot exceed" in HTMLParser(response.content).css_first("main").text()
+
+
+def test_a_broken_chapter_is_a_toast_on_an_htmx_request(
+    admin_client: Client, broken: Chapter
+) -> None:
+    response = admin_client.get(reverse("board:optimize"), **htmx())
+
+    assert response.status_code == 200
+    assert response["HX-Reswap"] == "none"
+    assert "cannot exceed" in response.content.decode()
+
+
+def test_a_broken_chapter_can_still_be_fixed(admin_client: Client, broken: Chapter) -> None:
+    response = admin_client.post(
+        reverse("chapters:update", kwargs={"pk": broken.pk}),
+        {"name": broken.name, "max_students": ""},
+        **htmx(),
+    )
+
+    assert "close-modal" in response["HX-Trigger"]
+    assert admin_client.get(reverse("board:index")).status_code == 200

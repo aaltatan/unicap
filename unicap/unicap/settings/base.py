@@ -64,6 +64,7 @@ MIDDLEWARE = [
     "django_htmx.middleware.HtmxMiddleware",
     "unicap.app.middlewares.CurrentChapterMiddleware",
     "unicap.app.middlewares.HtmxMessagesMiddleware",
+    "unicap.app.middlewares.DomainErrorMiddleware",
 ]
 
 ROOT_URLCONF = "unicap.unicap.urls"
@@ -148,6 +149,9 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+# files no URL serves (the backups): never inside MEDIA_ROOT or a folder the web server serves
+PRIVATE_MEDIA_ROOT = Path(config("PRIVATE_MEDIA_ROOT", default=str(BASE_DIR / "private")))
+
 # LibreOffice's `soffice`, converting the Word reports to PDF (empty: found on the PATH)
 SOFFICE_PATH = config("SOFFICE_PATH", default="")
 
@@ -171,9 +175,17 @@ COTTON_SNAKE_CASED_NAMES = False
 CACHES = {
     "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
     "local": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
+    # converted PDF reports: converting takes seconds, the same report is asked for again
+    "reports": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "reports",
+        "TIMEOUT": 60 * 60,
+        "OPTIONS": {"MAX_ENTRIES": 50},
+    },
 }
 
 SOLO_CACHE = "local"
+REPORTS_CACHE = "reports"
 
 # CORS
 

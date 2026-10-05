@@ -18,7 +18,8 @@
     class="board-card {{ card.status|status_class }} {% if not card.contract.is_included %}excluded{% endif %}"
     x-sort:item="{{ card.employee_id }}"
     data-employee="{{ card.employee_id }}"
-    :class="matches('{{ card.contract.employee.name|escapejs }}') ? '' : 'opacity-20'"
+    {# `typeof`: while dragged, the card's copy sits on <body>, outside the board's scope #}
+    :class="typeof matches !== 'function' || matches('{{ card.contract.employee.name|escapejs }}') ? '' : 'opacity-20'"
     @click="clickCard('{% url 'hr:contracts:details' card.contract_id %}')"
     @dblclick="doubleClickCard({{ card.employee_id }})"
     title="{{ card.contract|named_type }} · {{ card.contract.employee.specialization.name }} · {{ card.contract|terms }} · {{ card.status|status_label }}"

@@ -4,9 +4,11 @@ from typing import TYPE_CHECKING, Any
 
 from django.db import models, transaction
 from django.db.models import Max
+from django.utils.translation import gettext as _
 
 from unicap import domain
 
+from ..exceptions import UserError
 from ..querysets import ChapterQuerySet
 from ..snapshot import Snapshot
 from .base import BaseManager
@@ -83,6 +85,10 @@ class ChapterManager(BaseManager.from_queryset(ChapterQuerySet)):  # type: ignor
             ```
         """
         with transaction.atomic():
+            # one write to a chapter at a time: two that are each valid alone could
+            # otherwise both commit and break a rule together (MySQL locks the row;
+            # SQLite, with one writer at a time, ignores the lock)
+            self.select_for_update().filter(pk=chapter_id).values_list("pk", flat=True).first()
             yield
             self.get_domain(chapter_id)
 
@@ -129,7 +135,7 @@ class ChapterManager(BaseManager.from_queryset(ChapterQuerySet)):  # type: ignor
     def delete_many(self, ids: Iterable[int]) -> int:
         """Delete chapters with everything they own; a default moves to a remaining one."""
         with transaction.atomic():
-            deleted, _ = self.filter(pk__in=list(ids)).delete()
+            deleted, _counts = self.filter(pk__in=list(ids)).delete()
 
             if not self.filter(is_default=True).exists() and (first := self.first()):
                 self.set_default(first)
@@ -286,9 +292,16 @@ class ChapterManager(BaseManager.from_queryset(ChapterQuerySet)):  # type: ignor
         Returns how many contracts moved.
 
         Raises:
+            UserError: a faculty id is not one of the chapter's; nothing is saved.
             DomainError: the placement breaks a domain rule; nothing is saved.
         """
         moved = 0
+
+        asked = {faculty_id for faculty_id in placements.values() if faculty_id is not None}
+        owned = set(chapter.faculties.filter(pk__in=asked).values_list("pk", flat=True))
+
+        if asked - owned:
+            raise UserError(_("a faculty of this placement is not in the chapter."))
 
         with self.validated(chapter.pk):
             position = self.next_position(chapter)

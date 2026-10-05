@@ -1,0 +1,24 @@
+{% load i18n %}{% get_current_language as LANGUAGE_CODE %}{% get_current_language_bidi as LANGUAGE_BIDI %}<!doctype html>
+<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% translate 'server error' %}</title>
+    <!-- no assets and no context: this page must draw even when those are what failed -->
+    <style>
+      body { margin: 0; min-height: 100vh; display: grid; place-items: center; font-family: system-ui, sans-serif; background: #fafafa; color: #171717; }
+      main { max-width: 28rem; padding: 2rem; text-align: center; }
+      h1 { font-size: 1.25rem; }
+      p { color: #525252; font-size: 0.875rem; }
+      a { color: #4f46e5; }
+      @media (prefers-color-scheme: dark) { body { background: #0a0a0a; color: #f5f5f5; } p { color: #d4d4d4; } a { color: #a5b4fc; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>{% translate 'Something went wrong on the server' %}</h1>
+      <p>{% translate 'Nothing was saved. Try again; if it happens again, tell an admin what you were doing.' %}</p>
+      <p><a href="/">{% translate 'back to the dashboard' %}</a></p>
+    </main>
+  </body>
+</html>

@@ -1,7 +1,8 @@
-from django.db.models import Count, Prefetch, Q
+from django.db.models import Prefetch
 from typing_extensions import Self
 
 from ..constants import faculty as constants
+from ..utils.query import related_count
 from .base import BaseQuerySet
 
 
@@ -20,18 +21,19 @@ class FacultyQuerySet(BaseQuerySet):
 
     def annotate_counts(self) -> Self:
         """Accepted specializations of each type, and contracts signed to the faculty."""
+        shares, contracts = (
+            self.model._meta.get_field(name).related_model.objects.all()  # noqa: SLF001
+            for name in ("shares", "contracts")
+        )
+
         return self.annotate(
-            specialized_count=Count(
-                "shares",
-                filter=Q(shares__specialization_type="specialized"),
-                distinct=True,
+            specialized_count=related_count(
+                shares.filter(specialization_type="specialized"), "faculty"
             ),
-            supported_count=Count(
-                "shares",
-                filter=Q(shares__specialization_type="supported"),
-                distinct=True,
+            supported_count=related_count(
+                shares.filter(specialization_type="supported"), "faculty"
             ),
-            contracts_count=Count("contracts", distinct=True),
+            contracts_count=related_count(contracts, "faculty"),
         )
 
     def accepting(self, specialization_id: int) -> Self:

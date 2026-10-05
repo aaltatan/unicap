@@ -99,8 +99,20 @@ class SharesFormSet(forms.BaseInlineFormSet):
 
     def __init__(self, *args: Any, chapter: models.Model | None = None, **kwargs: Any) -> None:
         self.specializations = Specialization.objects.filter(chapter=chapter).order_by("name")
+        self._choices: list[tuple[object, str]] | None = None
 
         super().__init__(*args, **kwargs)
+
+    @property
+    def specialization_choices(self) -> list[tuple[object, str]]:
+        """The select's options, read once for every row (each row would query them again)."""
+        if self._choices is None:
+            self._choices = [
+                ("", "---------"),
+                *((row.pk, str(row)) for row in self.specializations),
+            ]
+
+        return self._choices
 
     def _construct_form(self, i: int, **kwargs: Any) -> forms.BaseForm:
         return self._limited(super()._construct_form(i, **kwargs))  # type: ignore[misc]  # Django's, not in the stubs
@@ -111,9 +123,9 @@ class SharesFormSet(forms.BaseInlineFormSet):
 
     def _limited(self, form: forms.BaseForm) -> forms.BaseForm:
         """Only the chapter's specializations; the position follows the rows' order."""
-        cast(
-            "forms.ModelChoiceField", form.fields["specialization"]
-        ).queryset = self.specializations
+        field = cast("forms.ModelChoiceField", form.fields["specialization"])
+        field.queryset = self.specializations  # what a posted value is checked against
+        field.choices = self.specialization_choices
         form.fields["position"].required = False
         return form
 

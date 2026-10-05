@@ -683,6 +683,36 @@ AR: dict[str, str] = {
     # API
     "each specialization is listed once: %(names)s": "كل اختصاص يُذكر مرة واحدة: %(names)s",
     "each faculty is listed once: %(names)s": "كل كلية تُذكر مرة واحدة: %(names)s",
+    # requests that fail
+    "a broken rule": "قاعدة مخالَفة",
+    "this page cannot be shown until it is fixed.": "لا يمكن عرض هذه الصفحة قبل تصحيح ذلك.",
+    "you are not allowed to do this.": "غير مسموح لك بهذا الإجراء.",
+    "this is not there any more: reload the page.": "لم يعد هذا موجوداً: أعد تحميل الصفحة.",
+    "the server cannot be reached: check the connection, then try again.": "تعذّر الوصول إلى "
+    "الخادم: تحقق من الاتصال ثم حاول مجدداً.",
+    "something went wrong on the server: nothing was saved.": "حدث خطأ في الخادم: لم يُحفظ شيء.",
+    "back to the dashboard": "العودة إلى لوحة المعلومات",
+    "not allowed": "غير مسموح",
+    "page not found": "الصفحة غير موجودة",
+    "you are not allowed to open this page: ask an admin for the permission.": "غير مسموح لك "
+    "بفتح هذه الصفحة: اطلب الصلاحية من أحد المدراء.",
+    "there is nothing at this address: it may have been deleted, or belong to another "
+    "chapter.": "لا يوجد شيء في هذا العنوان: ربما حُذف، أو يتبع فصلاً آخر.",
+    "server error": "خطأ في الخادم",
+    "Something went wrong on the server": "حدث خطأ في الخادم",
+    "Nothing was saved. Try again; if it happens again, tell an admin what you were "
+    "doing.": "لم يُحفظ شيء. حاول مجدداً؛ وإن تكرر ذلك فأخبر أحد المدراء بما كنت تفعله.",
+    "this backup's file is gone.": "ملف هذه النسخة الاحتياطية لم يعد موجوداً.",
+    "a faculty of this placement is not in the chapter.": "إحدى كليات هذا التوزيع ليست في الفصل.",
+    "this faculty is not there any more.": "لم تعد هذه الكلية موجودة.",
+    "this backup is incomplete: a chapter has no name.": "هذه النسخة الاحتياطية ناقصة: فصل "
+    "بلا اسم.",
+    "this backup is incomplete: %(section)s is not a list of rows.": "هذه النسخة الاحتياطية "
+    "ناقصة: %(section)s ليست قائمة صفوف.",
+    "this backup is incomplete: %(section)s, row %(row)s has no %(fields)s.": "هذه النسخة "
+    "الاحتياطية ناقصة: %(section)s، الصف %(row)s ينقصه %(fields)s.",
+    "this backup holds values that cannot be saved: %(error)s": "في هذه النسخة الاحتياطية قيم "
+    "لا يمكن حفظها: %(error)s",
 }
 
 # Arabic has six plural forms: zero, one, two, few (3-10), many (11-99), other

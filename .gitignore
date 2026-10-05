@@ -22,3 +22,6 @@ htmlcov/
 
 # Node
 node_modules/
+
+# files no URL serves (backups)
+private/

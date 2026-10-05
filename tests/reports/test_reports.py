@@ -241,3 +241,14 @@ def test_templates_cannot_reach_python_internals(admin_client: Client, chapter: 
 
     assert response.redirect_chain == [(reverse("reports:capacity"), 302)]
     assert "Word template cannot be used" in response.content.decode()
+
+
+def test_a_broken_chapter_shows_its_problem_on_a_facultys_report(
+    admin_client: Client, chapter: Chapter, faculty: Faculty
+) -> None:
+    Chapter.objects.filter(pk=chapter.pk).update(max_students=10_000)
+
+    response = admin_client.get(reverse("reports:staff", kwargs={"pk": faculty.pk}))
+
+    assert response.status_code == 409
+    assert "cannot exceed" in response.content.decode()

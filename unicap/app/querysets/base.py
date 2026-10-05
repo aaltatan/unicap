@@ -6,6 +6,7 @@ from typing import Generic, TypeVar
 from django.db import models
 from djangoql.exceptions import DjangoQLError
 from djangoql.queryset import apply_search
+from djangoql.schema import DjangoQLSchema
 from typing_extensions import Self
 
 from ..utils.query import keywords_query
@@ -13,6 +14,29 @@ from ..utils.query import keywords_query
 M = TypeVar("M", bound=models.Model)
 
 DJANGOQL_MARKERS = ("=", "~", ">", "<", " in ", " and ", " or ")
+
+# what a DjangoQL query may name: the chapters and their rows, nothing else
+SEARCHABLE_MODELS = frozenset(
+    {
+        "app.chapter",
+        "app.specialization",
+        "app.faculty",
+        "app.facultyspecialization",
+        "app.employee",
+        "app.contract",
+    },
+)
+
+
+class DataSchema(DjangoQLSchema):
+    """DjangoQL over the app's data only: never the users, the backups or the settings.
+
+    The default schema follows every relation, so `chapter.backups.created_by.username`
+    would be a query; here a relation to any other model does not exist.
+    """
+
+    def excluded(self, model: type[models.Model]) -> bool:  # noqa: D102
+        return self.model_label(model) not in SEARCHABLE_MODELS
 
 
 class BaseQuerySet(models.QuerySet, Generic[M]):
@@ -34,7 +58,7 @@ class BaseQuerySet(models.QuerySet, Generic[M]):
 
         if any(marker in value.lower() for marker in DJANGOQL_MARKERS):
             try:
-                return apply_search(self, value)
+                return apply_search(self, value, schema=DataSchema)
             except (DjangoQLError, ValueError, TypeError):
                 pass
 

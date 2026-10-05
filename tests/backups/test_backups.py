@@ -20,6 +20,7 @@ from unicap.app.models import AppSettings, Backup, Chapter, Faculty, User
 @pytest.fixture(autouse=True)
 def media(settings: Settings, tmp_path: Path) -> None:
     settings.MEDIA_ROOT = tmp_path
+    settings.PRIVATE_MEDIA_ROOT = tmp_path / "private"
 
 
 def counts(chapter: Chapter) -> tuple[int, int, int, int]:
@@ -233,3 +234,103 @@ def test_a_backup_downloads_as_json(admin_client: Client, chapter: Chapter) -> N
 
     assert response["Content-Type"] == "application/json"
     assert json.loads(b"".join(response.streaming_content))["scope"] == "system"
+
+
+# --- files that are not what the app wrote ------------------------------------------------
+
+
+def _payload(**chapter: object) -> bytes:
+    data = {
+        "format": "unicap-backup",
+        "version": 1,
+        "scope": "chapter",
+        "chapters": [{"name": "uploaded", **chapter}],
+    }
+    return json.dumps(data).encode()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "content",
+    [
+        json.dumps(
+            {"format": "unicap-backup", "version": 1, "scope": "chapter", "chapters": ["x"]}
+        ).encode(),
+        json.dumps(
+            {"format": "unicap-backup", "version": 1, "scope": "chapter", "chapters": [{}]}
+        ).encode(),
+        _payload(employees="everyone"),
+        _payload(employees=[{}]),
+        _payload(employees=["Ali"]),
+        _payload(specializations=[{"notes": "no name"}]),
+        _payload(faculties=[{"name": "F", "shares": [{}]}]),
+        _payload(faculties=[{"name": "F", "shares": "all"}]),
+        _payload(contracts=[{"faculty": "F"}]),
+    ],
+)
+def test_a_backup_missing_what_a_row_needs_is_refused_when_uploaded(content: bytes) -> None:
+    with pytest.raises(UserError):
+        service.upload(SimpleUploadedFile("backup.json", content))
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "rows",
+    [
+        {"faculties": [{"name": "F", "students_per_phd": "many"}]},
+        {"faculties": [{"name": "F", "students_per_phd": None}]},
+        {
+            "specializations": [{"name": "S"}],
+            "employees": [{"name": "Ali", "specialization": "S"}],
+            "contracts": [{"employee": "Ali", "contract_type": "sometimes"}],
+        },
+        {"specializations": [{"name": "S"}, {"name": "S", "is_active": "perhaps"}]},
+    ],
+)
+def test_a_backup_holding_values_that_cannot_be_saved_restores_nothing(
+    rows: dict[str, object],
+) -> None:
+    backup = service.upload(SimpleUploadedFile("backup.json", _payload(**rows)))
+
+    with pytest.raises(UserError):
+        service.restore(backup, new_chapter="from a bad file")
+
+    assert not Chapter.objects.filter(name="from a bad file").exists()
+
+
+def test_a_backup_whose_file_is_gone_is_not_found(admin_client: Client, chapter: Chapter) -> None:
+    backup = service.create("chapter", chapter=chapter)
+    Path(backup.file.path).unlink()
+
+    response = admin_client.get(reverse("backups:download", kwargs={"pk": backup.pk}))
+
+    assert response.status_code == 404
+
+
+# --- where the files are kept -------------------------------------------------------------
+
+
+def test_backups_are_kept_out_of_the_served_media(
+    chapter: Chapter, settings: Settings, tmp_path: Path
+) -> None:
+    settings.MEDIA_ROOT = tmp_path / "media"
+    settings.PRIVATE_MEDIA_ROOT = tmp_path / "private"
+
+    backup = service.create("chapter", chapter=chapter)
+
+    assert Path(backup.file.path).is_relative_to(tmp_path / "private")
+    assert not (tmp_path / "media").exists()
+
+    with pytest.raises(ValueError, match="not accessible via a URL"):
+        _ = backup.file.url
+
+
+def test_the_admin_panel_links_a_backup_to_its_download(
+    admin_client: Client, chapter: Chapter
+) -> None:
+    backup = service.create("chapter", chapter=chapter)
+
+    response = admin_client.get(reverse("admin:app_backup_change", args=[backup.pk]))
+
+    assert response.status_code == 200
+    assert backup.get_download_url() in response.content.decode()

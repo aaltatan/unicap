@@ -109,7 +109,8 @@ shows up as the `django_vite.W001` check warning, then `DjangoViteAssetNotFoundE
 ## Backups
 
 Backups (the sidebar's **backups**, admins by default; the `restore_backup` permission can be
-given to others) are JSON files saved in `media/backups/`, rows written by name:
+given to others) are JSON files saved in `private/backups/` (`PRIVATE_MEDIA_ROOT`: outside the served media, so
+only the backups page hands them out), rows written by name:
 
 - the **whole system**: every chapter and the settings;
 - a **chapter**: its settings and every row (from the backups page or the chapters table);
@@ -147,10 +148,25 @@ Every model translates itself: `to_domain()` returns the domain value (`Faculty`
 onto a new or existing row. `Chapter.objects.create_from_domain()` saves a whole domain
 chapter (the `seed` command uses it).
 
+## Performance
+
+Each page has a ceiling of SQL queries, and none may grow with its rows
+(`tests/core/test_query_counts.py`). To look into a page, open it with the development
+server, then `/silk/` (django-silk, development settings only, superusers): every query of
+the request, where it was run from, and its time. `scripts/profile_queries.py` prints the
+same numbers for every page at once.
+
+`.github/workflows/ci.yml` runs the lint, the migration check, the build, both test suites
+and the domain's doctests on every push.
+
 ## Commands
 
 ```bash
-uv run pytest                          # tests
+uv run pytest                          # tests (fast: no browser)
+npm run build && uv run pytest -m slow # browser tests (Playwright, tests/e2e/): the Alpine
+                                       # components, right click, shortcuts, drag and drop;
+                                       # first: uv run playwright install chromium
+uv run python scripts/profile_queries.py   # SQL queries, repeats and time of every page
 uv run ruff check . && uv run ruff format --check .
 nox -s check                           # both
 nox -s build                           # production assets + requirements files

@@ -2,7 +2,7 @@
 
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse, Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.http import url_has_allowed_host_and_scheme
@@ -133,6 +133,9 @@ def restore(request: AppRequest, pk: int) -> HttpResponse:
 @permission_required("app.view_backup", raise_exception=True)
 def download(request: AppRequest, pk: int) -> FileResponse:  # noqa: ARG001
     backup = get_object_or_404(Backup, pk=pk)
+
+    if not backup.file.storage.exists(backup.file.name):
+        raise Http404(_("this backup's file is gone."))
 
     return FileResponse(
         backup.file.open("rb"),

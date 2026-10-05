@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      # mysqlclient builds against the MySQL client library (tests themselves run on SQLite)
+      - name: System libraries
+        run: sudo apt-get update && sudo apt-get install -y default-libmysqlclient-dev pkg-config gettext
+
+      - name: Install
+        run: |
+          uv sync
+          npm ci
+
+      - name: Lint
+        run: |
+          uv run ruff check .
+          uv run ruff format --check .
+
+      - name: Migrations are up to date
+        run: uv run manage.py makemigrations --check --dry-run
+        env:
+          DJANGO_SETTINGS_MODULE: unicap.unicap.settings.testing
+
+      - name: Build the frontend
+        run: npm run build
+
+      - name: Tests
+        run: uv run pytest
+
+      - name: Domain doctests
+        run: uv run pytest --doctest-modules unicap/domain
+
+      - name: Browser tests
+        run: |
+          uv run playwright install --with-deps chromium
+          uv run pytest -m slow

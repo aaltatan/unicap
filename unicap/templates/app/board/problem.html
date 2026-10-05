@@ -1,0 +1,17 @@
+{% load i18n %}
+<c-layout :page_title="page_title">
+  <div class="card mx-auto mt-10 max-w-xl p-8 text-center">
+    <span class="mx-auto grid size-14 place-items-center rounded-2xl bg-rose-600 text-white">{% heroicon_outline "exclamation-triangle" size=28 %}</span>
+    <h2 class="mt-4 text-xl font-semibold first-letter:uppercase">{% translate "this chapter's data breaks a rule" %}</h2>
+    <p class="mt-2 text-sm text-rose-700 dark:text-rose-300">{{ problem }}</p>
+    <p class="mt-2 text-sm text-neutral-600 dark:text-neutral-300 first-letter:uppercase">{% translate 'this page cannot be shown until it is fixed.' %}</p>
+    <div class="mt-6 flex flex-wrap justify-center gap-2">
+      {% if perms.app.view_chapter %}
+      <a class="btn btn-default" href="{% url 'chapters:index' %}">{% heroicon_outline "rectangle-stack" size=16 %} {% translate 'chapters' %}</a>
+      {% endif %}
+      {% if perms.app.view_backup %}
+      <a class="btn btn-default" href="{% url 'backups:index' %}">{% heroicon_outline "archive-box" size=16 %} {% translate 'backups' %}</a>
+      {% endif %}
+    </div>
+  </div>
+</c-layout>

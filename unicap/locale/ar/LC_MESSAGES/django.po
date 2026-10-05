@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: unicap 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-05 19:29+0300\n"
+"POT-Creation-Date: 2026-10-05 20:15+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: UniCap\n"
 "Language-Team: Arabic\n"
@@ -16,8 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
-"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
 #: .\tests\core\test_errors.py:62 .\unicap\app\choices.py:263
 #: .\unicap\app\constants\chapter.py:7 .\unicap\app\constants\faculty.py:13
@@ -42,11 +41,16 @@ msgstr "الحد الأعلى للطلاب"
 msgid "supported"
 msgstr "داعم"
 
-#: .\unicap\app\admin.py:199
+#: .\unicap\app\admin.py:190 .\unicap\app\models\backup.py:40
+#: .\unicap\app\models\report_template.py:31
+msgid "file"
+msgstr "الملف"
+
+#: .\unicap\app\admin.py:205
 msgid "built-in templates"
 msgstr "القوالب المضمّنة"
 
-#: .\unicap\app\admin.py:212
+#: .\unicap\app\admin.py:218
 msgid "variables"
 msgstr "المتغيرات"
 
@@ -54,7 +58,23 @@ msgstr "المتغيرات"
 msgid "UniCap"
 msgstr "UniCap"
 
-#: .\unicap\app\backups\payload.py:307
+#: .\unicap\app\backups\payload.py:190
+#| msgid "this backup is incomplete."
+msgid "this backup is incomplete: a chapter has no name."
+msgstr "هذه النسخة الاحتياطية ناقصة: فصل بلا اسم."
+
+#: .\unicap\app\backups\payload.py:203
+#, python-format
+msgid "this backup is incomplete: %(section)s is not a list of rows."
+msgstr "هذه النسخة الاحتياطية ناقصة: %(section)s ليست قائمة صفوف."
+
+#: .\unicap\app\backups\payload.py:210
+#, python-format
+msgid "this backup is incomplete: %(section)s, row %(row)s has no %(fields)s."
+msgstr ""
+"هذه النسخة الاحتياطية ناقصة: %(section)s، الصف %(row)s ينقصه %(fields)s."
+
+#: .\unicap\app\backups\payload.py:360
 #, python-format
 msgid ""
 "%(section)s: %(names)s cannot be removed, still used by %(users)s; restore "
@@ -63,66 +83,72 @@ msgstr ""
 "%(section)s: لا يمكن حذف %(names)s لأنها مستخدمة في %(users)s؛ استعد الفصل "
 "كاملاً بدلاً من ذلك."
 
-#: .\unicap\app\backups\payload.py:337
+#: .\unicap\app\backups\payload.py:390
 #, python-format
 msgid "%(owner)s: no %(name)s in this chapter; restore it first."
 msgstr "%(owner)s: لا يوجد %(name)s في هذا الفصل؛ استعده أولاً."
 
-#: .\unicap\app\backups\service.py:65
+#: .\unicap\app\backups\service.py:41
+#, python-format
+#| msgid "The Word template cannot be used: %(error)s"
+msgid "this backup holds values that cannot be saved: %(error)s"
+msgstr "في هذه النسخة الاحتياطية قيم لا يمكن حفظها: %(error)s"
+
+#: .\unicap\app\backups\service.py:74
 msgid "the file is too big (50 MB at most)."
 msgstr "الملف كبير جداً (50 ميغابايت كحد أقصى)."
 
-#: .\unicap\app\backups\service.py:80
+#: .\unicap\app\backups\service.py:89
 #, python-format
 msgid "uploaded: %(name)s"
 msgstr "مرفوع: %(name)s"
 
-#: .\unicap\app\backups\service.py:115
+#: .\unicap\app\backups\service.py:124
 msgid "choose the chapter to restore into: the backup's chapter is gone."
 msgstr "اختر الفصل الذي ستُستعاد إليه النسخة: فصلها الأصلي لم يعد موجوداً."
 
-#: .\unicap\app\backups\service.py:122
+#: .\unicap\app\backups\service.py:131
 #, python-format
 msgid "before restoring: %(backup)s"
 msgstr "قبل الاستعادة: %(backup)s"
 
-#: .\unicap\app\backups\service.py:135
+#: .\unicap\app\backups\service.py:144
 msgid "before restoring the whole system"
 msgstr "قبل استعادة النظام كاملاً"
 
-#: .\unicap\app\backups\service.py:156
+#: .\unicap\app\backups\service.py:165
 #, python-format
 msgid "a chapter named %(name)s exists already."
 msgstr "يوجد فصل باسم %(name)s مسبقاً."
 
-#: .\unicap\app\backups\service.py:168
+#: .\unicap\app\backups\service.py:177
 msgid "restored as a new chapter"
 msgstr "استُعيدت كفصل جديد"
 
-#: .\unicap\app\backups\service.py:189
+#: .\unicap\app\backups\service.py:198
 msgid "choose a chapter to back up."
 msgstr "اختر فصلاً لأخذ نسخة احتياطية منه."
 
-#: .\unicap\app\backups\service.py:195
+#: .\unicap\app\backups\service.py:204
 #, python-format
 msgid "unknown section %(section)s: %(sections)s"
 msgstr "قسم غير معروف %(section)s: %(sections)s"
 
-#: .\unicap\app\backups\service.py:245
+#: .\unicap\app\backups\service.py:254
 #, python-format
 msgid "this file is not a backup: %(error)s"
 msgstr "هذا الملف ليس نسخة احتياطية: %(error)s"
 
-#: .\unicap\app\backups\service.py:248
+#: .\unicap\app\backups\service.py:257
 msgid "this file is not a backup of this app."
 msgstr "هذا الملف ليس نسخة احتياطية من هذا التطبيق."
 
-#: .\unicap\app\backups\service.py:252
+#: .\unicap\app\backups\service.py:261
 #, python-format
 msgid "this backup's version is not supported: %(v)s"
 msgstr "إصدار هذه النسخة الاحتياطية غير مدعوم: %(v)s"
 
-#: .\unicap\app\backups\service.py:258 .\unicap\app\backups\service.py:261
+#: .\unicap\app\backups\service.py:267 .\unicap\app\backups\service.py:270
 msgid "this backup is incomplete."
 msgstr "هذه النسخة الاحتياطية غير مكتملة."
 
@@ -350,7 +376,8 @@ msgstr "داعم جزئي"
 
 #: .\unicap\app\choices.py:141 .\unicap\app\reports\context.py:40
 #: .\unicap\app\reports\context.py:57 .\unicap\app\reports\defaults.py:237
-#: .\unicap\app\reports\defaults.py:341 .\unicap\app\templatetags\domain.py:123
+#: .\unicap\app\reports\defaults.py:341
+#: .\unicap\app\templatetags\domain.py:123
 #: .\unicap\templates\app\reports\audit.html:87
 #: .\unicap\templates\app\reports\capacity-pivot.html:78
 #: .\unicap\templates\app\reports\capacity-pivot.html:90
@@ -453,7 +480,8 @@ msgid "faculty staff pivot"
 msgstr "ملخص كادر الكلية"
 
 #: .\unicap\app\choices.py:178 .\unicap\app\reports\defaults.py:270
-#: .\unicap\templates\app\reports\audit.html:12 .\unicap\unicap\constants.py:61
+#: .\unicap\templates\app\reports\audit.html:12
+#: .\unicap\unicap\constants.py:61
 msgid "calculation audit"
 msgstr "تدقيق الحساب"
 
@@ -545,11 +573,11 @@ msgstr "%(faculty)s: يجب أن يكون عدد الطلاب لكل دكتور�
 #: .\unicap\app\choices.py:218
 #, python-format
 msgid ""
-"%(faculty)s: min %(type)s PhDs (%(minimum)s) cannot exceed max %(type)s PhDs "
-"(%(maximum)s)"
+"%(faculty)s: min %(type)s PhDs (%(minimum)s) cannot exceed max %(type)s PhDs"
+" (%(maximum)s)"
 msgstr ""
-"%(faculty)s: لا يمكن أن يتجاوز الحد الأدنى لحملة الدكتوراه من النوع %(type)s "
-"(%(minimum)s) الحد الأعلى (%(maximum)s)"
+"%(faculty)s: لا يمكن أن يتجاوز الحد الأدنى لحملة الدكتوراه من النوع %(type)s"
+" (%(minimum)s) الحد الأعلى (%(maximum)s)"
 
 #: .\unicap\app\choices.py:222
 #, python-format
@@ -648,12 +676,14 @@ msgstr "%(owner)s: لا يمكن أن تكون القيم سالبة: %(fields)s
 msgid "masters per PhD must be positive"
 msgstr "عدد حملة الماجستير لكل دكتور يجب أن يكون موجباً"
 
-#: .\unicap\app\choices.py:259 .\unicap\app\models\faculty_specialization.py:61
+#: .\unicap\app\choices.py:259
+#: .\unicap\app\models\faculty_specialization.py:61
 #: .\unicap\templates\components\edu\faculties\form.html:33
 msgid "min teachers"
 msgstr "أدنى عدد مدرّسين"
 
-#: .\unicap\app\choices.py:260 .\unicap\app\models\faculty_specialization.py:66
+#: .\unicap\app\choices.py:260
+#: .\unicap\app\models\faculty_specialization.py:66
 #: .\unicap\templates\components\edu\faculties\form.html:34
 msgid "max teachers"
 msgstr "أعلى عدد مدرّسين"
@@ -712,8 +742,8 @@ msgstr "بعرض الشاشة"
 msgid "whole system"
 msgstr "النظام كاملاً"
 
-#: .\unicap\app\choices.py:287 .\unicap\app\models\backup.py:35
-#: .\unicap\app\models\backup.py:37 .\unicap\app\models\chapter.py:32
+#: .\unicap\app\choices.py:287 .\unicap\app\models\backup.py:36
+#: .\unicap\app\models\backup.py:38 .\unicap\app\models\chapter.py:32
 #: .\unicap\app\models\contract.py:25 .\unicap\app\models\employee.py:23
 #: .\unicap\app\models\faculty.py:26 .\unicap\app\models\specialization.py:18
 #: .\unicap\app\reports\defaults.py:396
@@ -727,7 +757,7 @@ msgstr "النظام كاملاً"
 msgid "chapter"
 msgstr "الفصل"
 
-#: .\unicap\app\choices.py:288 .\unicap\app\models\backup.py:23
+#: .\unicap\app\choices.py:288 .\unicap\app\models\backup.py:24
 #: .\unicap\templates\app\backups\index.html:36
 msgid "section"
 msgstr "القسم"
@@ -771,9 +801,9 @@ msgstr "العقود"
 
 #: .\unicap\app\constants\chapter.py:6 .\unicap\app\constants\employee.py:6
 #: .\unicap\app\constants\faculty.py:8
-#: .\unicap\app\constants\specialization.py:6 .\unicap\app\models\chapter.py:19
-#: .\unicap\app\models\employee.py:25 .\unicap\app\models\faculty.py:28
-#: .\unicap\app\models\specialization.py:20
+#: .\unicap\app\constants\specialization.py:6
+#: .\unicap\app\models\chapter.py:19 .\unicap\app\models\employee.py:25
+#: .\unicap\app\models\faculty.py:28 .\unicap\app\models\specialization.py:20
 #: .\unicap\app\reports\defaults.py:141 .\unicap\app\reports\defaults.py:310
 #: .\unicap\app\views\chapters.py:40 .\unicap\app\views\employees.py:32
 #: .\unicap\app\views\faculties.py:67 .\unicap\app\views\specializations.py:32
@@ -782,7 +812,7 @@ msgstr "العقود"
 msgid "name"
 msgstr "الاسم"
 
-#: .\unicap\app\constants\chapter.py:11 .\unicap\app\models\backup.py:40
+#: .\unicap\app\constants\chapter.py:11 .\unicap\app\models\backup.py:45
 #: .\unicap\app\models\chapter.py:27
 #: .\unicap\templates\app\backups\index.html:59
 msgid "created at"
@@ -866,8 +896,9 @@ msgstr "نوع التعيين"
 #: .\unicap\app\constants\contract.py:14 .\unicap\app\constants\employee.py:9
 #: .\unicap\app\constants\specialization.py:7
 #: .\unicap\app\filters\contract.py:54 .\unicap\app\filters\employee.py:32
-#: .\unicap\app\filters\specialization.py:10 .\unicap\app\models\contract.py:59
-#: .\unicap\app\models\employee.py:32 .\unicap\app\models\specialization.py:21
+#: .\unicap\app\filters\specialization.py:10
+#: .\unicap\app\models\contract.py:59 .\unicap\app\models\employee.py:32
+#: .\unicap\app\models\specialization.py:21
 msgid "is active"
 msgstr "مفعّل"
 
@@ -965,8 +996,8 @@ msgid "off"
 msgstr "معطّل"
 
 #: .\unicap\app\filters\employee.py:32
-#: .\unicap\app\filters\specialization.py:10 .\unicap\app\views\employees.py:38
-#: .\unicap\app\views\specializations.py:33
+#: .\unicap\app\filters\specialization.py:10
+#: .\unicap\app\views\employees.py:38 .\unicap\app\views\specializations.py:33
 #: .\unicap\templates\components\edu\specializations\cells.html:7
 #: .\unicap\templates\components\edu\specializations\details.html:3
 #: .\unicap\templates\components\hr\employees\cells.html:12
@@ -1078,7 +1109,7 @@ msgstr "الأدنى"
 msgid "max"
 msgstr "الأعلى"
 
-#: .\unicap\app\forms\faculty.py:131
+#: .\unicap\app\forms\faculty.py:143
 #, python-format
 msgid "each specialization is accepted once: %(names)s"
 msgstr "يُقبل كل اختصاص مرة واحدة: %(names)s"
@@ -1121,36 +1152,46 @@ msgstr "في هذا الفصل اختصاص بهذا الاسم."
 msgid "still in use by %(users)s: remove it from them first."
 msgstr "ما زال مستخدماً من قبل %(users)s: أزله منها أولاً."
 
-#: .\unicap\app\models\backup.py:18
+#: .\unicap\app\managers\chapter.py:304
+#| msgid "%(faculty)s is not in this chapter"
+msgid "a faculty of this placement is not in the chapter."
+msgstr "إحدى كليات هذا التوزيع ليست في الفصل."
+
+#: .\unicap\app\managers\contract.py:69
+msgid "this faculty is not there any more."
+msgstr "لم تعد هذه الكلية موجودة."
+
+#: .\unicap\app\middlewares.py:100
+msgid "a broken rule"
+msgstr "قاعدة مخالَفة"
+
+#: .\unicap\app\models\backup.py:19
 #: .\unicap\templates\app\backups\index.html:29
 #: .\unicap\templates\app\backups\index.html:60
 msgid "scope"
 msgstr "النطاق"
 
-#: .\unicap\app\models\backup.py:38 .\unicap\app\models\report_template.py:31
-msgid "file"
-msgstr "الملف"
-
-#: .\unicap\app\models\backup.py:39
+#: .\unicap\app\models\backup.py:44
 #: .\unicap\templates\app\backups\index.html:62
 msgid "size"
 msgstr "الحجم"
 
-#: .\unicap\app\models\backup.py:47
+#: .\unicap\app\models\backup.py:52
 #: .\unicap\templates\app\backups\index.html:63
 msgid "created by"
 msgstr "أنشأها"
 
-#: .\unicap\app\models\backup.py:53
+#: .\unicap\app\models\backup.py:58
 msgid "backup"
 msgstr "نسخة احتياطية"
 
-#: .\unicap\app\models\backup.py:54 .\unicap\app\views\backups.py:40
+#: .\unicap\app\models\backup.py:59 .\unicap\app\views\backups.py:40
+#: .\unicap\templates\app\board\problem.html:13
 #: .\unicap\unicap\constants.py:118
 msgid "backups"
 msgstr "النسخ الاحتياطية"
 
-#: .\unicap\app\models\backup.py:56
+#: .\unicap\app\models\backup.py:61
 msgid "Can restore a backup"
 msgstr "يمكنه استعادة نسخة احتياطية"
 
@@ -1163,7 +1204,9 @@ msgid "is default"
 msgstr "افتراضي"
 
 #: .\unicap\app\models\chapter.py:33 .\unicap\app\search.py:55
-#: .\unicap\app\views\chapters.py:35 .\unicap\unicap\constants.py:112
+#: .\unicap\app\views\chapters.py:35
+#: .\unicap\templates\app\board\problem.html:10
+#: .\unicap\unicap\constants.py:112
 msgid "chapters"
 msgstr "الفصول"
 
@@ -1207,7 +1250,8 @@ msgstr "تقريب الماجستير"
 
 #: .\unicap\app\models\faculty.py:92
 msgid "the faculty's masters in whole PhDs (e.g. one master alone)"
-msgstr "حملة الماجستير في الكلية بعدد كامل من الدكاترة (مثل حامل ماجستير واحد)"
+msgstr ""
+"حملة الماجستير في الكلية بعدد كامل من الدكاترة (مثل حامل ماجستير واحد)"
 
 #: .\unicap\app\models\faculty.py:95
 #: .\unicap\templates\components\edu\faculties\details.html:65
@@ -1343,8 +1387,8 @@ msgid ""
 "how many times the optimizer goes over every contract looking for a better "
 "place: more can find better placements, but takes longer"
 msgstr ""
-"عدد المرات التي يمر فيها المحسّن على كل عقد بحثاً عن مكان أفضل: الأكثر قد يجد "
-"توزيعاً أفضل، لكنه يستغرق وقتاً أطول"
+"عدد المرات التي يمر فيها المحسّن على كل عقد بحثاً عن مكان أفضل: الأكثر قد "
+"يجد توزيعاً أفضل، لكنه يستغرق وقتاً أطول"
 
 #: .\unicap\app\models\settings.py:54
 msgid "app settings"
@@ -1388,7 +1432,9 @@ msgstr "إعدادات العقود"
 msgid ""
 "A contract whose specialization the faculty does not accept is never "
 "counted, nor one of an employee who cannot be counted in that faculty."
-msgstr "العقد الذي لا تقبل الكلية اختصاصه لا يُحتسب أبداً، وكذلك عقد الموظف الذي لا يمكن احتسابه في تلك الكلية."
+msgstr ""
+"العقد الذي لا تقبل الكلية اختصاصه لا يُحتسب أبداً، وكذلك عقد الموظف الذي لا "
+"يمكن احتسابه في تلك الكلية."
 
 #: .\unicap\app\reports\audit.py:33
 msgid ""
@@ -1405,18 +1451,19 @@ msgid ""
 "supported PhDs. Masters are left out first, then parttime, then borrowed, "
 "then staff."
 msgstr ""
-"يُحتسب الاختصاص حتى حصته العليا من جميع المدرسين المحتسبين وحتى حده الأعلى من "
-"المدرسين، ويُحتسب كل نوع حتى الحد الأعلى للدكاترة الاختصاصيين / الداعمين في "
-"الكلية. يُستبعد حملة الماجستير أولاً، ثم الجزئيون، ثم المعارون، ثم الملاك."
+"يُحتسب الاختصاص حتى حصته العليا من جميع المدرسين المحتسبين وحتى حده الأعلى "
+"من المدرسين، ويُحتسب كل نوع حتى الحد الأعلى للدكاترة الاختصاصيين / الداعمين "
+"في الكلية. يُستبعد حملة الماجستير أولاً، ثم الجزئيون، ثم المعارون، ثم "
+"الملاك."
 
 #: .\unicap\app\reports\audit.py:42
 msgid ""
-"Masters are counted up to the number of counted specialized fulltime PhDs; a "
-"specialization's masters per PhD says how many masters make one PhD, and the "
-"faculty's masters rounding how that rounds to whole PhDs."
+"Masters are counted up to the number of counted specialized fulltime PhDs; a"
+" specialization's masters per PhD says how many masters make one PhD, and "
+"the faculty's masters rounding how that rounds to whole PhDs."
 msgstr ""
-"يُحتسب حملة الماجستير حتى عدد الدكاترة الاختصاصيين المتفرغين المحتسبين؛ يحدد "
-"«عدد حملة الماجستير لكل دكتور» في الاختصاص كم حامل ماجستير يعادل دكتوراً "
+"يُحتسب حملة الماجستير حتى عدد الدكاترة الاختصاصيين المتفرغين المحتسبين؛ يحدد"
+" «عدد حملة الماجستير لكل دكتور» في الاختصاص كم حامل ماجستير يعادل دكتوراً "
 "واحداً، ويحدد تقريب الماجستير في الكلية طريقة التقريب إلى دكاترة كاملين."
 
 #: .\unicap\app\reports\audit.py:47
@@ -1424,8 +1471,8 @@ msgid ""
 "Fulltime staff must be at least the min staff percentage of all PhDs signed "
 "to the faculty, the uncounted ones included."
 msgstr ""
-"يجب ألا يقل المتفرغون من الملاك عن الحد الأدنى لنسبة الملاك من جميع الدكاترة "
-"الموقّعين مع الكلية، بمن فيهم غير المحتسبين."
+"يجب ألا يقل المتفرغون من الملاك عن الحد الأدنى لنسبة الملاك من جميع الدكاترة"
+" الموقّعين مع الكلية، بمن فيهم غير المحتسبين."
 
 #: .\unicap\app\reports\audit.py:51
 msgid ""
@@ -1445,8 +1492,8 @@ msgid ""
 "faculty's max students. The chapter's capacity is its faculties' capacities "
 "summed, capped by its own max students."
 msgstr ""
-"الطاقة الاستيعابية = مكافئ الدكاترة المحتسبين × عدد الطلاب لكل دكتور، بما لا "
-"يتجاوز الحد الأعلى لطلاب الكلية. طاقة الفصل هي مجموع طاقات كلياته، بما لا "
+"الطاقة الاستيعابية = مكافئ الدكاترة المحتسبين × عدد الطلاب لكل دكتور، بما لا"
+" يتجاوز الحد الأعلى لطلاب الكلية. طاقة الفصل هي مجموع طاقات كلياته، بما لا "
 "يتجاوز الحد الأعلى لطلابه."
 
 #: .\unicap\app\reports\audit.py:61
@@ -1455,8 +1502,8 @@ msgid ""
 "ones not counted. Every maximum is applied again until none leaves anyone "
 "out."
 msgstr ""
-"عندما تتنافس عدة عقود على مكان واحد، لا تُحتسب العقود الموقّعة أخيراً. يُعاد "
-"تطبيق كل حد أعلى حتى لا يستبعد أيٌّ منها أحداً."
+"عندما تتنافس عدة عقود على مكان واحد، لا تُحتسب العقود الموقّعة أخيراً. يُعاد"
+" تطبيق كل حد أعلى حتى لا يستبعد أيٌّ منها أحداً."
 
 #: .\unicap\app\reports\audit.py:98
 msgid "contracts signed to the faculty"
@@ -1492,12 +1539,12 @@ msgstr "الدكاترة المحتسبون"
 #, python-format
 msgid ""
 "specialized %(specialized)s (fulltime staff %(sfs)s + fulltime borrowed "
-"%(sfb)s + parttime %(sp)s) + supported %(supported)s (fulltime staff %(ufs)s "
-"+ fulltime borrowed %(ufb)s + parttime %(up)s)"
+"%(sfb)s + parttime %(sp)s) + supported %(supported)s (fulltime staff %(ufs)s"
+" + fulltime borrowed %(ufb)s + parttime %(up)s)"
 msgstr ""
 "اختصاصي %(specialized)s (متفرغ ملاك %(sfs)s + متفرغ معار %(sfb)s + جزئي "
-"%(sp)s) + داعم %(supported)s (متفرغ ملاك %(ufs)s + متفرغ معار %(ufb)s + جزئي "
-"%(up)s)"
+"%(sp)s) + داعم %(supported)s (متفرغ ملاك %(ufs)s + متفرغ معار %(ufb)s + جزئي"
+" %(up)s)"
 
 #: .\unicap\app\reports\audit.py:135
 msgid "counted masters, as PhDs"
@@ -1570,7 +1617,8 @@ msgstr "نسبة الملاك"
 #: .\unicap\app\reports\audit.py:167
 #, python-format
 msgid ""
-"%(staff)s fulltime staff ÷ %(phds)s signed PhDs × 100 (minimum %(minimum)s%%)"
+"%(staff)s fulltime staff ÷ %(phds)s signed PhDs × 100 (minimum "
+"%(minimum)s%%)"
 msgstr ""
 "%(staff)s متفرغ ملاك ÷ %(phds)s دكتوراً موقّعاً × 100 (الحد الأدنى "
 "%(minimum)s%%)"
@@ -1787,7 +1835,7 @@ msgstr "الكادر حسب الاختصاص"
 msgid "signed teachers"
 msgstr "المدرسون الموقّعون"
 
-#: .\unicap\app\reports\documents.py:59
+#: .\unicap\app\reports\documents.py:67
 #, python-format
 msgid "%(faculty)s is not in this chapter"
 msgstr "%(faculty)s ليست في هذا الفصل"
@@ -1808,7 +1856,8 @@ msgstr "تعذّر إنشاء ملف PDF: لم يُنتج المحوّل أي م
 
 #: .\unicap\app\reports\pdf.py:103
 msgid ""
-"A PDF needs LibreOffice on the server (set SOFFICE_PATH), or Word on Windows."
+"A PDF needs LibreOffice on the server (set SOFFICE_PATH), or Word on "
+"Windows."
 msgstr ""
 "يحتاج ملف PDF إلى LibreOffice على الخادم (اضبط SOFFICE_PATH)، أو Word على "
 "Windows."
@@ -1878,7 +1927,12 @@ msgstr "رُفعت النسخة الاحتياطية: %(backup)s"
 msgid "restored. What it replaced is saved as: %(backup)s"
 msgstr "تمت الاستعادة. ما استُبدل محفوظ في: %(backup)s"
 
-#: .\unicap\app\views\backups.py:152
+#: .\unicap\app\views\backups.py:138
+#| msgid "this backup is incomplete."
+msgid "this backup's file is gone."
+msgstr "ملف هذه النسخة الاحتياطية لم يعد موجوداً."
+
+#: .\unicap\app\views\backups.py:155
 msgid "backup deleted."
 msgstr "حُذفت النسخة الاحتياطية."
 
@@ -1909,22 +1963,22 @@ msgstr "مسح الحد الأعلى للطلاب"
 msgid "chapter actions"
 msgstr "إجراءات الفصل"
 
-#: .\unicap\app\views\chapters.py:139
+#: .\unicap\app\views\chapters.py:141
 #, python-format
 msgid "%(name)s is the default chapter now."
 msgstr "أصبح %(name)s الفصل الافتراضي."
 
-#: .\unicap\app\views\chapters.py:152
+#: .\unicap\app\views\chapters.py:154
 #, python-format
 msgid "%(name)s (copy)"
 msgstr "%(name)s (نسخة)"
 
-#: .\unicap\app\views\chapters.py:163
+#: .\unicap\app\views\chapters.py:165
 #, python-format
 msgid "%(name)s created: it is the chapter shown now."
 msgstr "أُنشئ %(name)s: وهو الفصل المعروض الآن."
 
-#: .\unicap\app\views\chapters.py:173
+#: .\unicap\app\views\chapters.py:175
 #, python-format
 msgid "duplicate %(name)s"
 msgstr "نسخ %(name)s"
@@ -1947,70 +2001,70 @@ msgstr "إلغاء التوقيع"
 msgid "order"
 msgstr "الترتيب"
 
-#: .\unicap\app\views\crud.py:318
+#: .\unicap\app\views\crud.py:319
 #, python-format
 msgid "%(name)s created."
 msgstr "أُنشئ %(name)s."
 
-#: .\unicap\app\views\crud.py:318
+#: .\unicap\app\views\crud.py:319
 #, python-format
 msgid "%(name)s saved."
 msgstr "حُفظ %(name)s."
 
-#: .\unicap\app\views\crud.py:331
+#: .\unicap\app\views\crud.py:332
 #, python-format
 msgid "new %(what)s"
 msgstr "%(what)s جديد"
 
-#: .\unicap\app\views\crud.py:361
+#: .\unicap\app\views\crud.py:362
 #, python-format
 msgid "%(count)s deleted."
 msgstr "حُذف %(count)s."
 
-#: .\unicap\app\views\crud.py:388
+#: .\unicap\app\views\crud.py:389
 #, python-format
 msgid "%(name)s is on."
 msgstr "فُعّل %(name)s."
 
-#: .\unicap\app\views\crud.py:388
+#: .\unicap\app\views\crud.py:389
 #, python-format
 msgid "%(name)s is off."
 msgstr "عُطّل %(name)s."
 
-#: .\unicap\app\views\crud.py:415
+#: .\unicap\app\views\crud.py:416
 #, python-format
 msgid "%(what)s sample"
 msgstr "نموذج %(what)s"
 
-#: .\unicap\app\views\crud.py:424
+#: .\unicap\app\views\crud.py:425
 msgid "Choose a file."
 msgstr "اختر ملفاً."
 
-#: .\unicap\app\views\crud.py:432
+#: .\unicap\app\views\crud.py:433
 #, python-format
 msgid "%(count)s row(s) imported."
 msgstr "استُورد %(count)s صف."
 
-#: .\unicap\app\views\crud.py:441
+#: .\unicap\app\views\crud.py:442
 #, python-format
 msgid "import %(what)s"
 msgstr "استيراد %(what)s"
 
-#: .\unicap\app\views\crud.py:456
+#: .\unicap\app\views\crud.py:457
 #, python-format
 msgid "Only .xlsx and .csv files can be imported, not %(name)s."
 msgstr "يمكن استيراد ملفات ‎.xlsx و‎.csv فقط، وليس %(name)s."
 
-#: .\unicap\app\views\crud.py:465
+#: .\unicap\app\views\crud.py:466
 #, python-format
 msgid "%(name)s cannot be read: %(error)s"
 msgstr "تعذّرت قراءة %(name)s: %(error)s"
 
-#: .\unicap\app\views\crud.py:509
+#: .\unicap\app\views\crud.py:510
 msgid "check the fields to change."
 msgstr "حدّد الحقول التي تريد تغييرها."
 
-#: .\unicap\app\views\crud.py:516 .\unicap\app\views\crud.py:549
+#: .\unicap\app\views\crud.py:517 .\unicap\app\views\crud.py:550
 #, python-format
 msgid "%(count)s row(s) changed."
 msgstr "تغيّر %(count)s صف."
@@ -2047,6 +2101,48 @@ msgstr "الحالي · الهدف · الأعلى"
 #: .\unicap\unicap\constants.py:64
 msgid "faculty reports"
 msgstr "تقارير الكليات"
+
+#: .\unicap\templates\403.html:2
+#| msgid "not calculated"
+msgid "not allowed"
+msgstr "غير مسموح"
+
+#: .\unicap\templates\403.html:3
+msgid ""
+"you are not allowed to open this page: ask an admin for the permission."
+msgstr "غير مسموح لك بفتح هذه الصفحة: اطلب الصلاحية من أحد المدراء."
+
+#: .\unicap\templates\404.html:2
+#| msgid "not counted"
+msgid "page not found"
+msgstr "الصفحة غير موجودة"
+
+#: .\unicap\templates\404.html:3
+msgid ""
+"there is nothing at this address: it may have been deleted, or belong to "
+"another chapter."
+msgstr "لا يوجد شيء في هذا العنوان: ربما حُذف، أو يتبع فصلاً آخر."
+
+#: .\unicap\templates\500.html:6
+msgid "server error"
+msgstr "خطأ في الخادم"
+
+#: .\unicap\templates\500.html:19
+msgid "Something went wrong on the server"
+msgstr "حدث خطأ في الخادم"
+
+#: .\unicap\templates\500.html:20
+msgid ""
+"Nothing was saved. Try again; if it happens again, tell an admin what you "
+"were doing."
+msgstr ""
+"لم يُحفظ شيء. حاول مجدداً؛ وإن تكرر ذلك فأخبر أحد المدراء بما كنت تفعله."
+
+#: .\unicap\templates\500.html:21
+#: .\unicap\templates\components\layout\error-page.html:21
+#| msgid "open the board"
+msgid "back to the dashboard"
+msgstr "العودة إلى لوحة المعلومات"
 
 #: .\unicap\templates\app\backups\delete-modal.html:3
 #: .\unicap\templates\app\backups\delete-modal.html:7
@@ -2131,10 +2227,11 @@ msgstr "ستُستبدل كل الفصول والإعدادات بهذه الن�
 
 #: .\unicap\templates\app\backups\restore-modal.html:11
 msgid ""
-"the chapter's rows and settings are replaced by this backup, or it becomes a "
-"new chapter."
+"the chapter's rows and settings are replaced by this backup, or it becomes a"
+" new chapter."
 msgstr ""
-"ستُستبدل بيانات الفصل وإعداداته بهذه النسخة الاحتياطية، أو تصبح فصلاً جديداً."
+"ستُستبدل بيانات الفصل وإعداداته بهذه النسخة الاحتياطية، أو تصبح فصلاً "
+"جديداً."
 
 #: .\unicap\templates\app\backups\restore-modal.html:13
 #, python-format
@@ -2156,6 +2253,7 @@ msgid "upload"
 msgstr "رفع"
 
 #: .\unicap\templates\app\board\dashboard.html:5
+#: .\unicap\templates\app\board\problem.html:5
 msgid "this chapter's data breaks a rule"
 msgstr "بيانات هذا الفصل تخالف قاعدة"
 
@@ -2363,6 +2461,11 @@ msgstr ""
 msgid "apply these moves"
 msgstr "تطبيق هذه التنقلات"
 
+#: .\unicap\templates\app\board\problem.html:7
+#| msgid "the employee cannot be counted in this faculty"
+msgid "this page cannot be shown until it is fixed."
+msgstr "لا يمكن عرض هذه الصفحة قبل تصحيح ذلك."
+
 #: .\unicap\templates\app\board\recommend-modal.html:2
 msgid "recommend contracts"
 msgstr "اقتراح عقود"
@@ -2372,8 +2475,8 @@ msgid ""
 "how many contracts, of which kind, specialization and faculty, the "
 "university should sign so that no violation is left. Nothing is saved."
 msgstr ""
-"كم عقداً، ومن أي نوع واختصاص وكلية، يجب أن توقع الجامعة كي لا تبقى أي مخالفة. "
-"لا يُحفظ شيء."
+"كم عقداً، ومن أي نوع واختصاص وكلية، يجب أن توقع الجامعة كي لا تبقى أي "
+"مخالفة. لا يُحفظ شيء."
 
 #: .\unicap\templates\app\board\recommend-modal.html:35
 msgid "nothing to sign: no problem is left."
@@ -2412,8 +2515,8 @@ msgstr "ما يبقى بعد التوقيع"
 
 #: .\unicap\templates\app\board\recommend-modal.html:91
 msgid ""
-"a greedy search, faculty by faculty: each step signs the contract that helps "
-"the most for the strategy. Masters are suggested by the PhD they are worth "
+"a greedy search, faculty by faculty: each step signs the contract that helps"
+" the most for the strategy. Masters are suggested by the PhD they are worth "
 "together."
 msgstr ""
 "بحث جشع، كلية تلو الأخرى: كل خطوة توقع العقد الأكثر فائدة حسب الاستراتيجية. "
@@ -2421,6 +2524,7 @@ msgstr ""
 
 #: .\unicap\templates\app\board\recommend-modal.html:97
 #: .\unicap\templates\app\crud\details-modal.html:12
+#: .\unicap\templates\components\layout\error-toast.html:17
 #: .\unicap\templates\components\layout\filters-sidebar.html:43
 #: .\unicap\templates\components\layout\modal-body.html:35
 #: .\unicap\templates\components\layout\toast.html:18
@@ -2437,8 +2541,8 @@ msgid ""
 "make all %(signed)s signed contract(s) of %(name)s unsigned? Their terms "
 "stay; only the faculties are cleared."
 msgstr ""
-"جعل كل العقود الموقّعة (%(signed)s) في %(name)s غير موقّعة؟ تبقى شروطها؛ تُفرّغ "
-"الكليات فقط."
+"جعل كل العقود الموقّعة (%(signed)s) في %(name)s غير موقّعة؟ تبقى شروطها؛ "
+"تُفرّغ الكليات فقط."
 
 #: .\unicap\templates\app\board\welcome.html:5
 msgid "Welcome to UniCap"
@@ -2450,8 +2554,8 @@ msgid ""
 "teaching staff. Everything lives in a chapter (a term, or a scenario): its "
 "specializations, faculties, employees and contracts."
 msgstr ""
-"يحسب UniCap عدد الطلاب الذين يحق للجامعة قبولهم بحسب كادرها التدريسي. كل شيء "
-"يعيش داخل فصل (فصل دراسي، أو سيناريو): اختصاصاته وكلياته ومدرّسوه وعقوده."
+"يحسب UniCap عدد الطلاب الذين يحق للجامعة قبولهم بحسب كادرها التدريسي. كل شيء"
+" يعيش داخل فصل (فصل دراسي، أو سيناريو): اختصاصاته وكلياته ومدرّسوه وعقوده."
 
 #: .\unicap\templates\app\board\welcome.html:11
 msgid "create the first chapter"
@@ -2564,7 +2668,8 @@ msgid ""
 "added, nothing is deleted. All rows are saved, or none."
 msgstr ""
 "ملف Excel (xlsx) أو CSV بأعمدة التصدير نفسها. تشير الصفوف إلى بعضها بالاسم؛ "
-"يُحدَّث الصف الموجود اسمه، ويضاف الجديد، ولا يحذف شيء. تُحفظ كل الصفوف أو لا شيء."
+"يُحدَّث الصف الموجود اسمه، ويضاف الجديد، ولا يحذف شيء. تُحفظ كل الصفوف أو لا"
+" شيء."
 
 #: .\unicap\templates\app\crud\import-modal.html:9
 #: .\unicap\templates\app\crud\index.html:136
@@ -3068,6 +3173,22 @@ msgstr "قائمة المستخدم"
 msgid "log out"
 msgstr "تسجيل الخروج"
 
+#: .\unicap\templates\components\layout\messages.html:12
+msgid "you are not allowed to do this."
+msgstr "غير مسموح لك بهذا الإجراء."
+
+#: .\unicap\templates\components\layout\messages.html:13
+msgid "this is not there any more: reload the page."
+msgstr "لم يعد هذا موجوداً: أعد تحميل الصفحة."
+
+#: .\unicap\templates\components\layout\messages.html:14
+msgid "the server cannot be reached: check the connection, then try again."
+msgstr "تعذّر الوصول إلى الخادم: تحقق من الاتصال ثم حاول مجدداً."
+
+#: .\unicap\templates\components\layout\messages.html:15
+msgid "something went wrong on the server: nothing was saved."
+msgstr "حدث خطأ في الخادم: لم يُحفظ شيء."
+
 #: .\unicap\templates\components\layout\modal-body.html:24
 #: .\unicap\templates\components\layout\modal-body.html:25
 msgid "maximize"
@@ -3106,23 +3227,23 @@ msgid "PDF"
 msgstr "PDF"
 
 #: .\unicap\templates\registration\login.html:9
-#: .\unicap\templates\registration\login.html:35
+#: .\unicap\templates\registration\login.html:36
 msgid "log in"
 msgstr "تسجيل الدخول"
 
-#: .\unicap\templates\registration\login.html:19
+#: .\unicap\templates\registration\login.html:20
 msgid "university capacity calculator"
 msgstr "حاسبة الطاقة الاستيعابية للجامعة"
 
-#: .\unicap\templates\registration\login.html:25
+#: .\unicap\templates\registration\login.html:26
 msgid "the username or password is not right."
 msgstr "اسم المستخدم أو كلمة المرور غير صحيحة."
 
-#: .\unicap\templates\registration\login.html:28
+#: .\unicap\templates\registration\login.html:29
 msgid "username"
 msgstr "اسم المستخدم"
 
-#: .\unicap\templates\registration\login.html:32
+#: .\unicap\templates\registration\login.html:33
 msgid "password"
 msgstr "كلمة المرور"
 
@@ -3142,11 +3263,11 @@ msgstr "الإعدادات"
 msgid "admin panel"
 msgstr "لوحة الإدارة"
 
-#: .\unicap\unicap\settings\base.py:130
+#: .\unicap\unicap\settings\base.py:131
 msgid "English"
 msgstr "الإنجليزية"
 
-#: .\unicap\unicap\settings\base.py:131
+#: .\unicap\unicap\settings\base.py:132
 msgid "Arabic"
 msgstr "العربية"
 

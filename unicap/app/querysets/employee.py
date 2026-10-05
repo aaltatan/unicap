@@ -28,6 +28,10 @@ class EmployeeQuerySet(BaseQuerySet):
             specialization_type=F("accepted__specialization_type"),
         )
 
+    def with_excluded_faculties(self) -> Self:
+        """Prefetch the faculties each employee cannot be counted in (one query for all)."""
+        return self.prefetch_related("excluded_faculties")
+
     def holding(self, specialization_id: int) -> Self:
         """Employees whose specialization this is."""
         return self.filter(specialization_id=specialization_id)

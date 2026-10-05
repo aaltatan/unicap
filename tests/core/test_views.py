@@ -1,6 +1,7 @@
 """Every page: logins, permissions, whole pages vs HTMX partials, and the HTMX headers."""
 
 import json
+from unittest import mock
 
 import pytest
 from django.test import Client
@@ -8,7 +9,7 @@ from django.urls import reverse
 from selectolax.parser import HTMLParser
 
 from tests.conftest import htmx
-from unicap.app.models import Chapter, Contract, Faculty, Specialization
+from unicap.app.models import Chapter, Contract, Faculty, Specialization, User
 
 INDEX_PAGES = [
     "board:dashboard",
@@ -305,3 +306,52 @@ def test_the_filters_button_counts_only_the_filters_applied(
     # the reset clears the filters only: the search and the sorting stay
     reset = filtered.css_first("#filters-reset a").attributes["href"]
     assert reset == f"{url}?q=a&ordering=-position"
+
+
+@pytest.mark.parametrize("value", ["abc", "", "999999"])
+def test_the_header_refuses_what_is_not_a_chapter(
+    admin_client: Client, chapter: Chapter, value: str
+) -> None:
+    response = admin_client.post(reverse("chapters:select"), {"chapter": value, "next": "/"})
+
+    assert response.status_code == 404
+
+
+# --- when a request fails -----------------------------------------------------------------
+
+
+def test_a_refused_page_says_so(viewer_client: Client, chapter: Chapter) -> None:
+    response = viewer_client.get(reverse("edu:faculties:create"))
+
+    assert response.status_code == 403
+    assert "not allowed" in HTMLParser(response.content).css_first("main").text()
+
+
+def test_an_unknown_address_says_so(admin_client: Client, client: Client) -> None:
+    for visitor in (admin_client, client):  # logged in or not: the page needs no user
+        response = visitor.get("/no/such/page/")
+
+        assert response.status_code == 404
+        assert "nothing at this address" in HTMLParser(response.content).css_first("main").text()
+
+
+@pytest.mark.django_db
+def test_the_server_error_page_needs_nothing(client: Client) -> None:
+    client.raise_request_exception = False
+
+    with mock.patch("unicap.app.views.search.search_everything", side_effect=RuntimeError):
+        admin = User.objects.create_superuser("root", password="password")  # noqa: S106
+        client.force_login(admin)
+        response = client.get(reverse("search"), {"q": "x"})
+
+    assert response.status_code == 500
+    assert "went wrong" in response.content.decode()
+
+
+@pytest.mark.parametrize("status", ["403", "404", "offline", "error"])
+def test_every_page_holds_the_toast_of_a_failed_htmx_request(
+    admin_client: Client, chapter: Chapter, status: str
+) -> None:
+    html = HTMLParser(admin_client.get(reverse("board:dashboard")).content)
+
+    assert html.css_first(f'template[data-error-toast="{status}"]') is not None

@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from ..choices import BackupScopeChoices, BackupSectionChoices
 from ..managers import BackupManager
+from ..storages import PrivateStorage
 from .abstracts import NotedModel
 
 
@@ -35,7 +36,11 @@ class Backup(NotedModel):
         verbose_name=_("chapter"),
     )
     chapter_name = models.CharField(verbose_name=_("chapter"), max_length=255, blank=True)
-    file = models.FileField(verbose_name=_("file"), upload_to="backups/")
+    file = models.FileField(
+        verbose_name=_("file"),
+        upload_to="backups/",
+        storage=PrivateStorage(),  # downloaded through `backups:download` only
+    )
     size = models.PositiveIntegerField(verbose_name=_("size"), default=0)
     created_at = models.DateTimeField(verbose_name=_("created at"), auto_now_add=True)
     created_by = models.ForeignKey(

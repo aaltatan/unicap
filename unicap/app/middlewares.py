@@ -1,11 +1,18 @@
 from collections.abc import Callable
+from http import HTTPStatus
 from typing import TYPE_CHECKING, cast
 
+from django.contrib import messages
 from django.contrib.messages import get_messages
 from django.http import HttpRequest, HttpResponse
+from django.shortcuts import render
 from django.template.loader import render_to_string
+from django.utils.translation import gettext as _
+
+from unicap.domain import DomainError
 
 from .managers.base import chapters
+from .texts import error_text
 
 if TYPE_CHECKING:
     from .models import Chapter
@@ -61,6 +68,38 @@ class HtmxMessagesMiddleware:
             )
 
         return response
+
+
+class DomainErrorMiddleware:
+    """A page of a chapter whose stored rows break a rule shows the rule, not a server error.
+
+    Writes are validated before they commit, so this is rare (rows restored or edited
+    behind the rules, a rule added later). The whole page becomes the problem's page (409);
+    an HTMX request leaves the page as it is and shows the problem as a toast.
+    """
+
+    def __init__(self, get_response: GetResponse) -> None:  # noqa: D107
+        self.get_response = get_response
+
+    def __call__(self, request: HttpRequest) -> HttpResponse:  # noqa: D102
+        return self.get_response(request)
+
+    def process_exception(self, request: HttpRequest, exception: Exception) -> HttpResponse | None:
+        """Answer a `DomainError` no view caught; any other exception is left alone."""
+        if not isinstance(exception, DomainError):
+            return None
+
+        problem = error_text(exception)
+
+        if getattr(request, "htmx", False):
+            messages.error(request, problem)
+            response = HttpResponse("")
+            response["HX-Reswap"] = "none"
+            return response
+
+        context = {"page_title": _("a broken rule"), "problem": problem}
+
+        return render(request, "app/board/problem.html", context, status=HTTPStatus.CONFLICT)
 
 
 def _current_chapter(request: HttpRequest) -> "Chapter | None":

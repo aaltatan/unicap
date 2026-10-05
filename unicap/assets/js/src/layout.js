@@ -62,6 +62,11 @@ export function layout() {
         this.modalOpen = false;
         document.getElementById("modal-container").innerHTML = "";
       });
+
+      // a request that failed swaps nothing: say so, in the words the server wrote
+      document.body.addEventListener("htmx:responseError", (event) => errorToast(event.detail.xhr.status));
+      document.body.addEventListener("htmx:sendError", () => errorToast("offline"));
+      document.body.addEventListener("htmx:timeout", () => errorToast("offline"));
     },
 
     toggleNav() {
@@ -88,6 +93,16 @@ export function layout() {
       }, 200);
     },
   };
+}
+
+/** Show the toast the layout holds for a failed request (`<template data-error-toast>`). */
+function errorToast(status) {
+  const toasts = document.getElementById("messages");
+  const template =
+    document.querySelector(`template[data-error-toast="${status}"]`) ||
+    document.querySelector('template[data-error-toast="error"]');
+
+  if (toasts && template) toasts.appendChild(template.content.cloneNode(true));
 }
 
 /** A dropdown menu: open / close, closing on outside click and Escape. */

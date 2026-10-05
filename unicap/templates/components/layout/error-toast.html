@@ -1,0 +1,21 @@
+{% load i18n %}
+<c-vars status="error" />
+<!-- copied into the toasts by layout.js when an HTMX request fails with this status -->
+<template data-error-toast="{{ status }}">
+  <div
+    x-data="toast('error')"
+    x-show="show"
+    x-transition:enter="transition duration-200 ease-out"
+    x-transition:enter-start="opacity-0 translate-y-2"
+    x-transition:leave="transition duration-150 ease-in"
+    x-transition:leave-end="opacity-0"
+    class="card pointer-events-auto flex items-start gap-2 p-3 text-sm shadow-lg"
+    role="alert"
+  >
+    <span class="shrink-0 text-rose-500">{% heroicon_outline "exclamation-circle" size=20 %}</span>
+    <p class="flex-1 first-letter:uppercase">{{ slot }}</p>
+    <button type="button" class="btn btn-ghost btn-icon -m-1" @click="show = false" aria-label="{% translate 'close' %}">
+      {% heroicon_outline "x-mark" size=16 %}
+    </button>
+  </div>
+</template>

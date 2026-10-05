@@ -166,6 +166,59 @@ _DUMPERS = {
 }
 
 
+# --- checking a file ----------------------------------------------------------------------
+
+# what a row of each section cannot go without: the names it is found by
+_REQUIRED = {
+    "specializations": ("name",),
+    "faculties": ("name",),
+    "employees": ("name", "specialization"),
+    "contracts": ("employee",),
+}
+
+
+def check_chapter(data: object) -> None:
+    """A chapter of an uploaded file has the shape `load_chapter` reads.
+
+    Only the shape: a named chapter, sections that are lists of rows, each row holding the
+    names it is found by. The values are checked when they are saved.
+
+    Raises:
+        UserError: naming what is missing, and where.
+    """
+    if not isinstance(data, dict) or not _is_name(data.get("name")):
+        raise UserError(_("this backup is incomplete: a chapter has no name."))
+
+    for section in SECTIONS:
+        if section in data:
+            _check_rows(data[section], section, _REQUIRED[section])
+
+    for faculty in data.get("faculties", ()):
+        if "shares" in faculty:
+            _check_rows(faculty["shares"], "faculties", ("specialization",))
+
+
+def _check_rows(rows: object, section: str, required: Iterable[str]) -> None:
+    if not isinstance(rows, list) or not all(isinstance(row, dict) for row in rows):
+        msg = _("this backup is incomplete: %(section)s is not a list of rows.") % {
+            "section": _(section),
+        }
+        raise UserError(msg)
+
+    for number, row in enumerate(rows, start=1):
+        if missing := [key for key in required if not _is_name(row.get(key))]:
+            msg = _("this backup is incomplete: %(section)s, row %(row)s has no %(fields)s.") % {
+                "section": _(section),
+                "row": number,
+                "fields": ", ".join(missing),
+            }
+            raise UserError(msg)
+
+
+def _is_name(value: object) -> bool:
+    return isinstance(value, str) and bool(value.strip())
+
+
 # --- restoring ----------------------------------------------------------------------------
 
 

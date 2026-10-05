@@ -94,6 +94,55 @@ def test_a_faculty_report_downloads_as_pdf(
     assert faculty.name in docx_text(converter[0])
 
 
+def test_the_same_report_is_converted_once(
+    admin_client: Client,
+    chapter: Chapter,
+    converter: list[bytes],
+) -> None:
+    for _again in range(3):
+        response = admin_client.get(reverse("reports:capacity-pdf"))
+        assert b"".join(response.streaming_content) == PDF
+
+    assert len(converter) == 1
+
+
+def test_a_change_in_the_chapter_is_converted_again(
+    admin_client: Client,
+    chapter: Chapter,
+    converter: list[bytes],
+) -> None:
+    admin_client.get(reverse("reports:capacity-pdf"))
+
+    faculty = Faculty.objects.for_chapter(chapter.pk).first()
+    faculty.students_per_phd += 1
+    faculty.save()
+
+    admin_client.get(reverse("reports:capacity-pdf"))
+    admin_client.get(reverse("reports:capacity-pivot-pdf"))  # another report: its own PDF
+
+    assert len(converter) == 3
+
+
+def test_a_failed_conversion_is_not_remembered(
+    admin_client: Client,
+    chapter: Chapter,
+    mocker: MockerFixture,
+) -> None:
+    def fail(source: Path, target: Path) -> None:
+        raise subprocess.CalledProcessError(1, "soffice")
+
+    mocker.patch.object(pdf, "_converter", return_value=fail)
+    admin_client.get(reverse("reports:capacity-pdf"))
+
+    def convert(source: Path, target: Path) -> None:
+        target.write_bytes(PDF)
+
+    mocker.patch.object(pdf, "_converter", return_value=convert)
+    response = admin_client.get(reverse("reports:capacity-pdf"))
+
+    assert b"".join(response.streaming_content) == PDF
+
+
 def test_without_an_office_suite_the_page_says_why(
     admin_client: Client,
     chapter: Chapter,

@@ -2,9 +2,11 @@ from collections.abc import Iterable, Mapping
 from typing import TYPE_CHECKING, Any
 
 from django.db.models import Max
+from django.utils.translation import gettext as _
 
 from unicap.domain import ContractStatus
 
+from ..exceptions import UserError
 from ..querysets import ContractQuerySet
 from .base import ChapterOwnedManager, chapters, check_rows
 
@@ -58,8 +60,14 @@ class ContractManager(ChapterOwnedManager.from_queryset(ContractQuerySet)):  # t
         """Drag and drop: sign the contract to `faculty_id` (None: unsigned).
 
         Raises:
+            UserError: there is no such faculty; nothing is saved.
             DomainError: the faculty is not the chapter's; nothing is saved.
         """
+        faculties = self.model._meta.get_field("faculty").related_model._default_manager  # noqa: SLF001
+
+        if faculty_id is not None and not faculties.filter(pk=faculty_id).exists():
+            raise UserError(_("this faculty is not there any more."))
+
         contract.faculty_id = faculty_id
 
         return self.save_contract(contract)

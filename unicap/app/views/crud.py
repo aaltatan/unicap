@@ -199,8 +199,6 @@ def render_index(  # noqa: PLR0913 - the request, what to list and how to show i
     """
     params = request.GET
 
-    total = queryset.count()
-
     filterset = resource.filterset(params or None, queryset=queryset, request=request)
 
     rows = cast(
@@ -221,6 +219,9 @@ def render_index(  # noqa: PLR0913 - the request, what to list and how to show i
     per_page = _per_page(params.get("per_page"), _view_settings(resource).per_page)
 
     page = Paginator(rows, per_page).get_page(params.get("page"))
+
+    # unnarrowed, the page's count is the total: one COUNT instead of two
+    total = queryset.count() if _is_narrowed(filterset) else page.paginator.count
 
     objects = list(page.object_list)
 
@@ -677,6 +678,14 @@ def _active_filters(filterset: FilterSet) -> int:
     return sum(
         1 for name, value in filterset.form.cleaned_data.items() if name != "q" and _holds(value)
     )
+
+
+def _is_narrowed(filterset: FilterSet) -> bool:
+    """A search or a filter leaves some rows out (an invalid one filters nothing)."""
+    if not filterset.is_bound or not filterset.is_valid():
+        return False
+
+    return any(_holds(value) for value in filterset.form.cleaned_data.values())
 
 
 def _holds(value: object) -> bool:

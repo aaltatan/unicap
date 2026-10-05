@@ -117,7 +117,9 @@ def bulk_delete(request: AppRequest) -> HttpResponse:
 @require_POST
 def select(request: AppRequest) -> HttpResponse:
     """The header's chapter switcher: every page now shows this chapter."""
-    chapter = get_object_or_404(Chapter, pk=request.POST.get("chapter") or 0)
+    chosen = request.POST.get("chapter", "")
+
+    chapter = get_object_or_404(Chapter, pk=chosen if chosen.isdigit() else 0)
 
     request.session[SESSION_CHAPTER] = chapter.pk
 

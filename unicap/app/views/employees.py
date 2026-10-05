@@ -52,6 +52,7 @@ def index(request: ChapterRequest) -> HttpResponse:
         RESOURCE,
         Employee.objects.for_chapter(chapter_id).with_contract().annotate_specialization_type(),
         decorate=lambda rows: Employee.objects.attach_statuses(rows, chapter_id),
+        export_queryset=lambda rows: rows.with_excluded_faculties(),
     )
 
 

@@ -1,0 +1,3 @@
+{% load i18n %}
+{% translate 'page not found' as title %}
+<c-layout.error-page :title="title" icon="magnifying-glass">{% translate 'there is nothing at this address: it may have been deleted, or belong to another chapter.' %}</c-layout.error-page>
