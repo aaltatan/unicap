@@ -1,0 +1,47 @@
+{% load i18n %}
+{% comment %}
+  A modal's card. `width`: md / lg / xl / full (the section's settings). With resizable
+  modals (the app's settings) the corner drags it wider or taller, and a button maximizes it.
+{% endcomment %}
+<c-vars title="" width="lg" />
+{% with resizable=app_settings.resizable_modals %}
+<div
+  class="card mx-auto flex max-h-[84vh] max-w-[calc(100vw-1.5rem)] flex-col overflow-hidden {% if resizable %}min-h-48 min-w-72 resize{% endif %}"
+  style="width: min({% if width == 'md' %}32rem{% elif width == 'xl' %}56rem{% elif width == 'full' %}100vw{% else %}42rem{% endif %}, calc(100vw - 1.5rem))"
+  {% if resizable %}
+  x-data="{ maximized: false }"
+  :class="maximized && '!h-[90vh] !max-h-[90vh] !w-[calc(100vw-1.5rem)] !resize-none'"
+  {% endif %}
+>
+  <div class="flex items-center gap-2 border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
+    <h2 class="truncate text-base font-semibold first-letter:uppercase">{{ title }}</h2>
+    {{ header_actions }}
+    {% if resizable %}
+    <button
+      type="button"
+      class="btn btn-ghost btn-icon ms-auto"
+      @click="maximized = !maximized"
+      :title="maximized ? '{% translate 'restore' %}' : '{% translate 'maximize' %}'"
+      :aria-label="maximized ? '{% translate 'restore' %}' : '{% translate 'maximize' %}'"
+    >
+      <span x-show="!maximized">{% heroicon_outline "arrows-pointing-out" size=18 %}</span>
+      <span x-show="maximized" x-cloak>{% heroicon_outline "arrows-pointing-in" size=18 %}</span>
+    </button>
+    {% endif %}
+    <button
+      type="button"
+      class="btn btn-ghost btn-icon {% if not resizable %}ms-auto{% endif %}"
+      @click="closeModal()"
+      aria-label="{% translate 'close' %}"
+    >
+      {% heroicon_outline "x-mark" size=18 %}
+    </button>
+  </div>
+  <div class="scroll flex-1 overflow-y-auto px-4 py-3">{{ slot }}</div>
+  {% if footer %}
+  <div class="flex flex-wrap items-center justify-end gap-2 border-t border-neutral-200 bg-neutral-50 px-4 py-3 dark:border-neutral-800 dark:bg-neutral-900/60">
+    {{ footer }}
+  </div>
+  {% endif %}
+</div>
+{% endwith %}

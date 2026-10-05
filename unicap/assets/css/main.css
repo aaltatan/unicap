@@ -1,0 +1,283 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply antialiased;
+  }
+
+  [x-cloak] {
+    display: none !important;
+  }
+
+  ::selection {
+    @apply bg-indigo-200 dark:bg-indigo-800;
+  }
+}
+
+@layer components {
+  /* inputs */
+  .input {
+    @apply block w-full rounded-md border border-neutral-300 bg-white px-2.5 py-1.5 text-sm text-neutral-900 shadow-sm placeholder:text-neutral-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 disabled:cursor-not-allowed disabled:opacity-60 aria-[invalid=true]:border-rose-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:placeholder:text-neutral-500;
+  }
+
+  select.input {
+    @apply pe-8;
+  }
+
+  textarea.input {
+    @apply min-h-[2.25rem] resize-y;
+  }
+
+  .checkbox {
+    @apply size-4 cursor-pointer rounded border-neutral-300 text-indigo-600 accent-indigo-600 focus:ring-indigo-500 dark:border-neutral-600 dark:bg-neutral-900;
+  }
+
+  .label {
+    @apply mb-1 block text-xs font-medium text-neutral-600 first-letter:uppercase dark:text-neutral-300;
+  }
+
+  /* buttons */
+  .btn {
+    @apply inline-flex cursor-pointer select-none items-center justify-center gap-1.5 whitespace-nowrap rounded-md border px-3 py-1.5 text-sm font-medium transition-colors first-letter:uppercase focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50;
+  }
+
+  .btn-default {
+    @apply border-neutral-300 bg-white text-neutral-800 hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800;
+  }
+
+  .btn-primary {
+    @apply border-indigo-600 bg-indigo-600 text-white hover:bg-indigo-700 dark:border-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400;
+  }
+
+  .btn-danger {
+    @apply border-rose-600 bg-rose-600 text-white hover:bg-rose-700;
+  }
+
+  .btn-ghost {
+    @apply border-transparent bg-transparent text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-300 dark:hover:bg-neutral-800 dark:hover:text-white;
+  }
+
+  .btn-icon {
+    @apply px-1.5;
+  }
+
+  /* surfaces */
+  .card {
+    @apply rounded-xl border border-neutral-200 bg-white shadow-sm dark:border-neutral-800 dark:bg-neutral-900;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium first-letter:uppercase;
+  }
+
+  .badge-neutral {
+    @apply bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300;
+  }
+
+  .badge-success {
+    @apply bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300;
+  }
+
+  .badge-danger {
+    @apply bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-300;
+  }
+
+  .badge-warning {
+    @apply bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300;
+  }
+
+  .badge-info {
+    @apply bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300;
+  }
+
+  /* menus */
+  .menu {
+    @apply absolute z-40 mt-1 min-w-48 overflow-hidden rounded-lg border border-neutral-200 bg-white p-1 shadow-lg dark:border-neutral-700 dark:bg-neutral-900;
+  }
+
+  .menu-item {
+    @apply flex w-full cursor-pointer items-center gap-2 rounded-md px-2.5 py-1.5 text-start text-sm text-neutral-700 first-letter:uppercase hover:bg-neutral-100 dark:text-neutral-200 dark:hover:bg-neutral-800;
+  }
+
+  /* the popup of whatever has a `title` (tooltip.js): lines kept, each in its own direction */
+  .tooltip {
+    @apply pointer-events-none fixed z-[100] max-h-[calc(100svh-1rem)] max-w-[min(56rem,calc(100vw-1rem))] gap-x-5 overflow-hidden whitespace-pre-line rounded-lg bg-neutral-900 px-2.5 py-1.5 text-start text-xs font-medium leading-5 text-white shadow-lg ring-1 ring-black/10 dark:bg-neutral-100 dark:text-neutral-900 print:hidden;
+    unicode-bidi: plaintext;
+    column-rule: 1px solid rgb(115 115 115 / 0.4);
+  }
+
+  .tooltip[hidden] {
+    display: none;
+  }
+
+  /* sidebar navigation */
+  .nav-link {
+    @apply flex items-center gap-3 rounded-lg px-2.5 py-2 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white;
+  }
+
+  .nav-link.active {
+    @apply bg-indigo-50 text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-300;
+  }
+
+  /* tables */
+  .data-table {
+    @apply w-full border-separate border-spacing-0 text-sm;
+  }
+
+  .data-table th {
+    @apply sticky top-0 z-10 whitespace-nowrap border-b border-neutral-200 bg-neutral-50 px-3 py-2 text-start text-xs font-semibold text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900 dark:text-neutral-300;
+  }
+
+  .data-table td {
+    @apply border-b border-neutral-100 px-3 py-2 align-middle text-neutral-800 dark:border-neutral-800/70 dark:text-neutral-200;
+  }
+
+  /* inside borders between columns (the outer edge is the card's) */
+  .data-table th:not(:last-child),
+  .data-table td:not(:last-child) {
+    @apply border-e border-e-neutral-200 dark:border-e-neutral-800;
+  }
+
+  .data-table tbody tr {
+    @apply transition-colors odd:bg-white even:bg-neutral-50/60 hover:bg-indigo-50/60 dark:odd:bg-neutral-950 dark:even:bg-neutral-900/40 dark:hover:bg-indigo-500/10;
+  }
+
+  .data-table tbody tr:has(input[name="ids"]:checked) {
+    @apply bg-indigo-50 dark:bg-indigo-500/15;
+  }
+
+  /* phones (below `sm`): every row is a card, each value beside its column's label
+     (`data-label`, set by table.js); no checkboxes, no "⋮" menu: a tap opens the details */
+  @media (max-width: 639px) {
+    .data-table.cards thead {
+      display: none;
+    }
+
+    .data-table.cards tbody tr {
+      @apply block cursor-pointer border-b border-neutral-200 py-1.5 dark:border-neutral-800;
+    }
+
+    /* the label floats at the start, the value (however many pieces) flows at the end */
+    .data-table.cards tbody td {
+      @apply block min-w-0 max-w-none whitespace-normal border-0 px-3 py-1 text-end;
+    }
+
+    .data-table.cards tbody td::before {
+      content: attr(data-label);
+      float: inline-start;
+      @apply me-3 pt-0.5 text-start text-xs font-medium text-neutral-500 dark:text-neutral-400;
+    }
+
+    .data-table.cards tbody td > .flex {
+      @apply justify-end;
+    }
+
+    .data-table.cards tbody td[data-phone="hidden"],
+    .data-table.cards tbody td.hidden,
+    .data-table.cards tbody td:empty {
+      display: none;
+    }
+
+    /* the "nothing here" row */
+    .data-table.cards tbody td[colspan] {
+      @apply block text-center;
+    }
+
+    .data-table.cards tbody td[colspan]::before {
+      content: none;
+    }
+  }
+
+  /* board cards */
+  .board-card {
+    @apply flex cursor-grab items-center gap-2 rounded-md border px-2 py-1 text-xs shadow-sm transition active:cursor-grabbing;
+  }
+
+  .board-card.counted {
+    @apply border-emerald-300 bg-emerald-50 text-emerald-900 dark:border-emerald-700/60 dark:bg-emerald-900/30 dark:text-emerald-100;
+  }
+
+  .board-card.uncounted {
+    @apply border-rose-300 bg-rose-50 text-rose-900 dark:border-rose-700/60 dark:bg-rose-900/30 dark:text-rose-100;
+  }
+
+  .board-card.unsigned {
+    @apply border-neutral-300 bg-white text-neutral-800 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-100;
+  }
+
+  .board-card.excluded {
+    @apply border-dashed opacity-50;
+  }
+
+  .lane {
+    @apply flex min-h-40 flex-col rounded-xl border-2 border-transparent bg-neutral-100/80 transition-colors dark:bg-neutral-900/60;
+  }
+
+  .lane.would-count {
+    @apply border-emerald-500 bg-emerald-50/70 dark:bg-emerald-900/20;
+  }
+
+  .lane.would-not-count {
+    @apply border-rose-500 bg-rose-50/70 dark:bg-rose-900/20;
+  }
+
+  .lane.would-unsign {
+    @apply border-neutral-400 dark:border-neutral-500;
+  }
+}
+
+@layer utilities {
+  .scroll {
+    @apply scrollbar-thin scrollbar-track-transparent scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-700;
+  }
+
+  .spinner {
+    @apply inline-block size-4 animate-spin rounded-full border-2 border-neutral-300 border-t-indigo-600;
+  }
+
+  .htmx-request.htmx-pulse {
+    @apply animate-pulse;
+  }
+}
+
+/* HTMX indicators: hidden unless a request is in flight */
+.htmx-indicator {
+  opacity: 0;
+  transition: opacity 150ms ease-in;
+}
+
+.htmx-request .htmx-indicator,
+.htmx-request.htmx-indicator {
+  opacity: 1;
+}
+
+body.sorting,
+body.sorting * {
+  cursor: grabbing !important;
+}
+
+/* checkbox lists rendered by Django (filters) */
+fieldset input[type="checkbox"],
+fieldset input[type="radio"] {
+  @apply size-4 shrink-0 cursor-pointer accent-indigo-600;
+}
+
+/* while a drag is pressed (assets/js/src/drag.js): no text selection anywhere */
+.no-select,
+.no-select * {
+  -webkit-user-select: none !important;
+  user-select: none !important;
+}
+
+/* the gap between a chart's arcs: the card's own background */
+.chart-gap {
+  --chart-gap: #fff;
+}
+
+.dark .chart-gap {
+  --chart-gap: #171717;
+}

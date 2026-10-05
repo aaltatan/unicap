@@ -1,0 +1,209 @@
+{% load i18n %}
+{% comment %}
+  The table alone: what HTMX swaps into #table (search, filters, sorting, paging, refresh).
+  Rows come from the resource's `cells.html`; everything else is shared.
+{% endcomment %}
+<!-- redraw after any write elsewhere (modal saves, toggles, board moves) -->
+<span hidden hx-get="{{ request.get_full_path }}" hx-trigger="refresh from:body" hx-target="#table" hx-swap="innerHTML"></span>
+<input type="hidden" name="ordering" form="filters-form" value="{{ request.GET.ordering|default:'' }}" />
+{% if request.htmx %}{% include "app/crud/filters-badge.html" with oob=True %}{% endif %}
+
+<div class="card overflow-hidden">
+  <div class="scroll max-h-[calc(100svh-15rem)] overflow-auto">
+    <table class="data-table cards">
+      <thead>
+        <tr>
+          <th class="w-8">
+            {% if perms_delete %}
+            <input
+              type="checkbox"
+              class="checkbox"
+              aria-label="{% translate 'select all' %}"
+              @change="toggleAll($el.checked)"
+            />
+            {% endif %}
+          </th>
+          <th class="w-10 text-neutral-400">#</th>
+          {% for column in resource.columns %}
+          <th data-col="{{ column.key }}" class="{% if column.align == 'end' %}text-end{% endif %}">
+            {% if column.sort %}
+            {% sort_state column.sort as state %}
+            <button
+              type="button"
+              class="inline-flex items-center gap-1 first-letter:uppercase hover:text-indigo-600 dark:hover:text-indigo-400 {% if state.direction %}text-indigo-600 dark:text-indigo-400{% endif %}"
+              title="{% translate 'click: sort by this column · shift+click: add it as another level' %}"
+              @click="$event.shiftKey ? $refs.multi{{ forloop.counter }}.click() : $refs.single{{ forloop.counter }}.click()"
+            >
+              <span class="first-letter:uppercase">{{ column.label }}</span>
+              {% if state.direction == "asc" %}{% heroicon_mini "chevron-up" size=14 %}{% elif state.direction == "desc" %}{% heroicon_mini "chevron-down" size=14 %}{% else %}<span class="text-neutral-300 dark:text-neutral-600">{% heroicon_mini "chevron-up-down" size=14 %}</span>{% endif %}
+              {% if state.level %}<sup class="text-[10px]">{{ state.level }}</sup>{% endif %}
+            </button>
+            <span hidden x-ref="single{{ forloop.counter }}" hx-get="{{ state.single }}" hx-target="#table" hx-swap="innerHTML" hx-push-url="true"></span>
+            <span hidden x-ref="multi{{ forloop.counter }}" hx-get="{{ state.multi }}" hx-target="#table" hx-swap="innerHTML" hx-push-url="true"></span>
+            {% else %}
+            <span class="first-letter:uppercase">{{ column.label }}</span>
+            {% endif %}
+          </th>
+          {% endfor %}
+          <th data-pin="end" class="w-px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for obj in objects %}
+        <tr
+          @click="openOnPhone($event, '{{ obj.get_absolute_url }}')"
+          @contextmenu="openRowMenu($event)"
+          {% if perms_change %}@dblclick="editRow($event, '{{ obj.get_update_url }}')"{% endif %}
+        >
+          <td data-phone="hidden">
+            {% if perms_delete %}
+            <input
+              type="checkbox"
+              class="checkbox"
+              name="ids"
+              value="{{ obj.pk }}"
+              aria-label="{% translate 'select' %} {{ obj }}"
+              @change="count()"
+            />
+            {% endif %}
+          </td>
+          <td data-phone="hidden" class="text-xs tabular-nums text-neutral-400">{{ page.start_index|add:forloop.counter0 }}</td>
+          {% include resource.templates|add:"/cells.html" %}
+          <td data-pin="end" data-phone="hidden">
+            <!-- the row's actions, under "⋮" -->
+            <div
+              x-data="rowMenu"
+              data-row-menu
+              class="flex justify-end"
+              @click.outside="close()"
+              @keydown.escape.window="close()"
+              @contextmenu.window.capture="close()"
+              @open-at="show($event.detail)"
+            >
+              <button
+                type="button"
+                class="btn btn-ghost btn-icon"
+                x-ref="button"
+                @click="toggle()"
+                aria-haspopup="menu"
+                :aria-expanded="open"
+                title="{% translate 'actions' %}"
+                aria-label="{% translate 'actions' %}"
+              >
+                {% heroicon_outline "ellipsis-vertical" size=18 %}
+              </button>
+              <div
+                x-ref="menu"
+                x-show="open"
+                x-cloak
+                role="menu"
+                class="menu !fixed !mt-0 min-w-48"
+                :class="{ 'invisible': !position }"
+                :style="position"
+                @click="close()"
+              >
+                <button
+                  type="button"
+                  class="menu-item"
+                  role="menuitem"
+                  hx-get="{{ obj.get_absolute_url }}"
+                  hx-target="#modal-container"
+                  hx-swap="innerHTML"
+                >
+                  {% heroicon_outline "eye" size=16 %} {% translate 'details' %}
+                </button>
+                {% if resource.row_actions %}{% include resource.templates|add:"/actions.html" %}{% endif %}
+                {% if perms_change %}
+                <button
+                  type="button"
+                  class="menu-item"
+                  role="menuitem"
+                  hx-get="{{ obj.get_update_url }}"
+                  hx-target="#modal-container"
+                  hx-swap="innerHTML"
+                >
+                  {% heroicon_outline "pencil-square" size=16 %} {% translate 'edit' %}
+                </button>
+                {% endif %}
+                {% if perms_delete %}
+                <button
+                  type="button"
+                  class="menu-item text-rose-600 hover:text-rose-700 dark:text-rose-400"
+                  role="menuitem"
+                  hx-get="{{ obj.get_delete_url }}"
+                  hx-target="#modal-container"
+                  hx-swap="innerHTML"
+                >
+                  {% heroicon_outline "trash" size=16 %} {% translate 'delete' %}
+                </button>
+                {% endif %}
+              </div>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="{{ resource.columns|length|add:3 }}" class="py-12 text-center">
+            <div class="flex flex-col items-center gap-2 text-neutral-500">
+              {% heroicon_outline resource.icon size=32 class="text-neutral-300 dark:text-neutral-600" %}
+              {% if total %}
+              <p class="first-letter:uppercase">{% translate 'nothing matches the search and filters.' %}</p>
+              <a href="{{ index_url }}" class="btn btn-default" data-url-reset>{% translate 'clear filters' %}</a>
+              {% else %}
+              <p class="first-letter:uppercase">{% translate 'nothing here yet.' %}</p>
+              {% endif %}
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- footer: "12 of 40 faculties", rows per page, pages -->
+  <div class="flex flex-wrap items-center gap-3 border-t border-neutral-200 px-3 py-2 text-sm text-neutral-600 dark:border-neutral-800 dark:text-neutral-400">
+    <p>
+      {% blocktranslate with shown=filtered total=total what=resource.title %}{{ shown }} of {{ total }} {{ what }}{% endblocktranslate %}
+    </p>
+
+    <label class="ms-auto flex items-center gap-2">
+      <span class="hidden sm:inline first-letter:uppercase">{% translate 'rows per page' %}</span>
+      <select
+        name="per_page"
+        form="filters-form"
+        class="input w-auto py-1"
+        hx-get="{{ index_url }}"
+        hx-include="#filters-form"
+        hx-target="#table"
+        hx-swap="innerHTML"
+        hx-push-url="true"
+      >
+        {% for choice in per_page_choices %}
+        <option value="{{ choice }}" {% if choice == per_page %}selected{% endif %}>{{ choice }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    {% if page.paginator.num_pages > 1 %}
+    <nav class="flex items-center gap-0.5" aria-label="{% translate 'pages' %}">
+      <button type="button" class="btn btn-ghost btn-icon" {% if not page.has_previous %}disabled{% endif %}
+        hx-get="{% page_query 1 %}" hx-target="#table" hx-swap="innerHTML" hx-push-url="true" title="{% translate 'first page' %}">
+        <span class="rtl:rotate-180">{% heroicon_mini "chevron-double-left" size=16 %}</span>
+      </button>
+      <button type="button" class="btn btn-ghost btn-icon" {% if not page.has_previous %}disabled{% endif %}
+        {% if page.has_previous %}hx-get="{% page_query page.previous_page_number %}"{% endif %} hx-target="#table" hx-swap="innerHTML" hx-push-url="true" title="{% translate 'previous page' %}">
+        <span class="rtl:rotate-180">{% heroicon_mini "chevron-left" size=16 %}</span>
+      </button>
+      <span class="px-2 tabular-nums">{{ page.number }} / {{ page.paginator.num_pages }}</span>
+      <button type="button" class="btn btn-ghost btn-icon" {% if not page.has_next %}disabled{% endif %}
+        {% if page.has_next %}hx-get="{% page_query page.next_page_number %}"{% endif %} hx-target="#table" hx-swap="innerHTML" hx-push-url="true" title="{% translate 'next page' %}">
+        <span class="rtl:rotate-180">{% heroicon_mini "chevron-right" size=16 %}</span>
+      </button>
+      <button type="button" class="btn btn-ghost btn-icon" {% if not page.has_next %}disabled{% endif %}
+        hx-get="{% page_query page.paginator.num_pages %}" hx-target="#table" hx-swap="innerHTML" hx-push-url="true" title="{% translate 'last page' %}">
+        <span class="rtl:rotate-180">{% heroicon_mini "chevron-double-right" size=16 %}</span>
+      </button>
+    </nav>
+    {% endif %}
+  </div>
+</div>

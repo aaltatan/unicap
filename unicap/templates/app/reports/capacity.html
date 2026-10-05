@@ -1,0 +1,79 @@
+{% load i18n domain %}
+<c-layout :page_title="page_title" :wide="True">
+  {% if problem %}
+  <div class="card p-5 text-sm text-rose-700">{{ problem }}</div>
+  {% else %}
+  <div class="space-y-4">
+    <div class="flex flex-wrap items-end gap-2">
+      <div>
+        <p class="text-xs font-medium uppercase tracking-wider text-neutral-500">{% translate 'chapter' %}</p>
+        <h2 class="text-2xl font-semibold tracking-tight">{{ chapter.name }}</h2>
+      </div>
+      <div class="ms-auto flex gap-2 print:hidden">
+        <a class="btn btn-default" href="{% url 'reports:capacity-pivot' %}">{% heroicon_outline "squares-2x2" size=16 %} {% translate 'pivot' %}</a>
+        <c-reports.actions docx="{% url 'reports:capacity-docx' %}" pdf="{% url 'reports:capacity-pdf' %}" />
+      </div>
+    </div>
+
+    <div class="card overflow-x-auto">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>{% translate 'faculty' %}</th>
+            <th class="text-end">{% translate 'specialized FT staff' %}</th>
+            <th class="text-end">{% translate 'specialized FT borrowed' %}</th>
+            <th class="text-end">{% translate 'specialized PT' %}</th>
+            <th class="text-end">{% translate 'supported FT staff' %}</th>
+            <th class="text-end">{% translate 'supported FT borrowed' %}</th>
+            <th class="text-end">{% translate 'supported PT' %}</th>
+            <th class="text-end">{% translate 'masters' %}</th>
+            <th class="text-end">{% translate 'PhD equivalents' %}</th>
+            <th class="text-end">{% translate 'per PhD' %}</th>
+            <th class="text-end">{% translate 'capacity' %}</th>
+            <th class="text-end">{% translate 'current students' %}</th>
+            <th class="text-end">{% translate 'max students' %}</th>
+            <th class="text-end">{% translate 'free seats' %}</th>
+            <th class="text-end">{% translate 'staff' %}</th>
+            <th>{% translate 'compliance' %}</th>
+          </tr>
+        </thead>
+        <tbody class="tabular-nums">
+          {% for lane in lanes %}
+          {% with r=lane.report c=lane.report.counted s=lane.report.signed names=lane.report|teacher_names %}
+          <tr>
+            <td class="font-medium">{{ r.faculty.name }}</td>
+            <td class="text-end"><span title="{{ names.counted.specialized_fulltime_staff }}">{{ c.specialized_fulltime_staff }}</span><span class="text-neutral-400" title="{{ names.signed.specialized_fulltime_staff }}">/{{ s.specialized_fulltime_staff }}</span></td>
+            <td class="text-end"><span title="{{ names.counted.specialized_fulltime_borrowed }}">{{ c.specialized_fulltime_borrowed }}</span><span class="text-neutral-400" title="{{ names.signed.specialized_fulltime_borrowed }}">/{{ s.specialized_fulltime_borrowed }}</span></td>
+            <td class="text-end"><span title="{{ names.counted.specialized_parttime }}">{{ c.specialized_parttime }}</span><span class="text-neutral-400" title="{{ names.signed.specialized_parttime }}">/{{ s.specialized_parttime }}</span></td>
+            <td class="text-end"><span title="{{ names.counted.supported_fulltime_staff }}">{{ c.supported_fulltime_staff }}</span><span class="text-neutral-400" title="{{ names.signed.supported_fulltime_staff }}">/{{ s.supported_fulltime_staff }}</span></td>
+            <td class="text-end"><span title="{{ names.counted.supported_fulltime_borrowed }}">{{ c.supported_fulltime_borrowed }}</span><span class="text-neutral-400" title="{{ names.signed.supported_fulltime_borrowed }}">/{{ s.supported_fulltime_borrowed }}</span></td>
+            <td class="text-end"><span title="{{ names.counted.supported_parttime }}">{{ c.supported_parttime }}</span><span class="text-neutral-400" title="{{ names.signed.supported_parttime }}">/{{ s.supported_parttime }}</span></td>
+            <td class="text-end"><span title="{{ names.counted.masters }}">{{ c.masters }}</span><span class="text-neutral-400" title="{{ names.signed.masters }}">/{{ s.masters }}</span></td>
+            <td class="text-end font-medium" title="{{ names.counted.all }}">{{ c.phd_equivalents|number }}</td>
+            <td class="text-end">{{ r.faculty.students_per_phd }}</td>
+            <td class="text-end font-semibold text-indigo-600 dark:text-indigo-400">{{ r.capacity }}</td>
+            <td class="text-end {% if r|has_violation:'current_students_over_capacity' %}font-semibold text-rose-600 dark:text-rose-400{% endif %}">{{ r.faculty.current_students|default_if_none:"—" }}</td>
+            <td class="text-end">{{ r.faculty.max_students|default_if_none:"—" }}</td>
+            <td class="text-end {% if r.free_seats is not None and r.free_seats < 0 %}text-rose-600 dark:text-rose-400{% endif %}">{{ r.free_seats|default_if_none:"—" }}</td>
+            <td class="text-end {% if r|has_violation:'staff_ratio_too_low' %}text-rose-600{% endif %}" title="{{ r.mix|mix_text }}">{{ r.staff_percentage|percent }}</td>
+            <td>{% if r.is_compliant %}<span class="badge badge-success">{% translate 'compliant' %}</span>{% else %}<span class="badge badge-danger" title="{% for v in r.violations %}{{ v|violation_text }}&#10;{% endfor %}">{{ r.violations|length }} {% translate 'violations' %}</span>{% endif %}</td>
+          </tr>
+          {% endwith %}
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr class="font-semibold">
+            <td class="px-3 py-2" colspan="10">{% translate 'chapter capacity' %}{% if chapter.max_students is not None %} ({% translate 'capped at' %} {{ chapter.max_students }}){% endif %}</td>
+            <td class="px-3 py-2 text-end text-indigo-600 dark:text-indigo-400">{{ report.capacity }}</td>
+            <td class="px-3 py-2 text-end {% if report.seat_shortage %}text-rose-600 dark:text-rose-400{% endif %}">{{ report.current_students|default_if_none:"—" }}</td>
+            <td class="px-3 py-2 text-end">{{ report.max_students|default_if_none:"—" }}</td>
+            <td class="px-3 py-2 text-end {% if report.free_seats is not None and report.free_seats < 0 %}text-rose-600 dark:text-rose-400{% endif %}">{{ report.free_seats|default_if_none:"—" }}</td>
+            <td colspan="2"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+    <p class="text-xs text-neutral-500 first-letter:uppercase">{% translate 'each cell: counted / signed. Contracts left out of the calculation are not in either.' %} {% translate 'hover a number for its teachers.' %}</p>
+  </div>
+  {% endif %}
+</c-layout>

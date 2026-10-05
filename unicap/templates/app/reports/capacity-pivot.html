@@ -1,0 +1,102 @@
+{% load i18n %}
+{% comment %}The capacity report's numbers (`reports.capacity_pivot_context`), a small table per faculty.{% endcomment %}
+<c-layout :page_title="page_title" :wide="True">
+  {% if problem %}
+  <div class="card p-5 text-sm text-rose-700">{{ problem }}</div>
+  {% else %}
+  <div class="space-y-4">
+    <div class="flex flex-wrap items-end gap-2">
+      <div>
+        <p class="text-xs font-medium uppercase tracking-wider text-neutral-500">{% translate 'chapter' %} · {{ date }}</p>
+        <h2 class="text-2xl font-semibold tracking-tight">{{ chapter.name }}</h2>
+      </div>
+      <div class="ms-auto flex gap-2 print:hidden">
+        <a class="btn btn-default" href="{% url 'reports:capacity' %}">{% heroicon_outline "table-cells" size=16 %} {% translate 'detailed' %}</a>
+        <c-reports.actions docx="{% url 'reports:capacity-pivot-docx' %}" pdf="{% url 'reports:capacity-pivot-pdf' %}" />
+      </div>
+    </div>
+
+    <!-- the chapter at a glance -->
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 print:grid-cols-4">
+      <div class="card p-3">
+        <p class="text-xs text-neutral-500 first-letter:uppercase">{% translate 'chapter capacity' %}</p>
+        <p class="text-2xl font-semibold tabular-nums text-indigo-600 dark:text-indigo-400">{{ chapter.capacity }}</p>
+      </div>
+      <div class="card p-3">
+        <p class="text-xs text-neutral-500 first-letter:uppercase">{% translate 'current students' %}</p>
+        <p class="text-xl font-semibold tabular-nums">{{ chapter.current_students }}</p>
+      </div>
+      <div class="card p-3">
+        <p class="text-xs text-neutral-500 first-letter:uppercase">{% translate 'free seats' %}</p>
+        <p class="text-xl font-semibold tabular-nums">{{ chapter.free_seats }}</p>
+      </div>
+      <div class="card p-3">
+        <p class="text-xs text-neutral-500 first-letter:uppercase">{% translate 'compliance' %}</p>
+        <p class="text-xl font-semibold first-letter:uppercase">{{ chapter.compliance }}</p>
+      </div>
+    </div>
+
+    <!-- one card per faculty: its PhDs by type (rows) and terms (columns) -->
+    <div class="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3 print:grid-cols-2">
+      {% for f in faculties %}
+      <section class="card break-inside-avoid space-y-3 p-4">
+        <div class="flex items-start gap-2">
+          <h3 class="font-semibold">{{ f.name }}</h3>
+          <span class="badge {% if f.is_compliant %}badge-success{% else %}badge-danger{% endif %} ms-auto">{{ f.compliance }}</span>
+        </div>
+        <div class="overflow-x-auto print:overflow-visible">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th class="text-end" title="{% translate 'fulltime staff' %}">{% translate 'FT staff' %}</th>
+              <th class="text-end" title="{% translate 'fulltime borrowed' %}">{% translate 'FT borrowed' %}</th>
+              <th class="text-end" title="{% translate 'parttime' %}">{% translate 'PT' %}</th>
+              <th class="text-end">{% translate 'total' %}</th>
+            </tr>
+          </thead>
+          <tbody class="tabular-nums">
+            <tr>
+              <td class="font-medium first-letter:uppercase">{% translate 'specialized' %}</td>
+              <td class="text-end" title="{{ f.names.specialized.fulltime_staff }}">{{ f.specialized.fulltime_staff }}</td>
+              <td class="text-end" title="{{ f.names.specialized.fulltime_borrowed }}">{{ f.specialized.fulltime_borrowed }}</td>
+              <td class="text-end" title="{{ f.names.specialized.parttime }}">{{ f.specialized.parttime }}</td>
+              <td class="text-end font-semibold">{{ f.specialized.total }}</td>
+            </tr>
+            <tr>
+              <td class="font-medium first-letter:uppercase">{% translate 'supported' %}</td>
+              <td class="text-end" title="{{ f.names.supported.fulltime_staff }}">{{ f.supported.fulltime_staff }}</td>
+              <td class="text-end" title="{{ f.names.supported.fulltime_borrowed }}">{{ f.supported.fulltime_borrowed }}</td>
+              <td class="text-end" title="{{ f.names.supported.parttime }}">{{ f.supported.parttime }}</td>
+              <td class="text-end font-semibold">{{ f.supported.total }}</td>
+            </tr>
+          </tbody>
+        </table>
+        </div>
+        <dl class="grid grid-cols-4 gap-2 text-sm">
+          <div><dt class="label">{% translate 'masters' %}</dt><dd class="tabular-nums" title="{{ f.names.masters }}">{{ f.masters }}</dd></div>
+          <div><dt class="label">{% translate 'PhD equivalents' %}</dt><dd class="tabular-nums">{{ f.phd_equivalents }}</dd></div>
+          <div><dt class="label">{% translate 'per PhD' %}</dt><dd class="tabular-nums">{{ f.students_per_phd }}</dd></div>
+          <div><dt class="label">{% translate 'staff' %}</dt><dd class="tabular-nums">{{ f.staff_percentage }}</dd></div>
+          <div><dt class="label">{% translate 'capacity' %}</dt><dd class="font-semibold tabular-nums text-indigo-600 dark:text-indigo-400">{{ f.capacity }}</dd></div>
+          <div><dt class="label">{% translate 'current students' %}</dt><dd class="tabular-nums">{{ f.current_students }}</dd></div>
+          <div><dt class="label">{% translate 'max students' %}</dt><dd class="tabular-nums">{{ f.max_students }}</dd></div>
+          <div><dt class="label">{% translate 'free seats' %}</dt><dd class="tabular-nums">{{ f.free_seats }}</dd></div>
+        </dl>
+        <p class="text-xs text-neutral-600 dark:text-neutral-300">
+          <span class="first-letter:uppercase">{% translate 'specialized' %}</span> {{ f.mix.specialized }} · {% translate 'supported' %} {{ f.mix.supported }}
+          <span class="text-neutral-400">|</span> {% translate 'fulltime' %} {{ f.mix.fulltime }} · {% translate 'parttime' %} {{ f.mix.parttime }}
+          <span class="text-neutral-400">|</span> {% translate 'PhDs' %} {{ f.mix.phds }} · {% translate 'masters' %} {{ f.mix.masters }}
+        </p>
+        {% if f.violations %}
+        <ul class="list-inside list-disc space-y-0.5 text-xs text-rose-700 dark:text-rose-300">
+          {% for violation in f.violations %}<li>{{ violation }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+      </section>
+      {% endfor %}
+    </div>
+    <p class="text-xs text-neutral-500 first-letter:uppercase">{% translate 'each cell: counted / signed, or one number when all are counted.' %}</p>
+  </div>
+  {% endif %}
+</c-layout>

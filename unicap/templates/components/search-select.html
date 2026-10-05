@@ -1,0 +1,51 @@
+{% load i18n %}
+{% comment %}
+  A select searched by typing (assets/js/src/search-select.js). The slot is the native
+  <select>: hidden, but still the field the form submits.
+  `<c-search-select>{% render_field field class="input" %}</c-search-select>`
+{% endcomment %}
+<div x-data="searchSelect" class="relative" data-search-select>
+  <div class="sr-only" aria-hidden="true">{{ slot }}</div>
+  <input
+    x-ref="input"
+    type="text"
+    class="input pe-8"
+    role="combobox"
+    autocomplete="off"
+    :aria-expanded="isOpen"
+    placeholder="{% translate 'type to search' %}…"
+    x-model="query"
+    @focus="open(); $el.select()"
+    @click="open()"
+    @input="type()"
+    @blur="close()"
+    @keydown.down.prevent="move(1)"
+    @keydown.up.prevent="move(-1)"
+    @keydown.enter.prevent="isOpen ? pick(filtered[active]) : open()"
+    @keydown.escape="if (isOpen) { $event.stopPropagation(); close(); }"
+  />
+  <span class="pointer-events-none absolute inset-y-0 end-2 flex items-center text-neutral-400">
+    {% heroicon_mini "chevron-up-down" size=16 %}
+  </span>
+  <ul
+    x-ref="list"
+    x-show="isOpen"
+    x-cloak
+    role="listbox"
+    class="scroll absolute start-0 z-50 mt-1 max-h-60 w-max min-w-full max-w-[22rem] overflow-y-auto rounded-lg border border-neutral-200 bg-white p-1 text-sm shadow-lg dark:border-neutral-700 dark:bg-neutral-900"
+  >
+    <template x-for="(option, index) in filtered" :key="option.value">
+      <li
+        role="option"
+        class="cursor-pointer truncate rounded-md px-2.5 py-1.5"
+        :class="index === active ? 'bg-indigo-50 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300' : 'text-neutral-700 dark:text-neutral-200'"
+        :data-active="index === active ? '' : null"
+        :aria-selected="option.value === select.value"
+        @mousedown.prevent="pick(option)"
+        @mousemove="active = index"
+        x-text="option.label"
+      ></li>
+    </template>
+    <li x-show="!filtered.length" class="px-2.5 py-1.5 text-neutral-400">{% translate 'no match' %}</li>
+  </ul>
+</div>

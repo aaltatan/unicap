@@ -1,0 +1,47 @@
+{% load i18n domain %}
+{% comment %}Each faculty's own reports: its staff listed by name, or counted by specialization.{% endcomment %}
+<c-layout :page_title="page_title">
+  {% if problem %}
+  <div class="card p-5 text-sm text-rose-700">{{ problem }}</div>
+  {% else %}
+  <div class="space-y-4">
+    <div>
+      <p class="text-xs font-medium uppercase tracking-wider text-neutral-500">{{ chapter.name }}</p>
+      <h2 class="text-2xl font-semibold tracking-tight first-letter:uppercase">{% translate 'faculty reports' %}</h2>
+    </div>
+    <div class="card overflow-x-auto">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>{% translate 'faculty' %}</th>
+            <th class="text-end">{% translate 'capacity' %}</th>
+            <th class="text-end">{% translate 'staff' %}</th>
+            <th>{% translate 'compliance' %}</th>
+            <th>{% translate 'reports' %}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for faculty in faculties %}
+          {% with r=faculty.report %}
+          <tr>
+            <td class="font-medium"><c-object-link :obj="faculty" :allowed="True" /></td>
+            <td class="text-end font-semibold tabular-nums text-indigo-600 dark:text-indigo-400">{{ r.capacity }}</td>
+            <td class="text-end tabular-nums" title="{{ r.mix|mix_text }}">{{ r.staff_percentage|percent }}</td>
+            <td>{% if r.is_compliant %}<span class="badge badge-success">{% translate 'compliant' %}</span>{% else %}<span class="badge badge-danger">{{ r.violations|length }} {% translate 'violations' %}</span>{% endif %}</td>
+            <td>
+              <div class="flex flex-wrap gap-2">
+                <a class="btn btn-default" href="{% url 'reports:staff' faculty.pk %}">{% heroicon_outline "table-cells" size=16 %} {% translate 'staff report' %}</a>
+                <a class="btn btn-default" href="{% url 'reports:staff-pivot' faculty.pk %}">{% heroicon_outline "squares-2x2" size=16 %} {% translate 'pivot' %}</a>
+              </div>
+            </td>
+          </tr>
+          {% endwith %}
+          {% empty %}
+          <tr><td colspan="5" class="text-center text-neutral-500 first-letter:uppercase">{% translate 'no faculty yet.' %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+</c-layout>

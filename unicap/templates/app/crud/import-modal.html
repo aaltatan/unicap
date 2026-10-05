@@ -1,0 +1,42 @@
+{% load i18n %}
+<form hx-post="{{ action_url }}" hx-target="#modal-container" hx-swap="innerHTML" hx-encoding="multipart/form-data">
+  <c-layout.modal-body :title="page_title" width="md">
+    <div class="space-y-3 text-sm">
+      <p class="text-neutral-600 first-letter:uppercase dark:text-neutral-300">
+        {% translate 'an Excel (xlsx) or CSV file with the same columns as an export. Rows refer to each other by name; a row whose name exists is updated, new ones are added, nothing is deleted. All rows are saved, or none.' %}
+      </p>
+      <p class="text-neutral-600 dark:text-neutral-300">
+        <span class="font-medium">{% translate 'columns' %}:</span> <code class="text-xs">{{ columns|join:", " }}</code>
+      </p>
+      {% if has_sample %}
+      <div class="flex flex-wrap items-center gap-2">
+        <span class="text-neutral-600 first-letter:uppercase dark:text-neutral-300">{% translate 'a sample file to fill in' %}:</span>
+        <a class="btn btn-default" href="{{ action_url }}?sample=xlsx" download>
+          {% heroicon_outline "arrow-down-tray" size=16 %} {% translate 'Excel sample' %}
+        </a>
+        <a class="btn btn-default" href="{{ action_url }}?sample=csv" download>
+          {% heroicon_outline "arrow-down-tray" size=16 %} {% translate 'CSV sample' %}
+        </a>
+      </div>
+      <p class="text-xs text-neutral-500 dark:text-neutral-400">
+        {% translate 'The sample holds dummy rows: replace them with yours. In Excel, the columns filled from a list have a dropdown.' %}
+      </p>
+      {% endif %}
+      {% if errors %}
+      <div class="rounded-lg border border-rose-200 bg-rose-50 p-3 text-rose-800 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-200" role="alert">
+        <ul class="scroll max-h-48 list-inside list-disc space-y-1 overflow-y-auto">
+          {% for error in errors %}<li>{{ error }}</li>{% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+      <input type="file" name="file" accept=".xlsx,.csv" required class="input file:me-3 file:rounded file:border-0 file:bg-indigo-50 file:px-2 file:py-1 file:text-indigo-700 dark:file:bg-indigo-500/20 dark:file:text-indigo-200" />
+    </div>
+    <c-slot name="footer">
+      <button type="button" class="btn btn-default" @click="closeModal()">{% translate 'cancel' %}</button>
+      <button type="submit" class="btn btn-primary">
+        <span class="htmx-indicator spinner border-t-white"></span>
+        {% heroicon_outline "arrow-up-tray" size=16 %} {% translate 'import' %}
+      </button>
+    </c-slot>
+  </c-layout.modal-body>
+</form>

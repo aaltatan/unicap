@@ -1,0 +1,13 @@
+{% load i18n domain %}
+<td data-col="name">
+  <button type="button" class="font-medium hover:text-indigo-600 hover:underline dark:hover:text-indigo-400"
+    hx-get="{{ obj.get_absolute_url }}" hx-target="#modal-container" hx-swap="innerHTML"
+    title="{{ obj.name }}{% if obj.specialization_type %} ({{ obj.specialization_type|type_label }}){% endif %}">{{ obj.name }}</button>
+</td>
+<td data-col="specialization"><c-object-link :obj="obj.specialization" :allowed="perms.app.view_specialization" />{% if not obj.specialization.is_active %} <span class="badge badge-neutral">{% translate 'off' %}</span>{% endif %}</td>
+<td data-col="specialization_type"><c-type-tag :kind="obj.specialization_type" /></td>
+<td data-col="faculty">{% if obj.contract %}{% if obj.contract.faculty %}<c-object-link :obj="obj.contract.faculty" :allowed="perms.app.view_faculty" />{% else %}{% translate 'unsigned' %}{% endif %}{% else %}<span class="text-neutral-400">{% translate 'no contract' %}</span>{% endif %}</td>
+<td data-col="terms" class="whitespace-nowrap text-neutral-600 dark:text-neutral-300">{% if obj.contract %}{{ obj.contract.get_degree_display }} · {{ obj.contract.get_contract_type_display }} {{ obj.contract.get_employment_type_display }}{% endif %}</td>
+<td data-col="status">{% if obj.contract %}<span class="badge {{ obj.status|status_badge }}">{{ obj.status|status_label }}</span>{% endif %}</td>
+<td data-col="is_active"><c-switch :on="obj.is_active" url="{{ obj.get_toggle_url }}" :enabled="perms_change" label="{% translate 'active' %}" /></td>
+<td data-col="notes" class="max-w-xs truncate text-neutral-500" title="{{ obj.notes }}">{{ obj.notes|truncatechars:80 }}</td>

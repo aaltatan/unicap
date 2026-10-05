@@ -1,0 +1,99 @@
+{% load i18n %}
+<c-layout :page_title="page_title">
+  <div class="space-y-4">
+    <!-- take a backup -->
+    {% if can_add %}
+    <div class="card flex flex-wrap items-center gap-2 p-3">
+      <form method="post" action="{% url 'backups:create' %}">
+        {% csrf_token %}
+        <input type="hidden" name="scope" value="system" />
+        <button type="submit" class="btn btn-primary">{% heroicon_outline "server-stack" size=16 %} {% translate 'back up the whole system' %}</button>
+      </form>
+      {% if current_chapter %}
+      <form method="post" action="{% url 'backups:create' %}">
+        {% csrf_token %}
+        <input type="hidden" name="scope" value="chapter" />
+        <input type="hidden" name="chapter" value="{{ current_chapter.pk }}" />
+        <button type="submit" class="btn btn-default">{% heroicon_outline "rectangle-stack" size=16 %} {% blocktranslate with name=current_chapter.name %}back up {{ name }}{% endblocktranslate %}</button>
+      </form>
+      {% endif %}
+      <button type="button" class="btn btn-default ms-auto" hx-get="{% url 'backups:upload' %}" hx-target="#modal-container" hx-swap="innerHTML">
+        {% heroicon_outline "arrow-up-tray" size=16 %} {% translate 'upload a backup' %}
+      </button>
+    </div>
+    {% endif %}
+
+    <!-- filters -->
+    <form method="get" class="flex flex-wrap items-end gap-2">
+      <label class="text-sm">
+        <span class="label">{% translate 'scope' %}</span>
+        <select name="scope" class="input" onchange="this.form.submit()">
+          <option value="">{% translate 'all' %}</option>
+          {% for value, label in scopes %}<option value="{{ value }}" {% if filters.scope == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+      </label>
+      <label class="text-sm">
+        <span class="label">{% translate 'section' %}</span>
+        <select name="section" class="input" onchange="this.form.submit()">
+          <option value="">{% translate 'all' %}</option>
+          {% for value, label in sections %}<option value="{{ value }}" {% if filters.section == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+      </label>
+      <label class="text-sm">
+        <span class="label">{% translate 'chapter' %}</span>
+        <select name="chapter" class="input" onchange="this.form.submit()">
+          <option value="">{% translate 'all' %}</option>
+          {% for chapter in chapters %}<option value="{{ chapter.pk }}" {% if filters.chapter == chapter.pk|stringformat:"s" %}selected{% endif %}>{{ chapter.name }}</option>{% endfor %}
+        </select>
+      </label>
+      {% if filters.scope or filters.section or filters.chapter %}
+      <a href="{% url 'backups:index' %}" class="btn btn-default">{% heroicon_outline "arrow-path" size=16 %} {% translate 'reset' %}</a>
+      {% endif %}
+    </form>
+
+    <!-- the backups -->
+    <div class="card overflow-x-auto">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>{% translate 'created at' %}</th>
+            <th>{% translate 'scope' %}</th>
+            <th>{% translate 'chapter' %}</th>
+            <th class="text-end">{% translate 'size' %}</th>
+            <th>{% translate 'created by' %}</th>
+            <th>{% translate 'notes' %}</th>
+            <th class="w-px"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for backup in backups %}
+          <tr>
+            <td class="whitespace-nowrap tabular-nums">{{ backup.created_at|date:"Y-m-d H:i" }}</td>
+            <td>
+              <span class="badge {% if backup.scope == 'system' %}badge-info{% else %}badge-neutral{% endif %}">{{ backup.get_scope_display }}</span>
+              {% if backup.section %}<span class="text-xs text-neutral-500">{{ backup.get_section_display }}</span>{% endif %}
+            </td>
+            <td>{{ backup.chapter_name|default:"—" }}</td>
+            <td class="text-end tabular-nums">{{ backup.size|filesizeformat }}</td>
+            <td>{{ backup.created_by|default:"—" }}</td>
+            <td class="max-w-xs truncate text-neutral-500" title="{{ backup.notes }}">{{ backup.notes }}</td>
+            <td>
+              <div class="flex items-center justify-end gap-0.5">
+                <a class="btn btn-ghost btn-icon" href="{{ backup.get_download_url }}" title="{% translate 'download' %}">{% heroicon_outline "arrow-down-tray" size=16 %}</a>
+                {% if can_restore %}
+                <button type="button" class="btn btn-ghost btn-icon" hx-get="{{ backup.get_restore_url }}" hx-target="#modal-container" hx-swap="innerHTML" title="{% translate 'restore' %}">{% heroicon_outline "arrow-uturn-left" size=16 %}</button>
+                {% endif %}
+                {% if can_delete %}
+                <button type="button" class="btn btn-ghost btn-icon hover:text-rose-600" hx-get="{{ backup.get_delete_url }}" hx-target="#modal-container" hx-swap="innerHTML" title="{% translate 'delete' %}">{% heroicon_outline "trash" size=16 %}</button>
+                {% endif %}
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="7" class="py-10 text-center text-sm text-neutral-500 first-letter:uppercase">{% translate 'no backup yet.' %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</c-layout>

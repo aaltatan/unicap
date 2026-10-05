@@ -1,0 +1,38 @@
+{% load i18n %}
+{% comment %}Change some fields of every selected row: a field changes only when its box is checked.{% endcomment %}
+<form hx-post="{{ resource.url_bulk_edit }}" hx-target="#modal-container" hx-swap="innerHTML">
+  <input type="hidden" name="confirmed" value="1" />
+  {% for id in ids %}<input type="hidden" name="ids" value="{{ id }}" />{% endfor %}
+  <c-layout.modal-body title="{% translate 'edit the selected rows' %}" width="lg">
+    <div class="space-y-3">
+      <p class="text-sm text-neutral-500 first-letter:uppercase">
+        {% blocktranslate count counter=ids|length %}the checked fields change on the selected row.{% plural %}the checked fields change on all {{ counter }} selected rows.{% endblocktranslate %}
+      </p>
+      {% for error in form.non_field_errors %}<p class="whitespace-pre-line text-sm text-rose-600 first-letter:uppercase">{{ error }}</p>{% endfor %}
+      {% for apply, field in rows %}
+      <div
+        class="flex items-start gap-3 rounded-lg border border-neutral-200 p-2 dark:border-neutral-800"
+        x-data
+        @input="$refs.apply.checked = true"
+        @change="if ($event.target !== $refs.apply) $refs.apply.checked = true"
+      >
+        <input
+          type="checkbox"
+          class="checkbox mt-7"
+          name="{{ apply.html_name }}"
+          id="{{ apply.id_for_label }}"
+          x-ref="apply"
+          {% if apply.value %}checked{% endif %}
+          title="{% translate 'change this field' %}"
+          aria-label="{% blocktranslate with name=field.label %}change {{ name }}{% endblocktranslate %}"
+        />
+        <c-field :field="field" class="min-w-0 flex-1" />
+      </div>
+      {% endfor %}
+    </div>
+    <c-slot name="footer">
+      <button type="button" class="btn btn-default" @click="closeModal()">{% translate 'cancel' %}</button>
+      <button type="submit" class="btn btn-primary">{% heroicon_outline "check" size=16 %} {% translate 'apply' %}</button>
+    </c-slot>
+  </c-layout.modal-body>
+</form>

@@ -1,0 +1,33 @@
+{% load i18n domain %}
+<dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+  <div><dt class="label">{% translate 'specialization' %}</dt><dd>{{ obj.specialization.name }}</dd></div>
+  <div><dt class="label">{% translate 'active' %}</dt><dd>{{ obj.is_active|yesno:_("yes,no") }}</dd></div>
+  {% if excluded_faculties %}
+  <div class="col-span-2">
+    <dt class="label">{% translate 'cannot be counted in' %}</dt>
+    <dd class="flex flex-wrap gap-1.5">
+      {% for faculty in excluded_faculties %}<span class="badge badge-danger"><c-object-link :obj="faculty" :allowed="perms.app.view_faculty" /></span>{% endfor %}
+    </dd>
+  </div>
+  {% endif %}
+</dl>
+<h3 class="mb-2 mt-4 text-sm font-semibold first-letter:uppercase">{% translate 'contract in this chapter' %}</h3>
+{% if obj.contract %}
+<div class="rounded-lg border border-neutral-200 p-3 text-sm dark:border-neutral-800">
+  <div class="flex flex-wrap items-center gap-2">
+    <span class="font-medium">{{ obj.contract.faculty.name|default:_("unsigned") }}</span>
+    <c-type-tag :kind="obj.specialization_type" />
+    <span class="text-neutral-500">{{ obj.contract.get_degree_display }} · {{ obj.contract.get_contract_type_display }} {{ obj.contract.get_employment_type_display }}</span>
+    <span class="badge {{ obj.status|status_badge }} ms-auto">{{ obj.status|status_label }}</span>
+  </div>
+  {% if not obj.contract.is_active %}<p class="mt-2 text-xs text-neutral-500 first-letter:uppercase">{% translate 'the contract is switched off: it is not calculated.' %}</p>{% endif %}
+  <button type="button" class="btn btn-default mt-3" hx-get="{{ obj.contract.get_update_url }}" hx-target="#modal-container" hx-swap="innerHTML">
+    {% heroicon_outline "pencil-square" size=16 %} {% translate 'edit the contract' %}
+  </button>
+</div>
+{% else %}
+<p class="text-sm text-neutral-500 first-letter:uppercase">{% translate 'no contract yet.' %}</p>
+{% endif %}
+{% if obj.notes %}
+<div class="mt-4"><p class="label">{% translate 'notes' %}</p><p class="whitespace-pre-line text-sm">{{ obj.notes }}</p></div>
+{% endif %}

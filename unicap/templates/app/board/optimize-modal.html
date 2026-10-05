@@ -1,0 +1,54 @@
+{% load i18n domain %}
+{% with o=optimization old=optimization.before_outcome new=optimization.after_outcome %}
+<form hx-post="{% url 'board:optimize' %}" hx-target="#modal-container" hx-swap="innerHTML">
+  <input type="hidden" name="placements" value="{{ placements }}" />
+  <c-layout.modal-body title="{% translate 'optimize' %}: {{ strategy_label }}" width="xl">
+    <p class="mb-4 text-sm text-neutral-600 first-letter:uppercase dark:text-neutral-300">{{ strategy_description }}</p>
+
+    <div class="overflow-x-auto">
+      <table class="data-table rounded-lg border border-neutral-200 dark:border-neutral-800">
+        <thead><tr><th></th><th class="text-end">{% translate 'now' %}</th><th class="text-end">{% translate 'after' %}</th></tr></thead>
+        <tbody class="tabular-nums">
+          <tr><td class="first-letter:uppercase">{% translate 'students' %}</td><td class="text-end">{{ o.before.capacity }}</td><td class="text-end font-semibold">{{ o.after.capacity }}</td></tr>
+          <tr><td class="first-letter:uppercase">{% translate 'counted teachers' %}</td><td class="text-end">{{ old.teachers }}</td><td class="text-end font-semibold">{{ new.teachers }}</td></tr>
+          <tr><td class="first-letter:uppercase">{% translate 'signed contracts' %}</td><td class="text-end">{{ old.signed }}</td><td class="text-end font-semibold">{{ new.signed }}</td></tr>
+          <tr><td class="first-letter:uppercase">{% translate 'overflowing' %}</td><td class="text-end">{{ old.overflow_percentage|percent }}</td><td class="text-end font-semibold">{{ new.overflow_percentage|percent }}</td></tr>
+          <tr><td class="first-letter:uppercase">{% translate 'missing to targets' %}</td><td class="text-end">{{ old.target_shortfall }}</td><td class="text-end font-semibold">{{ new.target_shortfall }}</td></tr>
+          <tr><td class="first-letter:uppercase">{% translate 'staff (weakest faculty)' %}</td><td class="text-end">{{ old.staff_percentage|percent }} ({{ old.lowest_staff_percentage|percent }})</td><td class="text-end font-semibold">{{ new.staff_percentage|percent }} ({{ new.lowest_staff_percentage|percent }})</td></tr>
+          <tr><td class="first-letter:uppercase">{% translate 'violations' %}</td><td class="text-end">{{ old.violations }}</td><td class="text-end font-semibold">{{ new.violations }}</td></tr>
+          <tr><td class="first-letter:uppercase">{% translate 'compliant' %}</td><td class="text-end">{{ o.before.is_compliant|yesno:_("yes,no") }}</td><td class="text-end font-semibold">{{ o.after.is_compliant|yesno:_("yes,no") }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3 class="mb-2 mt-4 text-sm font-semibold first-letter:uppercase">
+      {% blocktranslate count counter=o.moves|length %}{{ counter }} move{% plural %}{{ counter }} moves{% endblocktranslate %}
+    </h3>
+    {% if o.moves %}
+    <ul class="scroll max-h-64 space-y-1 overflow-y-auto text-sm">
+      {% for move in o.moves %}
+      <li class="flex flex-wrap items-center gap-2 rounded-md border border-neutral-200 px-2 py-1 dark:border-neutral-800">
+        <span class="font-medium">{{ move.employee.name }}</span>
+        {# what the specialization is in the faculty the contract moves to #}
+        {% with kind=move.contract|specialization_type %}<c-type-tag :kind="kind" />{% endwith %}
+        <span class="text-xs text-neutral-500">{{ move.employee.specialization.name }} · {{ move.contract|terms }}</span>
+        <span class="ms-auto flex items-center gap-1 text-xs">
+          <span>{{ move.before.name|default:_("unsigned") }}</span>
+          <span class="rtl:rotate-180">{% heroicon_mini "arrow-right" size=14 %}</span>
+          <span class="font-semibold">{{ move.after.name|default:_("unsigned") }}</span>
+        </span>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <p class="text-sm text-neutral-500 first-letter:uppercase">{% translate 'the current placement is already the best this strategy finds.' %}</p>
+    {% endif %}
+    <p class="mt-3 text-xs text-neutral-500 first-letter:uppercase">{% translate 'a heuristic search (two starts and local moves), not a proven optimum. Employment terms never change, only faculties.' %}</p>
+
+    <c-slot name="footer">
+      <button type="button" class="btn btn-default" @click="closeModal()">{% translate 'cancel' %}</button>
+      <button type="submit" class="btn btn-primary" {% if not o.moves %}disabled{% endif %}>{% heroicon_outline "check" size=16 %} {% translate 'apply these moves' %}</button>
+    </c-slot>
+  </c-layout.modal-body>
+</form>
+{% endwith %}

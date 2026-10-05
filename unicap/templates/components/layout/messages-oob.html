@@ -1,0 +1,5 @@
+<div hx-swap-oob="beforeend:#messages">
+  {% for message in messages %}
+  <c-layout.toast :message="message" />
+  {% endfor %}
+</div>

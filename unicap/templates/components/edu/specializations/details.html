@@ -1,0 +1,54 @@
+{% load i18n domain %}
+<div class="flex flex-wrap gap-2">
+  {% if obj.is_active %}<span class="badge badge-success">{% translate 'active' %}</span>{% else %}<span class="badge badge-neutral">{% translate 'inactive: its contracts are not calculated' %}</span>{% endif %}
+  <span class="badge badge-info">{% blocktranslate count counter=obj.faculties_count %}accepted by {{ counter }} faculty{% plural %}accepted by {{ counter }} faculties{% endblocktranslate %}</span>
+  <span class="badge badge-neutral">{% blocktranslate count counter=obj.employees_count %}{{ counter }} employee{% plural %}{{ counter }} employees{% endblocktranslate %}</span>
+</div>
+
+<h3 class="mb-2 mt-4 text-sm font-semibold first-letter:uppercase">{% translate 'accepted by' %}</h3>
+{% if shares %}
+<table class="data-table rounded-lg border border-neutral-200 dark:border-neutral-800">
+  <thead><tr><th>{% translate 'faculty' %}</th><th>{% translate 'type' %}</th><th class="text-end">{% translate 'share' %}</th><th class="text-end">{% translate 'teachers' %}</th></tr></thead>
+  <tbody>
+    {% for share in shares %}
+    <tr>
+      <td>{{ share.faculty.name }}</td>
+      <td><span class="badge {% if share.specialization_type == 'specialized' %}badge-info{% else %}badge-neutral{% endif %}">{{ share.get_specialization_type_display }}</span></td>
+      <td class="text-end tabular-nums">{% if share.percentage is not None %}{{ share.percentage|number }}% <span class="text-neutral-400">({{ share.min_percentage|number|default:share.percentage|number }}–{{ share.max_percentage|number|default:share.percentage|number }})</span>{% else %}—{% endif %}</td>
+      <td class="text-end tabular-nums">{{ share.min_teachers|default_if_none:"" }}{% if share.min_teachers is not None or share.max_teachers is not None %}–{% endif %}{{ share.max_teachers|default_if_none:"" }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="text-sm text-neutral-500 first-letter:uppercase">{% translate 'no faculty accepts it.' %}</p>
+{% endif %}
+
+<h3 class="mb-2 mt-4 text-sm font-semibold first-letter:uppercase">{% translate 'employees' %}</h3>
+{% if employees %}
+<!-- one line per teacher: name · faculty · type · degree · terms · status -->
+<ul class="scroll max-h-72 divide-y divide-neutral-100 overflow-y-auto rounded-lg border border-neutral-200 text-sm dark:divide-neutral-800 dark:border-neutral-800">
+  {% for employee in employees %}
+  <li class="px-3 py-1.5 text-neutral-600 dark:text-neutral-300">
+    <span class="font-medium text-neutral-900 dark:text-neutral-100"><c-object-link :obj="employee" :allowed="perms.app.view_employee" /></span>
+    {% if employee.contract %}
+    · {% if employee.contract.faculty %}{{ employee.contract.faculty.name }}{% else %}{% translate 'unsigned' %}{% endif %}
+    {% if employee.specialization_type %}· {{ employee.specialization_type|type_label }}{% endif %}
+    · {{ employee.contract.get_degree_display }}
+    · {{ employee.contract.get_contract_type_display }} {{ employee.contract.get_employment_type_display }}
+    · {{ employee.status|status_label }}
+    {% if not employee.contract.is_active %}· {% translate 'switched off' %}{% endif %}
+    {% else %}
+    · {% translate 'no contract' %}
+    {% endif %}
+    {% if not employee.is_active %}· {% translate 'inactive' %}{% endif %}
+  </li>
+  {% endfor %}
+</ul>
+{% else %}
+<p class="text-sm text-neutral-500 first-letter:uppercase">{% translate 'no employee holds it.' %}</p>
+{% endif %}
+
+{% if obj.notes %}
+<div class="mt-4"><p class="label">{% translate 'notes' %}</p><p class="whitespace-pre-line text-sm">{{ obj.notes }}</p></div>
+{% endif %}

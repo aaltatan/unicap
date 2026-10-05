@@ -1,0 +1,130 @@
+{% load i18n domain %}
+{% comment %}
+  The board alone: HTMX swaps it after a drop, a toggle or any write elsewhere (refresh).
+{% endcomment %}
+<div
+  id="board"
+  class="space-y-3"
+  hx-get="{% url 'board:index' %}"
+  hx-trigger="refresh from:body"
+  hx-target="this"
+  hx-swap="outerHTML"
+>
+  <!-- summary -->
+  <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+    <div class="card px-3 py-2">
+      <p class="text-[11px] font-medium text-neutral-500 first-letter:uppercase">{% translate 'capacity' %}</p>
+      <p class="text-xl font-semibold tabular-nums text-indigo-600 dark:text-indigo-400">{{ report.capacity }}</p>
+      {% if report.chapter.max_students is not None %}<p class="text-[11px] text-neutral-500">{% translate 'chapter max' %} {{ report.chapter.max_students }}</p>{% endif %}
+    </div>
+    <div class="card px-3 py-2">
+      <p class="text-[11px] font-medium text-neutral-500 first-letter:uppercase">{% translate 'faculties allow' %}</p>
+      <p class="text-xl font-semibold tabular-nums">{{ report.faculties_capacity }}</p>
+    </div>
+    <div class="card px-3 py-2">
+      <p class="text-[11px] font-medium text-neutral-500 first-letter:uppercase">{% translate 'teaching capacity' %}</p>
+      <p class="text-xl font-semibold tabular-nums">{{ report.teaching_capacity }}</p>
+    </div>
+    <div class="card px-3 py-2">
+      <p class="text-[11px] font-medium text-neutral-500 first-letter:uppercase">{% translate 'overflowing' %}</p>
+      <p class="text-xl font-semibold tabular-nums {% if report.overflowing %}text-rose-600 dark:text-rose-400{% endif %}">{{ report.overflowing|length }}</p>
+    </div>
+    <div class="card px-3 py-2">
+      <p class="text-[11px] font-medium text-neutral-500 first-letter:uppercase">{% translate 'missing to targets' %}</p>
+      <p class="text-xl font-semibold tabular-nums">{{ report.target_shortfall }}</p>
+    </div>
+    <div class="card px-3 py-2 {% if report.is_compliant %}!border-emerald-300 dark:!border-emerald-800{% else %}!border-rose-300 dark:!border-rose-800{% endif %}">
+      <p class="text-[11px] font-medium text-neutral-500 first-letter:uppercase">{% translate 'compliance' %}</p>
+      <p class="flex items-center gap-1 text-sm font-semibold {% if report.is_compliant %}text-emerald-600 dark:text-emerald-400{% else %}text-rose-600 dark:text-rose-400{% endif %}">
+        {% if report.is_compliant %}{% heroicon_mini "check-badge" size=18 %} {% translate 'compliant' %}{% else %}{% heroicon_mini "exclamation-triangle" size=18 %} {% translate 'not compliant' %}{% endif %}
+      </p>
+    </div>
+  </div>
+
+  <div class="grid items-start gap-3 lg:grid-cols-[17rem_1fr]">
+    {% with lane=lanes.0 %}
+    <section class="lane lg:sticky lg:top-16 lg:max-h-[calc(100svh-5rem)]" :class="laneClass('{{ lane.key }}')">
+      <header class="flex items-center gap-2 border-b border-neutral-200 px-3 py-2 dark:border-neutral-800">
+        {% heroicon_outline "inbox-stack" size=18 class="text-neutral-400" %}
+        <h2 class="text-sm font-semibold first-letter:uppercase">{% translate 'unsigned' %}</h2>
+        <span class="badge badge-neutral ms-auto">{{ lane.cards|length }}</span>
+      </header>
+      {% include "components/board/cards.html" with lane_height="max-h-[min(28rem,60svh)] lg:max-h-none lg:min-h-0" %}
+    </section>
+    {% endwith %}
+
+    <div
+      x-data="persistedOrder('board-lanes-{{ current_chapter.pk }}')"
+      x-sort="save()"
+      x-sort:config="{ handle: '.lane-handle', animation: 150, forceFallback: true, fallbackOnBody: true, fallbackTolerance: 3 }"
+      class="grid items-start gap-3 sm:grid-cols-2 2xl:grid-cols-3"
+    >
+      {% for lane in lanes|slice:"1:" %}
+      <section
+        class="lane"
+        :class="laneClass('{{ lane.key }}')"
+        data-key="{{ lane.key }}"
+        x-sort:item="'{{ lane.key }}'"
+      >
+        {% with faculty=lane.report.faculty report_=lane.report %}
+        <header class="space-y-1 border-b border-neutral-200 px-3 py-2 dark:border-neutral-800">
+          <div class="flex items-center gap-2">
+            <span class="lane-handle cursor-grab text-neutral-400 hover:text-neutral-600" title="{% translate 'drag to reorder lanes' %}">{% heroicon_mini "bars-3" size=16 %}</span>
+            <h2 class="truncate text-sm font-semibold">
+              <button type="button" class="hover:underline" hx-get="{% url 'edu:faculties:details' lane.faculty_id %}" hx-target="#modal-container" hx-swap="innerHTML">{{ faculty.name }}</button>
+            </h2>
+            <span class="ms-auto flex items-center gap-1">
+              {% if report_.is_compliant %}
+              <span class="text-emerald-500" title="{% translate 'compliant' %}">{% heroicon_mini "check-circle" size=18 %}</span>
+              {% else %}
+              <span class="badge badge-danger" title="{% for violation in report_.violations %}{{ violation|violation_text }}&#10;{% endfor %}">{% heroicon_mini "exclamation-triangle" size=12 %} {{ report_.violations|length }}</span>
+              {% endif %}
+              <span class="badge badge-neutral">{{ lane.cards|length }}</span>
+            </span>
+          </div>
+          <p class="text-xs">
+            <span class="font-semibold tabular-nums text-indigo-600 dark:text-indigo-400">{{ report_.capacity }}</span>
+            <span class="text-neutral-500">{% translate 'students' %} · {{ faculty.students_per_phd }} {% translate 'per PhD' %}</span>
+            {% if report_.unused_teaching_capacity %}<span class="text-amber-600 dark:text-amber-400">(+{{ report_.unused_teaching_capacity }} {% translate 'unused' %})</span>{% endif %}
+          </p>
+          <p class="flex flex-wrap gap-x-3 text-[11px] text-neutral-500 tabular-nums">
+            <span title="{{ report_.mix|mix_text }}" class="{% if report_|has_violation:'staff_ratio_too_low' %}font-semibold text-rose-600 dark:text-rose-400{% endif %}">{% translate 'staff' %} {{ report_.staff_percentage|percent }} · {% translate 'min' %} {{ faculty.min_staff_percentage|number }}%</span>
+            <span>{% translate 'now' %} {{ faculty.current_students|default_if_none:"—" }} · {% translate 'target' %} {{ faculty.target_students|default_if_none:"—" }} · {% translate 'max' %} {{ faculty.max_students|default_if_none:"—" }}</span>
+          </p>
+        </header>
+        {% endwith %}
+        {% include "components/board/cards.html" %}
+      </section>
+      {% empty %}
+      <div class="card col-span-full flex flex-col items-center gap-2 p-8 text-center text-sm text-neutral-500">
+        {% heroicon_outline "building-library" size=32 class="text-neutral-300" %}
+        <p class="first-letter:uppercase">{% translate 'no faculty in this chapter yet: add one to sign contracts to it.' %}</p>
+        <a href="{% url 'edu:faculties:index' %}" class="btn btn-default">{% translate 'faculties' %}</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- issues: violations and contracts not counted, with the reason -->
+  {% if not report.is_compliant or report.overflowing %}
+  <section class="card" x-data="{ open: $persist(true).as('board-issues-open').using($storage) }">
+    <button type="button" class="flex w-full items-center gap-2 px-4 py-3 text-sm font-semibold" @click="open = !open">
+      {% heroicon_outline "exclamation-triangle" size=18 class="text-amber-500" %}
+      <span class="first-letter:uppercase">{% translate 'issues' %}</span>
+      <span class="ms-auto transition-transform" :class="{'rotate-180': open}">{% heroicon_mini "chevron-down" size=18 %}</span>
+    </button>
+    <div x-show="open" x-collapse>
+      <ul class="space-y-1 border-t border-neutral-200 px-4 py-3 text-sm dark:border-neutral-800">
+        {% for faculty_report in report.faculties %}
+        {% for violation in faculty_report.violations %}
+        <li class="flex gap-2 text-rose-700 dark:text-rose-300">{% heroicon_mini "exclamation-circle" size=16 class="mt-0.5 shrink-0" %} {{ violation|violation_text }}</li>
+        {% endfor %}
+        {% for contract in faculty_report.uncounted %}
+        <li class="flex gap-2 text-neutral-700 dark:text-neutral-300">{% heroicon_mini "x-circle" size=16 class="mt-0.5 shrink-0 text-rose-500" %} {{ faculty_report.faculty.name }}: <span class="font-medium">{{ contract.employee.name }}</span> {% with kind=contract|specialization_type %}<c-type-tag :kind="kind" />{% endwith %} — {{ faculty_report.statuses|get_item:contract|status_label }}</li>
+        {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+  </section>
+  {% endif %}
+</div>

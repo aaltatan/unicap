@@ -1,0 +1,45 @@
+{% load i18n django_vite widget_tweaks %}
+{% get_current_language as LANGUAGE_CODE %}
+{% get_current_language_bidi as LANGUAGE_BIDI %}
+<!doctype html>
+<html lang="{{ LANGUAGE_CODE }}" dir="{% if LANGUAGE_BIDI %}rtl{% else %}ltr{% endif %}" class="h-full">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% translate 'log in' %} · {{ project_name }}</title>
+    <c-layout.theme />
+    {% vite_hmr_client %}
+    {% vite_asset 'unicap/assets/js/index.js' %}
+  </head>
+  <body x-data x-cloak class="grid h-full place-items-center bg-neutral-50 p-4 font-sans text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
+    <div class="w-full max-w-sm">
+      <div class="mb-6 flex flex-col items-center gap-2">
+        <span class="grid size-12 place-items-center rounded-xl bg-indigo-600 text-white">{% heroicon_solid "academic-cap" size=26 %}</span>
+        <h1 class="text-xl font-semibold">{{ project_name }}</h1>
+        <p class="text-sm text-neutral-500">{% translate 'university capacity calculator' %}</p>
+      </div>
+      <form method="post" class="card space-y-4 p-6">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ next }}" />
+        {% if form.non_field_errors %}
+        <p class="rounded-md bg-rose-50 p-2 text-sm text-rose-700 dark:bg-rose-950/50 dark:text-rose-300">{% translate 'the username or password is not right.' %}</p>
+        {% endif %}
+        <div>
+          <label for="{{ form.username.id_for_label }}" class="label">{% translate 'username' %}</label>
+          {% render_field form.username class="input" autofocus="" %}
+        </div>
+        <div>
+          <label for="{{ form.password.id_for_label }}" class="label">{% translate 'password' %}</label>
+          {% render_field form.password class="input" %}
+        </div>
+        <button type="submit" class="btn btn-primary w-full">{% translate 'log in' %}</button>
+      </form>
+      <form action="{% url 'set_language' %}" method="post" class="mt-4 text-center">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}" />
+        <input type="hidden" name="language" value="{% if LANGUAGE_CODE == 'ar' %}en{% else %}ar{% endif %}" />
+        <button type="submit" class="text-sm text-neutral-500 hover:underline">{% if LANGUAGE_CODE == 'ar' %}English{% else %}العربية{% endif %}</button>
+      </form>
+    </div>
+  </body>
+</html>

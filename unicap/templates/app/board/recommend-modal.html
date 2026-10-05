@@ -1,0 +1,99 @@
+{% load i18n domain %}
+<c-layout.modal-body title="{% translate 'recommend contracts' %}" width="xl">
+  <form
+    class="space-y-3"
+    hx-get="{% url 'board:recommend' %}"
+    hx-target="#modal-container"
+    hx-swap="innerHTML"
+    hx-indicator="#recommend-spinner"
+  >
+    <p class="text-sm text-neutral-600 first-letter:uppercase dark:text-neutral-300">
+      {% translate 'how many contracts, of which kind, specialization and faculty, the university should sign so that no violation is left. Nothing is saved.' %}
+    </p>
+    <div class="grid gap-3 sm:grid-cols-2">
+      <div class="space-y-3">
+        <c-field :field="form.strategy" />
+        <c-field :field="form.meet_targets" />
+        <c-field :field="form.optimize_first" />
+      </div>
+      <c-field :field="form.kinds" />
+    </div>
+    <button type="submit" class="btn btn-primary">
+      <span id="recommend-spinner" class="htmx-indicator spinner border-t-white"></span>
+      {% heroicon_outline "light-bulb" size=16 %} {% translate 'recommend' %}
+    </button>
+  </form>
+
+  {% if recommendation %}
+  {% with r=recommendation %}
+  <div class="mt-5 space-y-4 border-t border-neutral-200 pt-4 dark:border-neutral-800">
+    <p class="text-sm text-neutral-600 first-letter:uppercase dark:text-neutral-300">{{ strategy_description }}</p>
+
+    <div class="flex flex-wrap items-center gap-2 rounded-lg p-3 text-sm {% if r.is_solved %}bg-emerald-50 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-200{% else %}bg-amber-50 text-amber-800 dark:bg-amber-500/10 dark:text-amber-200{% endif %}">
+      {% if r.is_solved %}{% heroicon_outline "check-badge" size=20 %}{% else %}{% heroicon_outline "exclamation-triangle" size=20 %}{% endif %}
+      <span class="font-semibold first-letter:uppercase">
+        {% if not r.contracts %}{% translate 'nothing to sign: no problem is left.' %}
+        {% else %}{% blocktranslate count counter=r.contracts %}sign {{ counter }} contract{% plural %}sign {{ counter }} contracts{% endblocktranslate %}{% endif %}
+      </span>
+      {% if not r.is_solved %}<span class="first-letter:uppercase">{% translate 'some problems need more than new contracts (max teachers, max shares, max students): see what is left below.' %}</span>{% endif %}
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="data-table rounded-lg border border-neutral-200 dark:border-neutral-800">
+        <thead><tr><th></th><th class="text-end">{% translate 'now' %}</th><th class="text-end">{% translate 'after' %}</th></tr></thead>
+        <tbody class="tabular-nums">
+          <tr><td class="first-letter:uppercase">{% translate 'capacity' %}</td><td class="text-end">{{ r.before.capacity }}</td><td class="text-end font-semibold">{{ r.after.capacity }}</td></tr>
+          <tr><td class="first-letter:uppercase">{% translate 'violations' %}</td><td class="text-end">{{ r.before.violations|length }}</td><td class="text-end font-semibold">{{ r.after.violations|length }}</td></tr>
+          <tr><td class="first-letter:uppercase">{% translate 'current students without a seat' %}</td><td class="text-end">{{ r.before.seat_shortage }}</td><td class="text-end font-semibold">{{ r.after.seat_shortage }}</td></tr>
+          <tr><td class="first-letter:uppercase">{% translate 'missing to targets' %}</td><td class="text-end">{{ r.before.target_shortfall }}</td><td class="text-end font-semibold">{{ r.after.target_shortfall }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    {% if r.hires %}
+    <div class="overflow-x-auto">
+      <table class="data-table rounded-lg border border-neutral-200 dark:border-neutral-800">
+        <thead>
+          <tr>
+            <th>{% translate 'faculty' %}</th>
+            <th>{% translate 'specialization' %}</th>
+            <th>{% translate 'contract' %}</th>
+            <th class="text-end">{% translate 'count' %}</th>
+          </tr>
+        </thead>
+        <tbody class="tabular-nums">
+          {% for hire in r.hires %}
+          <tr>
+            <td class="font-medium">{{ hire.faculty.name }}</td>
+            <td>{{ hire.specialization.name }}</td>
+            <td>{{ hire.kind|hire_kind_label }}</td>
+            <td class="text-end font-semibold">{{ hire.count }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr class="font-semibold"><td class="px-3 py-2" colspan="3">{% translate 'total' %}</td><td class="px-3 py-2 text-end">{{ r.contracts }}</td></tr>
+        </tfoot>
+      </table>
+    </div>
+    {% endif %}
+
+    {% if r.after.violations %}
+    <div>
+      <p class="mb-1 text-sm font-semibold first-letter:uppercase">{% translate 'left after signing' %}</p>
+      <ul class="space-y-1 text-sm">
+        {% for violation in r.after.violations %}
+        <li class="flex gap-2 text-rose-700 dark:text-rose-300">{% heroicon_mini "exclamation-circle" size=16 class="mt-0.5 shrink-0" %} {{ violation|violation_text }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+    <p class="text-xs text-neutral-500 first-letter:uppercase">{% translate 'a greedy search, faculty by faculty: each step signs the contract that helps the most for the strategy. Masters are suggested by the PhD they are worth together.' %}</p>
+  </div>
+  {% endwith %}
+  {% endif %}
+
+  <c-slot name="footer">
+    <button type="button" class="btn btn-default" @click="closeModal()">{% translate 'close' %}</button>
+  </c-slot>
+</c-layout.modal-body>

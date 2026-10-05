@@ -1,0 +1,19 @@
+{% load i18n %}
+{% comment %}A report's outputs in one menu: print the page, or its Word / PDF file.{% endcomment %}
+<div class="relative" x-data="dropdown" @click.outside="close()" @keydown.escape.window="close()">
+  <button type="button" class="btn btn-primary" @click="toggle()" aria-haspopup="menu" :aria-expanded="open">
+    {% heroicon_outline "arrow-down-tray" size=16 %} {% translate 'export' %}
+    {% heroicon_mini "chevron-down" size=16 %}
+  </button>
+  <div class="menu end-0" role="menu" x-show="open" x-cloak>
+    <button type="button" class="menu-item" role="menuitem" @click="close(); $nextTick(() => window.print())">
+      {% heroicon_outline "printer" size=16 %} {% translate 'print' %}
+    </button>
+    <a class="menu-item" role="menuitem" href="{{ docx }}" @click="close()">
+      {% heroicon_outline "document-text" size=16 %} {% translate 'Word' %}
+    </a>
+    <a class="menu-item" role="menuitem" href="{{ pdf }}" @click="close()">
+      {% heroicon_outline "document-arrow-down" size=16 %} {% translate 'PDF' %}
+    </a>
+  </div>
+</div>

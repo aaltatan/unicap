@@ -1,0 +1,63 @@
+{% load i18n widget_tweaks %}
+<div class="space-y-5">
+  <div class="grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <c-field :field="form.name" class="col-span-2" />
+    <c-field :field="form.students_per_phd" />
+    <c-field :field="form.min_staff_percentage" />
+    <c-field :field="form.current_students" />
+    <c-field :field="form.target_students" />
+    <c-field :field="form.max_students" />
+    <c-field :field="form.staff_rounding" />
+    <c-field :field="form.min_specialized" />
+    <c-field :field="form.max_specialized" />
+    <c-field :field="form.min_supported" />
+    <c-field :field="form.max_supported" />
+  </div>
+
+  <!-- accepted specializations: drag rows to order them -->
+  <fieldset x-data="formset('{{ formset.prefix }}')" class="@container rounded-lg border border-neutral-200 p-3 dark:border-neutral-800">
+    <legend class="px-1 text-sm font-semibold first-letter:uppercase">{% translate 'accepted specializations' %}</legend>
+    <p class="mb-2 text-xs text-neutral-500 first-letter:uppercase">
+      {% translate 'leave the share empty for the new method (only specialized / supported matters). Min / max default to the share itself. Drag rows to reorder.' %}
+      {% translate 'Contract type: only that type counts for the specialization here (empty: any). Masters: on / off, and how many make one PhD.' %}
+    </p>
+    {{ formset.management_form }}
+    {% for error in formset.non_form_errors %}<p class="mb-2 text-sm text-rose-600 first-letter:uppercase">{{ error }}</p>{% endfor %}
+
+    <div class="hidden grid-cols-[minmax(7rem,2fr)_minmax(5.5rem,1.2fr)_repeat(5,minmax(3rem,1fr))_minmax(5.5rem,1fr)_minmax(4.5rem,0.8fr)_2rem] gap-2 pb-1 pe-0.5 ps-7 text-[11px] font-medium text-neutral-500 @3xl:grid">
+      <span class="first-letter:uppercase">{% translate 'specialization' %}</span>
+      <span class="first-letter:uppercase">{% translate 'type' %}</span>
+      <span class="first-letter:uppercase">{% translate 'share %' %}</span>
+      <span class="first-letter:uppercase">{% translate 'min %' %}</span>
+      <span class="first-letter:uppercase">{% translate 'max %' %}</span>
+      <span class="first-letter:uppercase">{% translate 'min teachers' %}</span>
+      <span class="first-letter:uppercase">{% translate 'max teachers' %}</span>
+      <span class="first-letter:uppercase">{% translate 'contract type' %}</span>
+      <span class="first-letter:uppercase" title="{% translate 'calculate masters · masters per PhD' %}">{% translate 'masters' %}</span>
+      <span></span>
+    </div>
+
+    <div x-ref="rows" x-sort="renumber()" x-sort:config="{ handle: '.drag-handle', animation: 150, forceFallback: true, fallbackOnBody: true, fallbackTolerance: 3 }" class="space-y-2">
+      {% for share in formset %}
+      {% include "components/edu/faculties/share-row.html" with share=share saved=share.instance.pk %}
+      {% endfor %}
+    </div>
+
+    <template x-ref="template">
+      {% include "components/edu/faculties/share-row.html" with share=formset.empty_form saved=False %}
+    </template>
+
+    <button type="button" class="btn btn-default mt-2" @click="add()">
+      {% heroicon_outline "plus" size=16 %} {% translate 'accept a specialization' %}
+    </button>
+
+    <!-- a share's min / max % of the counted teachers, in whole teachers -->
+    <div class="mt-3 grid grid-cols-1 gap-3 border-t border-neutral-200 pt-3 sm:grid-cols-3 dark:border-neutral-800">
+      <c-field :field="form.max_share_rounding" />
+      <c-field :field="form.min_share_rounding" />
+      <c-field :field="form.masters_rounding" />
+    </div>
+  </fieldset>
+
+  <c-field :field="form.notes" />
+</div>

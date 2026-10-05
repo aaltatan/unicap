@@ -1,0 +1,110 @@
+{% load i18n %}
+{% comment %}How every capacity is reached (`reports.audit_context`): the rules, then each step.{% endcomment %}
+<c-layout :page_title="page_title">
+  {% if problem %}
+  <div class="card p-5 text-sm text-rose-700">{{ problem }}</div>
+  {% else %}
+  <div class="space-y-5">
+    <div class="flex flex-wrap items-end gap-2">
+      <div>
+        <p class="text-xs font-medium uppercase tracking-wider text-neutral-500">{{ chapter.name }} · {{ date }}</p>
+        <h2 class="text-2xl font-semibold tracking-tight first-letter:uppercase">{% translate 'calculation audit' %}</h2>
+      </div>
+      <div class="ms-auto flex gap-2 print:hidden">
+        <c-reports.actions docx="{% url 'reports:audit-docx' %}" pdf="{% url 'reports:audit-pdf' %}" />
+      </div>
+    </div>
+
+    <!-- the logic: the counting rules every number below follows -->
+    <section class="card space-y-2 p-4">
+      <h3 class="text-sm font-semibold first-letter:uppercase">{% translate 'the counting rules' %}</h3>
+      <ol class="list-inside list-decimal space-y-1 text-sm text-neutral-700 dark:text-neutral-300">
+        {% for rule in rules %}<li>{{ rule }}</li>{% endfor %}
+      </ol>
+    </section>
+
+    <!-- the chapter -->
+    <section class="space-y-2">
+      <h3 class="text-sm font-semibold first-letter:uppercase">{% translate 'chapter capacity' %}: <span class="tabular-nums text-indigo-600 dark:text-indigo-400">{{ chapter.capacity }}</span></h3>
+      <div class="card overflow-x-auto print:overflow-visible">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="w-10">#</th>
+              <th>{% translate 'step' %}</th>
+              <th>{% translate 'how' %}</th>
+              <th class="text-end">{% translate 'result' %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for step in steps %}
+            <tr class="break-inside-avoid">
+              <td class="tabular-nums text-neutral-500">{{ step.index }}</td>
+              <td class="font-medium first-letter:uppercase sm:whitespace-nowrap">{{ step.label }}</td>
+              <td class="text-neutral-600 dark:text-neutral-300">{{ step.how|default:"—" }}</td>
+              <td class="text-end font-semibold tabular-nums">{{ step.value }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- each faculty, step by step -->
+    {% for f in faculties %}
+    <section class="space-y-2">
+      <div class="flex flex-wrap items-center gap-2">
+        <h3 class="text-sm font-semibold"><bdi>{{ f.name }}</bdi>: <span class="tabular-nums text-indigo-600 dark:text-indigo-400">{{ f.capacity }}</span></h3>
+        <span class="badge {% if f.is_compliant %}badge-success{% else %}badge-danger{% endif %}">{{ f.compliance }}</span>
+      </div>
+      <div class="card overflow-x-auto print:overflow-visible">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="w-10">#</th>
+              <th>{% translate 'step' %}</th>
+              <th>{% translate 'how' %}</th>
+              <th class="text-end">{% translate 'result' %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for step in f.steps %}
+            <tr class="break-inside-avoid">
+              <td class="tabular-nums text-neutral-500">{{ step.index }}</td>
+              <td class="font-medium first-letter:uppercase sm:whitespace-nowrap">{{ step.label }}</td>
+              <td class="text-neutral-600 dark:text-neutral-300">{{ step.how|default:"—" }}</td>
+              <td class="text-end font-semibold tabular-nums">{{ step.value }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="text-xs text-neutral-600 dark:text-neutral-300">
+        <span class="font-medium first-letter:uppercase">{% translate 'signed teachers' %}:</span>
+        {% translate 'specialized' %} {{ f.mix.specialized }} · {% translate 'supported' %} {{ f.mix.supported }}
+        <span class="text-neutral-400">|</span> {% translate 'fulltime' %} {{ f.mix.fulltime }} · {% translate 'parttime' %} {{ f.mix.parttime }}
+        <span class="text-neutral-400">|</span> {% translate 'PhDs' %} {{ f.mix.phds }} · {% translate 'masters' %} {{ f.mix.masters }}
+      </p>
+      {% if f.violations %}
+      <ul class="list-inside list-disc space-y-0.5 text-sm text-rose-700 dark:text-rose-300">
+        {% for violation in f.violations %}<li>{{ violation }}</li>{% endfor %}
+      </ul>
+      {% endif %}
+      {% if f.uncounted %}
+      <details class="card p-3 text-sm">
+        <summary class="cursor-pointer font-medium first-letter:uppercase">{% translate 'contracts not counted' %} ({{ f.uncounted|length }})</summary>
+        <table class="data-table mt-2">
+          <thead><tr><th class="w-10">#</th><th>{% translate 'name' %}</th><th>{% translate 'specialization' %}</th><th>{% translate 'terms' %}</th><th>{% translate 'reason' %}</th></tr></thead>
+          <tbody>
+            {% for u in f.uncounted %}
+            <tr><td class="tabular-nums text-neutral-500">{{ u.index }}</td><td class="font-medium">{{ u.name }}</td><td>{{ u.specialization }}</td><td>{{ u.terms }}</td><td>{{ u.reason }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </details>
+      {% endif %}
+    </section>
+    {% endfor %}
+  </div>
+  {% endif %}
+</c-layout>

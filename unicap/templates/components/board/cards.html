@@ -1,0 +1,32 @@
+{% load i18n domain %}
+{% comment %}
+  A lane's cards scroll inside the lane (its height is capped), so a long lane never pushes
+  the others down the page: every lane stays in reach while dragging (SortableJS scrolls
+  the lane under the pointer near its edges).
+{% endcomment %}
+<div
+  class="scroll flex min-h-24 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain p-2 {{ lane_height|default:'max-h-[min(28rem,60svh)]' }}"
+  data-lane="{{ lane.key }}"
+  {% if can_move %}
+  x-sort="drop($item, $el.dataset.lane)"
+  x-sort:group="cards"
+  x-sort:config="sortConfig"
+  {% endif %}
+>
+  {% for card in lane.cards %}
+  <div
+    class="board-card {{ card.status|status_class }} {% if not card.contract.is_included %}excluded{% endif %}"
+    x-sort:item="{{ card.employee_id }}"
+    data-employee="{{ card.employee_id }}"
+    :class="matches('{{ card.contract.employee.name|escapejs }}') ? '' : 'opacity-20'"
+    @click="clickCard('{% url 'hr:contracts:details' card.contract_id %}')"
+    @dblclick="doubleClickCard({{ card.employee_id }})"
+    title="{{ card.contract|named_type }} · {{ card.contract.employee.specialization.name }} · {{ card.contract|terms }} · {{ card.status|status_label }}"
+  >
+    <span class="truncate font-medium">{{ card.contract.employee.name }}</span>
+    {% with kind=card.contract|specialization_type %}<c-type-tag :kind="kind" class="shrink-0 px-1 py-0 text-[10px]" />{% endwith %}
+    <span class="hidden truncate text-[10px] opacity-60 xl:inline">{{ card.contract.employee.specialization.name }}</span>
+    <span class="ms-auto shrink-0 rounded bg-black/5 px-1 text-[10px] font-semibold dark:bg-white/10">{{ card.contract|short_terms }}</span>
+  </div>
+  {% endfor %}
+</div>

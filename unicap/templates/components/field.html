@@ -1,0 +1,55 @@
+{% load i18n widget_tweaks %}
+{% comment %}
+  One form field: label, widget (styled by its kind), help text and errors.
+{% endcomment %}
+<c-vars field="" :show_label="True" class="" />
+{% with kind=field|widget_kind %}
+{% if kind == "hidden" %}
+{{ field }}
+{% else %}
+<div class="{{ class }}">
+  {% if kind == "checkbox" %}
+  <label class="flex cursor-pointer items-center gap-2 py-1 text-sm">
+    {% render_field field class="checkbox" %}
+    <span class="first-letter:uppercase">{{ field.label }}</span>
+  </label>
+  {% elif kind == "checkboxes" or kind == "radios" %}
+  <fieldset x-data="{ q: '' }">
+    <legend class="label">{{ field.label }}</legend>
+    {% if field.field.choices|length > 8 %}
+    <input type="search" class="input mb-1 py-1 text-xs" x-model="q" placeholder="{% translate 'type to search' %}…" aria-label="{% translate 'search' %} {{ field.label }}" />
+    {% endif %}
+    <div class="scroll max-h-40 space-y-0.5 overflow-y-auto rounded-md border border-neutral-200 p-1.5 dark:border-neutral-700">
+      {% for option in field %}
+      <label x-show="$matches($el.textContent, q)" class="flex cursor-pointer items-center gap-2 rounded px-1.5 py-1 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800">
+        {{ option.tag }}
+        <span class="first-letter:uppercase">{{ option.choice_label }}</span>
+      </label>
+      {% empty %}
+      <p class="px-1.5 py-1 text-xs text-neutral-400">—</p>
+      {% endfor %}
+    </div>
+  </fieldset>
+  {% else %}
+  {% if show_label %}
+  <label for="{{ field.id_for_label }}" class="label">
+    {{ field.label }}{% if field.field.required %}<span class="text-rose-500"> *</span>{% endif %}
+  </label>
+  {% endif %}
+  {% if kind == "search" %}
+  <c-search-select>{% if field.errors %}{% render_field field class="input" aria-invalid="true" %}{% else %}{% render_field field class="input" %}{% endif %}</c-search-select>
+  {% elif field.errors %}
+  {% render_field field class="input" aria-invalid="true" %}
+  {% else %}
+  {% render_field field class="input" %}
+  {% endif %}
+  {% endif %}
+  {% if field.help_text %}
+  <p class="mt-1 text-xs text-neutral-500 first-letter:uppercase dark:text-neutral-400">{{ field.help_text }}</p>
+  {% endif %}
+  {% for error in field.errors %}
+  <p class="mt-1 text-xs text-rose-600 first-letter:uppercase dark:text-rose-400">{{ error }}</p>
+  {% endfor %}
+</div>
+{% endif %}
+{% endwith %}

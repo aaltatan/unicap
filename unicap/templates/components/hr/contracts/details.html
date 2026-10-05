@@ -1,0 +1,21 @@
+{% load i18n domain %}
+<div class="mb-4 flex flex-wrap items-center gap-2">
+  <span class="badge {{ obj.status|status_badge }}">{{ obj.status|status_label }}</span>
+  <c-type-tag :kind="obj.specialization_type" />
+  {% if not obj.is_active %}<span class="badge badge-neutral">{% translate 'switched off' %}</span>{% endif %}
+</div>
+<dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:grid-cols-3">
+  <div><dt class="label">{% translate 'employee' %}</dt><dd><c-object-link :obj="obj.employee" :allowed="perms.app.view_employee" /></dd></div>
+  <div><dt class="label">{% translate 'specialization' %}</dt><dd><c-object-link :obj="obj.employee.specialization" :allowed="perms.app.view_specialization" /></dd></div>
+  <div><dt class="label">{% translate 'faculty' %}</dt><dd>{% if obj.faculty %}<c-object-link :obj="obj.faculty" :allowed="perms.app.view_faculty" />{% else %}{% translate 'unsigned' %}{% endif %}</dd></div>
+  <div><dt class="label">{% translate 'degree' %}</dt><dd>{{ obj.get_degree_display }}</dd></div>
+  <div><dt class="label">{% translate 'contract type' %}</dt><dd>{{ obj.get_contract_type_display }}</dd></div>
+  <div><dt class="label">{% translate 'employment type' %}</dt><dd>{{ obj.get_employment_type_display }}</dd></div>
+  <div><dt class="label">{% translate 'signing order' %}</dt><dd class="tabular-nums">{{ obj.position }}</dd></div>
+</dl>
+<p class="mt-4 text-xs text-neutral-500 first-letter:uppercase">
+  {% translate 'when a group overflows, the contracts signed last are the ones not counted.' %}
+</p>
+{% if obj.notes %}
+<div class="mt-4"><p class="label">{% translate 'notes' %}</p><p class="whitespace-pre-line text-sm">{{ obj.notes }}</p></div>
+{% endif %}

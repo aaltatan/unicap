@@ -1,0 +1,189 @@
+{% load i18n domain charts %}
+<c-layout :page_title="page_title">
+  {% if problem %}
+  <div class="card border-rose-300 p-5 text-sm text-rose-700 dark:text-rose-300">
+    <p class="font-semibold first-letter:uppercase">{% translate "this chapter's data breaks a rule" %}</p>
+    <p class="mt-1">{{ problem }}</p>
+  </div>
+  {% else %}
+  <div class="space-y-4">
+    <div class="flex flex-wrap items-end gap-2">
+      <div>
+        <p class="text-xs font-medium uppercase tracking-wider text-neutral-500">{% translate 'chapter' %}</p>
+        <h2 class="text-2xl font-semibold tracking-tight">{{ chapter.name }}</h2>
+      </div>
+      <a href="{% url 'board:index' %}" class="btn btn-primary ms-auto">{% heroicon_outline "view-columns" size=16 %} {% translate 'open the board' %}</a>
+    </div>
+
+    <!-- key figures -->
+    <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+      <div class="card p-4">
+        <p class="text-xs font-medium text-neutral-500 first-letter:uppercase">{% translate 'capacity' %}</p>
+        <p class="mt-1 text-3xl font-semibold tabular-nums text-indigo-600 dark:text-indigo-400">{{ report.capacity }}</p>
+        <p class="mt-1 text-xs text-neutral-500">{% translate 'students the university may take' %}{% if chapter.max_students is not None %} · {% translate 'chapter max' %} {{ chapter.max_students }}{% endif %}</p>
+      </div>
+      <div class="card p-4">
+        <p class="text-xs font-medium text-neutral-500 first-letter:uppercase">{% translate 'counted teachers' %}</p>
+        <p class="mt-1 text-3xl font-semibold tabular-nums">{{ counts.counted }}<span class="text-base text-neutral-400"> / {{ contracts }}</span></p>
+        <p class="mt-1 text-xs text-neutral-500">{% blocktranslate with n=counts.uncounted %}{{ n }} not counted{% endblocktranslate %} · {% blocktranslate with n=counts.unsigned %}{{ n }} unsigned{% endblocktranslate %}</p>
+      </div>
+      <div class="card p-4">
+        <p class="text-xs font-medium text-neutral-500 first-letter:uppercase">{% translate 'missing to targets' %}</p>
+        <p class="mt-1 text-3xl font-semibold tabular-nums">{{ report.target_shortfall }}</p>
+        <p class="mt-1 text-xs text-neutral-500">{% translate 'teaching capacity' %} {{ report.teaching_capacity }}</p>
+      </div>
+      <div class="card p-4 {% if report.is_compliant %}!border-emerald-300 dark:!border-emerald-800{% else %}!border-rose-300 dark:!border-rose-800{% endif %}">
+        <p class="text-xs font-medium text-neutral-500 first-letter:uppercase">{% translate 'compliance' %}</p>
+        <p class="mt-2 flex items-center gap-2 text-lg font-semibold {% if report.is_compliant %}text-emerald-600 dark:text-emerald-400{% else %}text-rose-600 dark:text-rose-400{% endif %}">
+          {% if report.is_compliant %}{% heroicon_outline "check-badge" size=24 %} {% translate 'compliant' %}{% else %}{% heroicon_outline "exclamation-triangle" size=24 %} {% translate 'not compliant' %}{% endif %}
+        </p>
+        <p class="mt-1 text-xs text-neutral-500">{% blocktranslate with n=report.overflowing|length %}{{ n }} overflowing{% endblocktranslate %}</p>
+      </div>
+    </div>
+
+    <!-- widgets: drag by their handle to reorder (remembered) -->
+    <div x-data="persistedOrder('dashboard')" x-sort="save()" x-sort:config="{ handle: '.widget-handle', animation: 150, forceFallback: true, fallbackOnBody: true, fallbackTolerance: 3 }" class="grid gap-4 xl:grid-cols-2">
+
+      <section class="card" data-key="capacity" x-sort:item="'capacity'">
+        <header class="flex items-center gap-2 border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
+          <span class="widget-handle cursor-grab text-neutral-400" title="{% translate 'drag to reorder' %}">{% heroicon_mini "bars-3" size=16 %}</span>
+          <h3 class="text-sm font-semibold first-letter:uppercase">{% translate 'capacity by faculty' %}</h3>
+          <span class="ms-auto flex flex-wrap items-center gap-3 text-[11px] text-neutral-500">
+            <span class="flex items-center gap-1"><span class="h-2 w-3 rounded-sm bg-indigo-500"></span>{% translate 'capacity' %}</span>
+            <span class="flex items-center gap-1"><span class="h-2 w-3 rounded-sm bg-neutral-300 dark:bg-neutral-700"></span>{% translate 'max' %}</span>
+            <span class="flex items-center gap-1"><span class="h-3 w-0.5 bg-amber-500"></span>{% translate 'target' %}</span>
+            <span class="flex items-center gap-1"><span class="h-3 w-0.5 bg-rose-500"></span>{% translate 'now' %}</span>
+          </span>
+        </header>
+        <div class="space-y-3 p-4">
+          {% with scale=lanes|faculty_scale %}
+          {% for lane in lanes %}
+          {% with r=lane.report f=lane.report.faculty %}
+          <div>
+            <div class="mb-1 flex items-baseline gap-2 text-sm">
+              <span class="font-medium">{{ f.name }}</span>
+              <span class="ms-auto tabular-nums text-neutral-500">{{ r.capacity }}{% if f.max_students is not None %} / {{ f.max_students }}{% endif %}</span>
+            </div>
+            <div class="relative h-3 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+              {% if f.max_students %}<div class="absolute inset-y-0 start-0 rounded-full bg-neutral-300 dark:bg-neutral-700" style="width: {{ f.max_students|bar:scale }}%"></div>{% endif %}
+              <div class="absolute inset-y-0 start-0 rounded-full bg-indigo-500" style="width: {{ r.capacity|bar:scale }}%"></div>
+              {% if f.target_students %}<div class="absolute inset-y-0 w-0.5 bg-amber-500" style="inset-inline-start: {{ f.target_students|bar:scale }}%" title="{% translate 'target' %} {{ f.target_students }}"></div>{% endif %}
+              {% if f.current_students %}<div class="absolute inset-y-0 w-0.5 bg-rose-500" style="inset-inline-start: {{ f.current_students|bar:scale }}%" title="{% translate 'now' %} {{ f.current_students }}"></div>{% endif %}
+            </div>
+          </div>
+          {% endwith %}
+          {% empty %}
+          <p class="text-sm text-neutral-500 first-letter:uppercase">{% translate 'no faculty yet.' %}</p>
+          {% endfor %}
+          {% endwith %}
+        </div>
+      </section>
+
+      <section class="card chart-gap xl:col-span-2" data-key="composition" x-sort:item="'composition'">
+        <header class="flex items-center gap-2 border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
+          <span class="widget-handle cursor-grab text-neutral-400" title="{% translate 'drag to reorder' %}">{% heroicon_mini "bars-3" size=16 %}</span>
+          <h3 class="text-sm font-semibold first-letter:uppercase">{% translate 'how each faculty is filled' %}</h3>
+          <span class="ms-auto flex flex-wrap items-center gap-3 text-[11px] text-neutral-500">
+            <span class="flex items-center gap-1"><span class="size-2.5 rounded-full bg-indigo-700"></span>{% translate 'staff' %}</span>
+            <span class="flex items-center gap-1"><span class="size-2.5 rounded-full bg-amber-700"></span>{% translate 'borrowed' %}</span>
+            <span>{% translate 'counted PhDs · inner ring: staff / borrowed' %}</span>
+          </span>
+        </header>
+        <div class="grid gap-4 p-4 sm:grid-cols-2 2xl:grid-cols-3">
+          {% for lane in lanes %}
+          {% with chart=lane.report|composition_chart chart_id="composition-"|add:lane.key %}
+          {{ chart|json_script:chart_id }}
+          <div x-data="compositionChart('{{ chart_id }}')" class="flex items-center gap-3 rounded-lg border border-neutral-200 p-3 dark:border-neutral-800">
+            <div class="relative size-32 shrink-0">
+              {% if chart.total %}
+              <canvas x-ref="canvas" aria-label="{{ lane.report.faculty.name }}" role="img"></canvas>
+              <span class="pointer-events-none absolute inset-0 grid place-items-center text-lg font-semibold tabular-nums">{{ chart.total }}</span>
+              {% else %}
+              <span class="grid size-full place-items-center rounded-full border-8 border-neutral-100 text-xs text-neutral-400 dark:border-neutral-800">0</span>
+              {% endif %}
+            </div>
+            <div class="min-w-0 flex-1 text-xs">
+              <p class="mb-1 truncate text-sm font-medium">{{ lane.report.faculty.name }}</p>
+              {% for group in chart.groups %}
+              <p class="mt-1 flex items-center gap-1.5 font-semibold {% if group.employment == 'staff' %}text-indigo-700 dark:text-indigo-300{% else %}text-amber-700 dark:text-amber-300{% endif %}">
+                <span class="first-letter:uppercase">{{ group.label }}</span><span class="ms-auto tabular-nums">{{ group.count }}</span>
+              </p>
+              {% for slice in chart.slices %}{% if slice.employment == group.employment %}
+              <p class="flex gap-1.5 ps-2 text-neutral-600 dark:text-neutral-400"><span class="truncate first-letter:uppercase">{{ slice.kind_label }}</span><span class="ms-auto tabular-nums">{{ slice.count }}</span></p>
+              {% endif %}{% endfor %}
+              {% empty %}
+              <p class="text-neutral-400 first-letter:uppercase">{% translate 'no counted teacher yet.' %}</p>
+              {% endfor %}
+            </div>
+          </div>
+          {% endwith %}
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="card" data-key="staff" x-sort:item="'staff'">
+        <header class="flex items-center gap-2 border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
+          <span class="widget-handle cursor-grab text-neutral-400" title="{% translate 'drag to reorder' %}">{% heroicon_mini "bars-3" size=16 %}</span>
+          <h3 class="text-sm font-semibold first-letter:uppercase">{% translate 'staff share of PhDs' %}</h3>
+          <span class="ms-auto flex items-center gap-1 text-[11px] text-neutral-500"><span class="h-3 w-0.5 bg-neutral-900 dark:bg-white"></span>{% translate 'minimum' %}</span>
+        </header>
+        <div class="space-y-3 p-4">
+          {% for lane in lanes %}
+          {% with r=lane.report f=lane.report.faculty %}
+          <div>
+            <div class="mb-1 flex items-baseline gap-2 text-sm" title="{{ r.mix|mix_text }}">
+              <span class="font-medium">{{ f.name }}</span>
+              <span class="ms-auto tabular-nums {% if r|has_violation:'staff_ratio_too_low' %}font-semibold text-rose-600 dark:text-rose-400{% else %}text-neutral-500{% endif %}">{{ r.staff_percentage|percent }} · {% translate 'min' %} {{ f.min_staff_percentage|number }}%</span>
+            </div>
+            <div class="relative h-3 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+              <div class="absolute inset-y-0 start-0 rounded-full {% if r|has_violation:'staff_ratio_too_low' %}bg-rose-500{% else %}bg-emerald-500{% endif %}" style="width: {{ r.staff_percentage|bar:100 }}%"></div>
+              <div class="absolute inset-y-0 w-0.5 bg-neutral-900 dark:bg-white" style="inset-inline-start: {{ f.min_staff_percentage|bar:100 }}%"></div>
+            </div>
+          </div>
+          {% endwith %}
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="card" data-key="contracts" x-sort:item="'contracts'">
+        <header class="flex items-center gap-2 border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
+          <span class="widget-handle cursor-grab text-neutral-400" title="{% translate 'drag to reorder' %}">{% heroicon_mini "bars-3" size=16 %}</span>
+          <h3 class="text-sm font-semibold first-letter:uppercase">{% translate 'contracts' %}</h3>
+          <a href="{% url 'hr:contracts:index' %}" class="ms-auto text-xs text-indigo-600 hover:underline dark:text-indigo-400">{% translate 'all contracts' %}</a>
+        </header>
+        <div class="p-4">
+          <div class="flex h-4 overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+            <div class="bg-emerald-500" style="width: {{ counts.counted|bar:contracts }}%" title="{% translate 'counted' %}"></div>
+            <div class="bg-rose-500" style="width: {{ counts.uncounted|bar:contracts }}%" title="{% translate 'not counted' %}"></div>
+            <div class="bg-neutral-400" style="width: {{ counts.unsigned|bar:contracts }}%" title="{% translate 'unsigned' %}"></div>
+            <div class="bg-neutral-200 dark:bg-neutral-700" style="width: {{ counts.excluded|bar:contracts }}%" title="{% translate 'not calculated' %}"></div>
+          </div>
+          <dl class="mt-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
+            <div class="flex items-center gap-2"><span class="size-2.5 rounded-full bg-emerald-500"></span><dt class="first-letter:uppercase">{% translate 'counted' %}</dt><dd class="ms-auto font-semibold tabular-nums">{{ counts.counted }}</dd></div>
+            <div class="flex items-center gap-2"><span class="size-2.5 rounded-full bg-rose-500"></span><dt class="first-letter:uppercase">{% translate 'not counted' %}</dt><dd class="ms-auto font-semibold tabular-nums">{{ counts.uncounted }}</dd></div>
+            <div class="flex items-center gap-2"><span class="size-2.5 rounded-full bg-neutral-400"></span><dt class="first-letter:uppercase">{% translate 'unsigned' %}</dt><dd class="ms-auto font-semibold tabular-nums">{{ counts.unsigned }}</dd></div>
+            <div class="flex items-center gap-2"><span class="size-2.5 rounded-full bg-neutral-200 dark:bg-neutral-700"></span><dt class="first-letter:uppercase">{% translate 'not calculated' %}</dt><dd class="ms-auto font-semibold tabular-nums">{{ counts.excluded }}</dd></div>
+          </dl>
+        </div>
+      </section>
+
+      <section class="card" data-key="issues" x-sort:item="'issues'">
+        <header class="flex items-center gap-2 border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
+          <span class="widget-handle cursor-grab text-neutral-400" title="{% translate 'drag to reorder' %}">{% heroicon_mini "bars-3" size=16 %}</span>
+          <h3 class="text-sm font-semibold first-letter:uppercase">{% translate 'violations' %}</h3>
+        </header>
+        <ul class="scroll max-h-72 space-y-1.5 overflow-y-auto p-4 text-sm">
+          {% for faculty_report in report.faculties %}
+          {% for violation in faculty_report.violations %}
+          <li class="flex gap-2 text-rose-700 dark:text-rose-300">{% heroicon_mini "exclamation-circle" size=16 class="mt-0.5 shrink-0" %} {{ violation|violation_text }}</li>
+          {% endfor %}
+          {% endfor %}
+          {% if report.is_compliant %}
+          <li class="flex items-center gap-2 text-emerald-700 dark:text-emerald-300">{% heroicon_mini "check-circle" size=16 %} <span class="first-letter:uppercase">{% translate 'every faculty is compliant.' %}</span></li>
+          {% endif %}
+        </ul>
+      </section>
+    </div>
+  </div>
+  {% endif %}
+</c-layout>

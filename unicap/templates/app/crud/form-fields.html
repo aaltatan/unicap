@@ -1,0 +1,16 @@
+{% load i18n %}
+{% if form.non_field_errors %}
+<div class="mb-3 flex gap-2 rounded-lg border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800 dark:border-rose-900 dark:bg-rose-950/50 dark:text-rose-200" role="alert">
+  <span class="shrink-0">{% heroicon_outline "exclamation-triangle" size=18 %}</span>
+  <div>{% for error in form.non_field_errors %}<p class="first-letter:uppercase">{{ error }}</p>{% endfor %}</div>
+</div>
+{% endif %}
+{% if resource.custom_form %}
+{% include resource.templates|add:"/form.html" %}
+{% else %}
+<div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+  {% for field in form %}
+  <c-field :field="field" class="{% if field.name == 'notes' or field.name == 'name' %}sm:col-span-2{% endif %}" />
+  {% endfor %}
+</div>
+{% endif %}

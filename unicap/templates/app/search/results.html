@@ -1,0 +1,28 @@
+{% load i18n %}
+{% comment %}The header search's results: each kind of row, the first ones and a link to all.{% endcomment %}
+{% if q %}
+{% for group in groups %}
+<section class="py-1">
+  <div class="flex items-center gap-2 px-2.5 py-1 text-xs font-semibold text-neutral-500">
+    {% heroicon_outline group.icon size=14 %}
+    <span class="first-letter:uppercase">{{ group.title }}</span>
+    <span class="text-neutral-400">({{ group.total }})</span>
+    <a href="{{ group.table_url }}" class="ms-auto font-medium text-indigo-600 hover:underline dark:text-indigo-400">{% translate 'see all' %}</a>
+  </div>
+  {% for row in group.rows %}
+  <button
+    type="button"
+    class="menu-item"
+    hx-get="{{ row.get_absolute_url }}"
+    hx-target="#modal-container"
+    hx-swap="innerHTML"
+    @click="open = false"
+  >
+    <span class="truncate">{{ row }}</span>
+  </button>
+  {% endfor %}
+</section>
+{% empty %}
+<p class="px-3 py-4 text-center text-sm text-neutral-500 first-letter:uppercase">{% translate 'no match' %}</p>
+{% endfor %}
+{% endif %}

@@ -1,0 +1,11 @@
+{% load i18n %}
+<td data-col="name">
+  <button type="button" class="font-medium hover:text-indigo-600 hover:underline dark:hover:text-indigo-400"
+    hx-get="{{ obj.get_absolute_url }}" hx-target="#modal-container" hx-swap="innerHTML">{{ obj.name }}</button>
+</td>
+<td data-col="is_active">
+  <c-switch :on="obj.is_active" url="{{ obj.get_toggle_url }}" :enabled="perms_change" label="{% translate 'active' %}" />
+</td>
+<td data-col="faculties" class="text-end tabular-nums">{{ obj.faculties_count }}</td>
+<td data-col="employees" class="text-end tabular-nums">{{ obj.employees_count }}</td>
+<td data-col="notes" class="max-w-xs truncate text-neutral-500" title="{{ obj.notes }}">{{ obj.notes|truncatechars:80 }}</td>

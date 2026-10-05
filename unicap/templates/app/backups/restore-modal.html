@@ -1,0 +1,27 @@
+{% load i18n %}
+<form hx-post="{{ backup.get_restore_url }}" hx-target="#modal-container" hx-swap="innerHTML">
+  <c-layout.modal-body title="{% translate 'restore a backup' %}" width="md">
+    <div class="space-y-3 text-sm">
+      <p class="font-medium">{{ backup }}</p>
+      <div class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-amber-800 dark:border-amber-900 dark:bg-amber-950/40 dark:text-amber-200">
+        <p class="first-letter:uppercase">
+          {% if backup.scope == "system" %}
+          {% translate "every chapter and the settings are replaced by this backup." %}
+          {% elif backup.scope == "chapter" %}
+          {% translate "the chapter's rows and settings are replaced by this backup, or it becomes a new chapter." %}
+          {% else %}
+          {% blocktranslate with section=backup.get_section_display %}the chapter's {{ section }} are replaced by this backup; its other rows stay.{% endblocktranslate %}
+          {% endif %}
+        </p>
+        <p class="mt-1 first-letter:uppercase">{% translate "what is replaced is saved as a backup first, so this can be undone." %}</p>
+      </div>
+      {% for error in form.non_field_errors %}<p class="whitespace-pre-line text-rose-600 first-letter:uppercase">{{ error }}</p>{% endfor %}
+      {% if form.chapter %}<c-field :field="form.chapter" />{% endif %}
+      {% if form.new_chapter %}<c-field :field="form.new_chapter" />{% endif %}
+    </div>
+    <c-slot name="footer">
+      <button type="button" class="btn btn-default" @click="closeModal()">{% translate 'cancel' %}</button>
+      <button type="submit" class="btn btn-danger">{% heroicon_outline "arrow-uturn-left" size=16 %} {% translate 'restore' %}</button>
+    </c-slot>
+  </c-layout.modal-body>
+</form>

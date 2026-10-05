@@ -1,0 +1,20 @@
+<!-- closes on a click outside, unless the press began inside (dragging a modal's corner) -->
+<div
+  x-cloak
+  x-data="{ pressedOutside: false }"
+  x-show="modalOpen"
+  @mousedown.capture="pressedOutside = !$refs.container.contains($event.target)"
+  x-transition.opacity.duration.150ms
+  class="print:hidden fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto bg-black/40 p-3 pt-[8vh] backdrop-blur-[1px]"
+  role="dialog"
+  aria-modal="true"
+  @keydown.escape.window="modalOpen && closeModal()"
+>
+  <div
+    id="modal-container"
+    x-ref="container"
+    class="max-w-full"
+    x-trap.noscroll="modalOpen"
+    @click.outside="modalOpen && pressedOutside && closeModal()"
+  ></div>
+</div>

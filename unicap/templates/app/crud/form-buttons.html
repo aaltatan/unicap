@@ -1,0 +1,11 @@
+{% load i18n %}
+<button type="button" class="btn btn-default" @click="closeModal()">{% translate 'cancel' %}</button>
+{% if adding %}
+<button type="submit" name="save_and_new" value="1" class="btn btn-default" title="{% translate 'save, then start a new one' %}">
+  {% translate 'save & new' %}
+</button>
+{% endif %}
+<button type="submit" class="btn btn-primary" @keydown.ctrl.s.window.prevent="$el.click()" title="Ctrl+S">
+  <span class="htmx-indicator spinner border-t-white"></span>
+  {% heroicon_outline "check" size=16 %} {% translate 'save' %}
+</button>

@@ -1,0 +1,18 @@
+{% load domain charts %}
+{% comment %}
+  A faculty's signed teachers as percentages (the domain's `Mix`), beside its staff percentage:
+  specialized / supported, fulltime / parttime, PhDs / masters; each bar is the first of the pair.
+{% endcomment %}
+<div class="space-y-1.5 text-xs {{ class }}">
+  {% for row in mix|mix_rows %}
+  <div>
+    <div class="flex justify-between gap-2 tabular-nums">
+      <span class="first-letter:uppercase">{{ row.label }} <span class="font-semibold">{{ row.value|percent }}</span></span>
+      <span class="text-neutral-500"><span class="font-semibold">{{ row.other_value|percent }}</span> {{ row.other_label }}</span>
+    </div>
+    <div class="h-1.5 overflow-hidden rounded-full bg-neutral-200 dark:bg-neutral-700 print:border print:border-neutral-300">
+      <div class="h-full rounded-full bg-indigo-500" style="width: {{ row.value|bar:100 }}%"></div>
+    </div>
+  </div>
+  {% endfor %}
+</div>

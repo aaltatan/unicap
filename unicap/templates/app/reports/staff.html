@@ -1,0 +1,113 @@
+{% load i18n domain %}
+<c-layout :page_title="page_title">
+  {% with report=obj.report %}
+  <div class="space-y-5">
+    <div class="flex flex-wrap items-end gap-2">
+      <div>
+        <p class="text-xs font-medium uppercase tracking-wider text-neutral-500">{{ chapter.name }} · {% now "DATE_FORMAT" %}</p>
+        <h2 class="text-2xl font-semibold tracking-tight">{{ obj.name }}</h2>
+      </div>
+      <div class="ms-auto flex gap-2 print:hidden">
+        <a class="btn btn-default" href="{% url 'reports:staff-pivot' obj.pk %}">{% heroicon_outline "squares-2x2" size=16 %} {% translate 'pivot' %}</a>
+        <c-reports.actions docx="{% url 'reports:staff-docx' obj.pk %}" pdf="{% url 'reports:staff-pdf' obj.pk %}" />
+      </div>
+    </div>
+
+    {% if report %}
+    <!-- the faculty's numbers -->
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-4 print:grid-cols-4">
+      <div class="card p-3">
+        <p class="text-xs text-neutral-500 first-letter:uppercase">{% translate 'capacity' %}</p>
+        <p class="text-2xl font-semibold tabular-nums">{{ report.capacity }}</p>
+      </div>
+      <div class="card p-3">
+        <p class="text-xs text-neutral-500 first-letter:uppercase">{% translate 'staff' %}</p>
+        <p class="text-xl font-semibold tabular-nums {% if report|has_violation:'staff_ratio_too_low' %}text-rose-600{% endif %}">{{ report.staff_percentage|percent:1 }}</p>
+        <p class="text-xs text-neutral-500">{% translate 'min' %} {{ obj.min_staff_percentage|number }}%</p>
+      </div>
+      <div class="card p-3">
+        <p class="text-xs text-neutral-500 first-letter:uppercase">{% translate 'students per PhD' %}</p>
+        <p class="text-xl font-semibold tabular-nums">{{ obj.students_per_phd }}</p>
+      </div>
+      <div class="card p-3">
+        <p class="text-xs text-neutral-500 first-letter:uppercase">{% translate 'free seats' %}</p>
+        <p class="text-xl font-semibold tabular-nums">{{ report.free_seats|default_if_none:"—" }}</p>
+      </div>
+    </div>
+
+    <!-- what its signed teachers are made of -->
+    <section class="card break-inside-avoid space-y-2 p-3">
+      <h3 class="text-sm font-semibold first-letter:uppercase">{% translate 'signed teachers' %}</h3>
+      <c-mix :mix="report.mix" class="grid gap-x-6 sm:grid-cols-3 print:grid-cols-3" />
+    </section>
+
+    <!-- its own staff, in staff order (specialized fulltime staff first) -->
+    <section class="space-y-2">
+      <h3 class="text-sm font-semibold first-letter:uppercase">{% translate 'staff' %} <span class="text-neutral-400">({{ report.statuses|length }})</span></h3>
+      {% if report.statuses %}
+      <div class="card overflow-x-auto print:overflow-visible">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th class="w-10">#</th>
+              <th>{% translate 'name' %}</th>
+              <th>{% translate 'specialization' %}</th>
+              <th>{% translate 'specialization type' %}</th>
+              <th>{% translate 'terms' %}</th>
+              <th>{% translate 'status' %}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for contract, status in report.in_staff_order %}
+            <tr class="break-inside-avoid">
+              <td class="tabular-nums text-neutral-500">{{ forloop.counter }}</td>
+              <td class="font-medium">{{ contract.employee.name }}</td>
+              <td>{{ contract.employee.specialization.name }}</td>
+              <td>{% with kind=contract|specialization_type %}<c-type-tag :kind="kind" />{% endwith %}</td>
+              <td>{{ contract|terms }}</td>
+              <td><span class="badge {{ status|status_badge }}">{{ status|status_label }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="text-sm text-neutral-500 first-letter:uppercase">{% translate 'no contract is signed here.' %}</p>
+      {% endif %}
+    </section>
+
+    <div class="grid gap-5 lg:grid-cols-2 print:grid-cols-2">
+      <!-- head counts: signed vs counted -->
+      <section class="space-y-2 break-inside-avoid">
+        <h3 class="text-sm font-semibold first-letter:uppercase">{% translate 'head counts' %}</h3>
+        <table class="data-table card">
+          <thead><tr><th></th><th class="text-end">{% translate 'signed' %}</th><th class="text-end">{% translate 'counted' %}</th></tr></thead>
+          <tbody class="tabular-nums">
+            <tr><td>{% translate 'specialized fulltime staff' %}</td><td class="text-end">{{ report.signed.specialized_fulltime_staff }}</td><td class="text-end">{{ report.counted.specialized_fulltime_staff }}</td></tr>
+            <tr><td>{% translate 'specialized fulltime borrowed' %}</td><td class="text-end">{{ report.signed.specialized_fulltime_borrowed }}</td><td class="text-end">{{ report.counted.specialized_fulltime_borrowed }}</td></tr>
+            <tr><td>{% translate 'specialized parttime' %}</td><td class="text-end">{{ report.signed.specialized_parttime }}</td><td class="text-end">{{ report.counted.specialized_parttime }}</td></tr>
+            <tr><td>{% translate 'supported fulltime staff' %}</td><td class="text-end">{{ report.signed.supported_fulltime_staff }}</td><td class="text-end">{{ report.counted.supported_fulltime_staff }}</td></tr>
+            <tr><td>{% translate 'supported fulltime borrowed' %}</td><td class="text-end">{{ report.signed.supported_fulltime_borrowed }}</td><td class="text-end">{{ report.counted.supported_fulltime_borrowed }}</td></tr>
+            <tr><td>{% translate 'supported parttime' %}</td><td class="text-end">{{ report.signed.supported_parttime }}</td><td class="text-end">{{ report.counted.supported_parttime }}</td></tr>
+            <tr><td>{% translate 'masters' %}</td><td class="text-end">{{ report.signed.masters }}</td><td class="text-end">{{ report.counted.masters }}</td></tr>
+            <tr class="font-semibold"><td>{% translate 'PhD equivalents' %}</td><td class="text-end">{{ report.signed.phd_equivalents|number }}</td><td class="text-end">{{ report.counted.phd_equivalents|number }}</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- compliance -->
+      <section class="space-y-2 break-inside-avoid">
+        <h3 class="text-sm font-semibold first-letter:uppercase">{% translate 'compliance' %}</h3>
+        {% if report.violations %}
+        <ul class="list-inside list-disc space-y-0.5 text-sm text-rose-700 dark:text-rose-300">
+          {% for violation in report.violations %}<li>{{ violation|violation_text }}</li>{% endfor %}
+        </ul>
+        {% else %}
+        <p class="text-sm text-emerald-700 first-letter:uppercase dark:text-emerald-300">{% translate 'compliant: no violation.' %}</p>
+        {% endif %}
+      </section>
+    </div>
+    {% endif %}
+  </div>
+  {% endwith %}
+</c-layout>

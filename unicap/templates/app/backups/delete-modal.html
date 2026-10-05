@@ -1,0 +1,10 @@
+{% load i18n %}
+<form hx-post="{{ backup.get_delete_url }}" hx-target="#modal-container" hx-swap="innerHTML">
+  <c-layout.modal-body title="{% translate 'delete' %}" width="md">
+    <p class="text-sm first-letter:uppercase">{% blocktranslate with backup=backup %}delete the backup {{ backup }}? It cannot be undone.{% endblocktranslate %}</p>
+    <c-slot name="footer">
+      <button type="button" class="btn btn-default" @click="closeModal()">{% translate 'cancel' %}</button>
+      <button type="submit" class="btn btn-danger">{% heroicon_outline "trash" size=16 %} {% translate 'delete' %}</button>
+    </c-slot>
+  </c-layout.modal-body>
+</form>

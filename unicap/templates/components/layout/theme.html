@@ -1,0 +1,20 @@
+{% comment %}
+  In <head>, before the Vite assets: paint the right theme from the first frame.
+
+  The stylesheet arrives after the first paint (with `npm run dev` Vite injects it from JS), so
+  the page background is set here, and the <body x-cloak> stays hidden until Alpine starts
+  (the stylesheet is in by then). Colors: Tailwind neutral-50 / neutral-950, as on <body>.
+{% endcomment %}
+<style>
+  [x-cloak] { display: none !important; }
+  html { background-color: #fafafa; color-scheme: light; }
+  @media not print { html.dark { background-color: #0a0a0a; color-scheme: dark; } }
+</style>
+<script>
+  (function () {
+    var mode = "system";
+    try { mode = JSON.parse(localStorage.getItem("unicap:theme")) || "system"; } catch (e) {}
+    var dark = mode === "dark" || (mode === "system" && matchMedia("(prefers-color-scheme: dark)").matches);
+    document.documentElement.classList.toggle("dark", dark);
+  })();
+</script>

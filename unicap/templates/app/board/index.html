@@ -1,0 +1,60 @@
+{% load i18n %}
+<c-layout :page_title="page_title" :wide="True">
+  <div
+    x-data="board({ previewUrl: '{% url 'board:preview' %}', moveUrl: '{% url 'board:move' %}', toggleUrl: '{% url 'board:toggle' %}' })"
+    class="space-y-3"
+  >
+    <!-- toolbar -->
+    <div class="flex flex-wrap items-center gap-2">
+      <div class="relative min-w-48 flex-1 sm:max-w-xs">
+        <span class="pointer-events-none absolute inset-y-0 start-2.5 flex items-center text-neutral-400">{% heroicon_outline "magnifying-glass" size=16 %}</span>
+        <input type="search" x-model="search" class="input ps-8" placeholder="{% translate 'find a teacher' %}… ( / )"
+          @keydown.slash.window="if (!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) { $event.preventDefault(); $el.focus(); }" />
+      </div>
+
+      <div class="ms-auto flex flex-wrap items-center gap-1.5">
+        {% if can_move %}
+        <form class="flex items-center gap-1.5" hx-get="{% url 'board:optimize' %}" hx-target="#modal-container" hx-swap="innerHTML">
+          <label class="sr-only" for="strategy">{% translate 'strategy' %}</label>
+          <select id="strategy" name="strategy" class="input w-auto py-1.5">
+            {% for value, label in strategies %}
+            <option value="{{ value }}" title="{{ strategy_descriptions|get_item:value }}">{{ label|capfirst }}</option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn-primary" title="{% translate 'preview the moves before applying them' %}">
+            <span class="htmx-indicator spinner border-t-white"></span>
+            {% heroicon_outline "sparkles" size=16 %} {% translate 'optimize' %}…
+          </button>
+        </form>
+        <button type="button" class="btn btn-default" hx-get="{% url 'board:reset' %}" hx-target="#modal-container" hx-swap="innerHTML">
+          {% heroicon_outline "arrow-uturn-left" size=16 %} {% translate 'reset' %}
+        </button>
+        {% endif %}
+        <button type="button" class="btn btn-default" hx-get="{% url 'board:recommend' %}" hx-target="#modal-container" hx-swap="innerHTML" title="{% translate 'the contracts to sign to solve every problem' %}">
+          {% heroicon_outline "light-bulb" size=16 %} <span class="hidden md:inline">{% translate 'recommend' %}…</span>
+        </button>
+        {% if perms.app.add_chapter %}
+        <button type="button" class="btn btn-default" hx-get="{% url 'chapters:duplicate' current_chapter.pk %}" hx-target="#modal-container" hx-swap="innerHTML" title="{% translate 'copy this chapter with all of its data to try another scenario' %}">
+          {% heroicon_outline "document-duplicate" size=16 %} <span class="hidden md:inline">{% translate 'duplicate chapter' %}</span>
+        </button>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- drag hint: what a drop would give, computed by the server -->
+    <div class="flex min-h-9 flex-wrap items-center gap-x-4 gap-y-1 rounded-lg border border-dashed border-neutral-300 px-3 py-1.5 text-xs text-neutral-600 dark:border-neutral-700 dark:text-neutral-300">
+      <span x-show="hint" x-text="hint" class="font-medium text-neutral-900 dark:text-white"></span>
+      <template x-if="!hint">
+        <span class="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <span class="first-letter:uppercase">{% translate 'drag a card to another lane · click: details · double-click: on / off' %}</span>
+          <span class="flex items-center gap-1"><span class="size-3 rounded-sm border border-emerald-400 bg-emerald-100 dark:bg-emerald-900"></span>{% translate 'counted' %}</span>
+          <span class="flex items-center gap-1"><span class="size-3 rounded-sm border border-rose-400 bg-rose-100 dark:bg-rose-900"></span>{% translate 'not counted' %}</span>
+          <span class="flex items-center gap-1"><span class="size-3 rounded-sm border border-neutral-300 bg-white dark:bg-neutral-800"></span>{% translate 'unsigned' %}</span>
+          <span class="flex items-center gap-1"><span class="size-3 rounded-sm border border-dashed border-neutral-400 opacity-50"></span>{% translate 'not calculated' %}</span>
+        </span>
+      </template>
+    </div>
+
+    {% include "components/board/board.html" %}
+  </div>
+</c-layout>

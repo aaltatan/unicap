@@ -1,0 +1,101 @@
+{% load i18n %}
+<!-- small screens: a backdrop behind the open sidebar -->
+<div
+  x-cloak
+  x-show="navOpen"
+  x-transition.opacity
+  class="fixed inset-0 z-40 bg-black/30 lg:hidden"
+  @click="navOpen = false"
+  aria-hidden="true"
+></div>
+
+<nav
+  class="print:hidden fixed inset-y-0 start-0 z-50 flex w-64 shrink-0 flex-col border-e border-neutral-200 bg-white transition-all duration-200 dark:border-neutral-800 dark:bg-neutral-900 lg:static lg:!translate-x-0"
+  :class="{
+    'ltr:-translate-x-full rtl:translate-x-full': !navOpen,
+    'translate-x-0': navOpen,
+    'lg:w-16': navCollapsed,
+    'lg:w-64': !navCollapsed,
+  }"
+  aria-label="{% translate 'main navigation' %}"
+  @keydown.escape.window="navOpen = false"
+>
+  <div class="flex h-14 items-center gap-2 border-b border-neutral-200 px-3 dark:border-neutral-800">
+    <a href="{% url 'board:dashboard' %}" class="flex min-w-0 items-center gap-2">
+      <span class="grid size-8 shrink-0 place-items-center rounded-lg bg-indigo-600 text-white">
+        {% heroicon_solid "academic-cap" size=18 %}
+      </span>
+      <span class="truncate text-base font-semibold tracking-tight" :class="{'lg:hidden': navCollapsed}">
+        {{ project_name }}
+      </span>
+    </a>
+    <button
+      type="button"
+      class="btn btn-ghost btn-icon ms-auto lg:hidden"
+      @click="navOpen = false"
+      aria-label="{% translate 'close menu' %}"
+    >
+      {% heroicon_outline "x-mark" size=20 %}
+    </button>
+  </div>
+
+  <div class="scroll flex-1 space-y-5 overflow-y-auto p-2">
+    {% for section in navigation %}
+    <div>
+      <p
+        class="mb-1 px-2.5 text-[11px] font-semibold uppercase tracking-wider text-neutral-400 dark:text-neutral-500"
+        :class="{'lg:invisible': navCollapsed}"
+      >
+        {{ section.title }}
+      </p>
+      <ul class="space-y-0.5">
+        {% for link in section.links %}
+        <li class="group relative">
+          <a
+            href="{{ link.url }}"
+            class="nav-link {% active_link link.url %}"
+            title="{{ link.text|capfirst }}"
+            :class="{'lg:justify-center lg:px-0': navCollapsed}"
+          >
+            <span class="shrink-0">{% heroicon_outline link.icon size=20 %}</span>
+            <span class="truncate first-letter:uppercase" :class="{'lg:hidden': navCollapsed}">{{ link.text }}</span>
+          </a>
+          {% if link.create_url %}
+          <!-- shown while the link is hovered (or the button focused): its "new" form -->
+          <button
+            type="button"
+            class="absolute end-1.5 top-1/2 -translate-y-1/2 rounded-md p-1 text-neutral-500 opacity-0 transition-opacity hover:bg-neutral-200 hover:text-neutral-900 focus:opacity-100 group-hover:opacity-100 dark:text-neutral-400 dark:hover:bg-neutral-700 dark:hover:text-white"
+            :class="{'lg:hidden': navCollapsed}"
+            hx-get="{{ link.create_url }}"
+            hx-target="#modal-container"
+            hx-swap="innerHTML"
+            @click="navOpen = false"
+            title="{% translate 'new' %}: {{ link.text }}"
+            aria-label="{% translate 'new' %}: {{ link.text }}"
+          >
+            {% heroicon_mini "plus" size=16 %}
+          </button>
+          {% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endfor %}
+  </div>
+
+  <div class="border-t border-neutral-200 p-2 dark:border-neutral-800">
+    <button
+      type="button"
+      class="nav-link hidden w-full lg:flex"
+      :class="{'lg:justify-center lg:px-0': navCollapsed}"
+      @click="navCollapsed = !navCollapsed"
+      title="{% translate 'collapse sidebar' %} (Alt+S)"
+    >
+      <span class="shrink-0 transition-transform" :class="{'rotate-180': navCollapsed}">
+        <span class="rtl:hidden">{% heroicon_outline "chevron-double-left" size=20 %}</span>
+        <span class="ltr:hidden">{% heroicon_outline "chevron-double-right" size=20 %}</span>
+      </span>
+      <span class="first-letter:uppercase" :class="{'lg:hidden': navCollapsed}">{% translate 'collapse' %}</span>
+    </button>
+  </div>
+</nav>

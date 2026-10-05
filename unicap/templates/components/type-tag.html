@@ -1,0 +1,3 @@
+{% load domain %}
+{% comment %}`specialized` / `supported` beside a teacher's name (nothing when neither).{% endcomment %}
+{% if kind %}<span class="badge {{ kind|type_badge }} {{ class }}">{{ kind|type_label }}</span>{% endif %}

@@ -1,0 +1,113 @@
+[project]
+name = "unicap"
+version = "0.1.0"
+description = "University capacity calculator: the students a university may take from its teaching staff"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "django-cotton>=1.6.0",
+  "django==5.2.17",
+  "django-filter>=24.3",
+  "django-extensions>=3.2.3",
+  "djangoql>=0.18.1",
+  "django-import-export[xlsx]>=4.3.3",
+  "heroicons[django]>=2.9.0",
+  "django-htmx>=1.21.0",
+  "mysqlclient>=2.2.6",
+  "django-widget-tweaks>=1.5.0",
+  "django-braces>=1.16.0",
+  "python-decouple>=3.8",
+  "pillow>=11.1.0",
+  "django-vite>=3.1.0",
+  "django-cors-headers>=4.7.0",
+  "puremagic>=1.29",
+  "docxtpl>=0.20.0",
+  "django-cleanup>=9.0.0",
+  "django-solo>=2.4.0",
+  "typing-extensions>=4.12.0",
+  "jinja2>=3.1.6",
+  "djangorestframework>=3.18.1",
+  "djangorestframework-simplejwt>=5.5.1",
+]
+
+[dependency-groups]
+dev = [
+  "coverage>=7.6.9",
+  "django-pytest>=0.2.0",
+  "django-stubs>=6.0.9",
+  "djangorestframework-stubs>=3.18.0",
+  "factory-boy>=3.3.3",
+  "mypy>=2.4.0",
+  "nox>=2024.10.9",
+  "polib>=1.2.0",
+  "pytest>=8.3.4",
+  "pytest-cov>=6.0.0",
+  "pytest-coverage>=0.0",
+  "pytest-django>=4.9.0",
+  "pytest-mock>=3.14.0",
+  "pytest-order>=1.3.0",
+  "ruff>=0.8.0",
+  "selectolax>=0.3.27",
+]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "unicap.unicap.settings.testing"
+python_files = "test_*.py tests.py *_test.py"
+testpaths = ["tests"]
+addopts = "-m \"not slow\""
+markers = [
+  "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+extend-exclude = ["**/migrations/*", "node_modules", "unicap/static"]
+
+[tool.ruff.lint]
+select = ["ALL"]
+ignore = [
+  "D100",   # module docstrings are optional
+  "D104",   # package docstrings are optional
+  "D105",   # magic method docstrings
+  "D106",   # nested classes (Meta)
+  "D203",   # conflicts with D211
+  "D213",   # conflicts with D212
+  "D401",   # summaries describe ("The default chapter ..."), as in the domain package
+  "D413",   # no blank line after the last docstring section (Google style)
+  "COM812", # conflicts with the formatter
+  "CPY001", # no copyright headers
+  "TID252", # CLAUDE.md: relative imports inside an app
+  "RUF012", # Django's mutable class attributes (Meta, fields)
+]
+
+[tool.ruff.lint.flake8-annotations]
+allow-star-arg-any = true
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S101", "D", "ANN401", "PLR2004", "ARG001"]
+"**/migrations/**" = ["ALL"]
+"unicap/unicap/settings/*" = ["F403", "F405"]
+# delivery modules: the names say what they are (index, create, FacultyForm, ...)
+"unicap/app/{views,urls,forms,filters,resources,constants,serializers}/*" = ["D101", "D102", "D103", "D107"]
+"unicap/app/apps.py" = ["D101"]
+"unicap/app/admin.py" = ["D101", "D102", "ANN401", "ARG002"]  # Django admin hooks
+"unicap/app/models/*" = ["D102"]  # to_domain / from_domain are documented; url helpers are not
+"unicap/unicap/*.py" = ["D101", "D102"]
+# the domain package is provided as is
+"unicap/domain/**" = ["D101", "D102", "D103", "ARG004", "PLR2004", "PLR0917"]
+"scripts/*" = ["E501", "RUF001", "INP001", "T201"]
+# framework hooks keep their frameworks' (untyped) signatures
+"unicap/app/resources/base.py" = ["ANN401", "ARG002", "D102", "D107"]
+"unicap/app/resources/*" = ["ANN401", "ARG002"]
+"unicap/app/templatetags/*" = ["ANN401"]
+"unicap/domain/optimizer/board.py" = ["D107"]
+
+[tool.mypy]
+python_version = "3.10"
+plugins = ["mypy_django_plugin.main", "mypy_drf_plugin.main"]
+ignore_missing_imports = true
+exclude = ["migrations/"]
+
+[tool.django-stubs]
+django_settings_module = "unicap.unicap.settings.development"

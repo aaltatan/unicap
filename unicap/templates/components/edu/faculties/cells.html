@@ -1,0 +1,46 @@
+{% load i18n domain %}
+<td data-col="name">
+  <button type="button" class="font-medium hover:text-indigo-600 hover:underline dark:hover:text-indigo-400"
+    hx-get="{{ obj.get_absolute_url }}" hx-target="#modal-container" hx-swap="innerHTML">{{ obj.name }}</button>
+</td>
+<td data-col="accepts">
+  <div class="flex max-w-xs flex-wrap gap-1">
+    {% for share in obj.shares.all %}
+    <span class="badge {% if share.specialization_type == 'specialized' %}badge-info{% else %}badge-neutral{% endif %}"
+      title="{{ share.get_specialization_type_display }}{% if share.percentage is not None %} · {{ share.percentage|number }}%{% endif %}">
+      {{ share.specialization.name }}{% if share.percentage is not None %} {{ share.percentage|number }}%{% endif %}
+    </span>
+    {% empty %}<span class="text-xs text-neutral-400">—</span>
+    {% endfor %}
+  </div>
+</td>
+<td data-col="capacity" class="text-end tabular-nums">
+  {% if obj.report %}
+  <span class="font-semibold">{{ obj.report.capacity }}</span>
+  {% if obj.report.unused_teaching_capacity %}<span class="block text-[11px] text-amber-600 dark:text-amber-400" title="{% translate 'teaching capacity above the max students' %}">+{{ obj.report.unused_teaching_capacity }} {% translate 'unused' %}</span>{% endif %}
+  {% endif %}
+</td>
+<td data-col="students_per_phd" class="text-end tabular-nums">{{ obj.students_per_phd }}</td>
+<td data-col="staff" class="whitespace-nowrap tabular-nums"{% if obj.report %} title="{{ obj.report.mix|mix_text }}"{% endif %}>
+  {% if obj.report %}
+  <span class="{% if obj.report|has_violation:"staff_ratio_too_low" %}font-semibold text-rose-600 dark:text-rose-400{% endif %}">{{ obj.report.staff_percentage|percent }}</span>
+  <span class="text-xs text-neutral-400">· {% translate 'min' %} {{ obj.min_staff_percentage|number }}%</span>
+  {% endif %}
+</td>
+<td data-col="students" class="whitespace-nowrap tabular-nums text-neutral-600 dark:text-neutral-300">
+  {{ obj.current_students|default_if_none:"—" }} · {{ obj.target_students|default_if_none:"—" }} · {{ obj.max_students|default_if_none:"—" }}
+</td>
+<td data-col="contracts" class="text-end tabular-nums">{{ obj.contracts_count }}</td>
+<td data-col="compliance">
+  {% if obj.report %}
+  {% if obj.report.is_compliant %}
+  <span class="badge badge-success">{% heroicon_mini "check" size=12 %} {% translate 'compliant' %}</span>
+  {% else %}
+  <span class="badge badge-danger" title="{% for violation in obj.report.violations %}{{ violation|violation_text }}&#10;{% endfor %}">
+    {% heroicon_mini "exclamation-triangle" size=12 %}
+    {% blocktranslate count counter=obj.report.violations|length %}{{ counter }} violation{% plural %}{{ counter }} violations{% endblocktranslate %}
+  </span>
+  {% endif %}
+  {% endif %}
+</td>
+<td data-col="notes" class="max-w-xs truncate text-neutral-500" title="{{ obj.notes }}">{{ obj.notes|truncatechars:80 }}</td>

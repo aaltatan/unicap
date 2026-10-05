@@ -1,0 +1,6 @@
+{% comment %}
+  A related row inside a table cell or a modal: its name opens its own details modal
+  (plain text for a user who may not view it).
+{% endcomment %}
+{% if obj %}{% if allowed %}<button type="button" class="text-start hover:text-indigo-600 hover:underline dark:hover:text-indigo-400"
+  hx-get="{{ obj.get_absolute_url }}" hx-target="#modal-container" hx-swap="innerHTML">{{ obj }}</button>{% else %}{{ obj }}{% endif %}{% endif %}

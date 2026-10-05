@@ -1,0 +1,18 @@
+{% load i18n %}
+<c-layout.modal-body :title="page_title" width="{{ modal_width|default:'lg' }}">
+  {% include resource.templates|add:"/details.html" %}
+  <c-slot name="footer">
+    {% comment %} on phones the rows have no "⋮" menu: its actions are here {% endcomment %}
+    {% if perms_delete and obj.get_delete_url %}
+    <button type="button" class="btn btn-default me-auto text-rose-600 dark:text-rose-400" hx-get="{{ obj.get_delete_url }}" hx-target="#modal-container" hx-swap="innerHTML">
+      {% heroicon_outline "trash" size=16 %} {% translate 'delete' %}
+    </button>
+    {% endif %}
+    <button type="button" class="btn btn-default" @click="closeModal()">{% translate 'close' %}</button>
+    {% if perms_change and obj.get_update_url %}
+    <button type="button" class="btn btn-primary" hx-get="{{ obj.get_update_url }}" hx-target="#modal-container" hx-swap="innerHTML">
+      {% heroicon_outline "pencil-square" size=16 %} {% translate 'edit' %}
+    </button>
+    {% endif %}
+  </c-slot>
+</c-layout.modal-body>

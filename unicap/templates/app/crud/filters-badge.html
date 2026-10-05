@@ -1,0 +1,12 @@
+{% load i18n %}{% comment %}
+  The filters button's count and, beside it, its reset (only while a filter holds a
+  value). `part`: "badge" or "reset"; both parts are swapped out of band after every table
+  redraw (`oob`), so they follow the filters applied.
+{% endcomment %}{% if part != "reset" %}<span id="filters-badge" class="badge badge-info empty:hidden"{% if oob %} hx-swap-oob="true"{% endif %}>{% if active_filters %}{{ active_filters }}{% endif %}</span>{% endif %}
+{% if part != "badge" %}<span id="filters-reset" class="contents"{% if oob %} hx-swap-oob="true"{% endif %}>{% if active_filters %}<a
+  href="{{ filters_reset_url }}"
+  class="btn btn-default btn-icon rounded-s-none border-s-0 text-neutral-500 hover:text-rose-600 dark:hover:text-rose-400"
+  data-url-reset
+  title="{% translate 'clear the filters (search and sorting stay)' %}"
+  aria-label="{% translate 'clear the filters' %}"
+>{% heroicon_mini "x-mark" size=16 %}</a>{% endif %}</span>{% endif %}

@@ -1,0 +1,12 @@
+{% load i18n %}
+<form hx-post="{% url 'board:reset' %}" hx-target="#modal-container" hx-swap="innerHTML">
+  <c-layout.modal-body title="{% translate 'reset the board' %}" width="md">
+    <p class="text-sm first-letter:uppercase">
+      {% blocktranslate with name=chapter.name %}make all {{ signed }} signed contract(s) of {{ name }} unsigned? Their terms stay; only the faculties are cleared.{% endblocktranslate %}
+    </p>
+    <c-slot name="footer">
+      <button type="button" class="btn btn-default" @click="closeModal()">{% translate 'cancel' %}</button>
+      <button type="submit" class="btn btn-danger" {% if not signed %}disabled{% endif %}>{% heroicon_outline "arrow-uturn-left" size=16 %} {% translate 'reset' %}</button>
+    </c-slot>
+  </c-layout.modal-body>
+</form>

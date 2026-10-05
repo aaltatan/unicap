@@ -1,0 +1,28 @@
+{% load i18n %}
+<form hx-post="{{ resource.url_bulk_action }}" hx-target="#modal-container" hx-swap="innerHTML">
+  <input type="hidden" name="confirmed" value="1" />
+  <input type="hidden" name="action" value="{{ action.name }}" />
+  {% for id in ids %}<input type="hidden" name="ids" value="{{ id }}" />{% endfor %}
+  <c-layout.modal-body :title="action.label" width="md">
+    {% if ids %}
+    <div class="space-y-2 text-sm">
+      <p class="first-letter:uppercase">
+        {% blocktranslate count counter=ids|length %}apply to this row?{% plural %}apply to these {{ counter }} rows?{% endblocktranslate %}
+      </p>
+      <ul class="scroll max-h-40 list-inside list-disc overflow-y-auto text-neutral-600 dark:text-neutral-300">
+        {% for name in names %}<li>{{ name }}</li>{% endfor %}
+      </ul>
+    </div>
+    {% else %}
+    <p class="text-sm first-letter:uppercase">{% translate 'select rows first.' %}</p>
+    {% endif %}
+    <c-slot name="footer">
+      <button type="button" class="btn btn-default" @click="closeModal()">{% translate 'cancel' %}</button>
+      {% if ids %}
+      <button type="submit" class="btn {% if action.danger %}btn-danger{% else %}btn-primary{% endif %}" x-init="$nextTick(() => $el.focus())">
+        {% heroicon_outline action.icon size=16 %} {{ action.label }}
+      </button>
+      {% endif %}
+    </c-slot>
+  </c-layout.modal-body>
+</form>

@@ -1,0 +1,14 @@
+{% load i18n %}
+<form hx-post="{% url 'backups:upload' %}" hx-target="#modal-container" hx-swap="innerHTML" hx-encoding="multipart/form-data">
+  <c-layout.modal-body title="{% translate 'upload a backup' %}" width="md">
+    <div class="space-y-3">
+      <c-field :field="form.file" />
+      <c-field :field="form.notes" />
+      <p class="text-xs text-neutral-500 first-letter:uppercase">{% translate 'uploading only saves it here: restore it from the list afterwards.' %}</p>
+    </div>
+    <c-slot name="footer">
+      <button type="button" class="btn btn-default" @click="closeModal()">{% translate 'cancel' %}</button>
+      <button type="submit" class="btn btn-primary">{% heroicon_outline "arrow-up-tray" size=16 %} {% translate 'upload' %}</button>
+    </c-slot>
+  </c-layout.modal-body>
+</form>

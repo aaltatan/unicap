@@ -1,0 +1,13 @@
+{% load i18n %}
+{% comment %}An on/off switch posting to `url` (HTMX); the tables and board redraw after.{% endcomment %}
+<c-vars :on="False" url="" :enabled="True" label="" />
+<button
+  type="button"
+  role="switch"
+  aria-checked="{{ on|yesno:'true,false' }}"
+  class="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 disabled:cursor-not-allowed disabled:opacity-60 {% if on %}bg-emerald-500{% else %}bg-neutral-300 dark:bg-neutral-700{% endif %}"
+  {% if enabled %}hx-post="{{ url }}" hx-swap="none"{% else %}disabled{% endif %}
+  title="{{ label }}: {% if on %}{% translate 'on' %}{% else %}{% translate 'off' %}{% endif %}"
+>
+  <span class="inline-block size-4 rounded-full bg-white shadow transition-transform {% if on %}ltr:translate-x-[18px] rtl:-translate-x-[18px]{% else %}ltr:translate-x-0.5 rtl:-translate-x-0.5{% endif %}"></span>
+</button>

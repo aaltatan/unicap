@@ -1,0 +1,11 @@
+{% load i18n %}
+<c-layout :page_title="page_title">
+  <form method="post" action="{{ action_url }}" enctype="multipart/form-data" class="card mx-auto max-w-3xl" novalidate>
+    {% csrf_token %}
+    <div class="p-5">{% include "app/crud/form-fields.html" %}</div>
+    <div class="flex justify-end gap-2 border-t border-neutral-200 p-4 dark:border-neutral-800">
+      <a href="{{ resource.url_index }}" class="btn btn-default">{% translate 'cancel' %}</a>
+      <button type="submit" class="btn btn-primary">{% translate 'save' %}</button>
+    </div>
+  </form>
+</c-layout>

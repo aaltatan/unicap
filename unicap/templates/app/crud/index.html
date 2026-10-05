@@ -1,0 +1,241 @@
+{% load i18n %}
+<c-layout :page_title="page_title">
+  <c-slot name="filters">
+    <form
+      id="filters-form"
+      {% if app_settings.remember_table_state %}data-remember-url{% endif %}
+      class="flex min-h-0 flex-1 flex-col"
+      hx-get="{{ index_url }}"
+      hx-target="#table"
+      hx-swap="innerHTML"
+      hx-push-url="true"
+      hx-indicator="#spinner"
+    >
+      <div class="scroll flex-1 space-y-3 overflow-y-auto p-3">
+        {% for field in filterset.form %}
+        {% if field.name != "q" %}
+        <c-field :field="field" />
+        {% endif %}
+        {% endfor %}
+      </div>
+      <div class="flex gap-2 border-t border-neutral-200 p-3 dark:border-neutral-800">
+        <button type="submit" class="btn btn-primary flex-1">
+          {% heroicon_outline "funnel" size=16 %} {% translate 'apply' %}
+        </button>
+        <a href="{{ index_url }}" class="btn btn-default" data-url-reset title="{% translate 'clear every filter' %}">
+          {% heroicon_outline "arrow-path" size=16 %} {% translate 'reset' %}
+        </a>
+      </div>
+    </form>
+  </c-slot>
+
+  <div
+    x-data="tableColumns('{{ resource.name }}', {{ resource.columns_json }})"
+    class="space-y-3"
+  >
+    <div x-data="tableSelection" class="space-y-3">
+    <!-- toolbar: search, count, actions -->
+    <div class="flex flex-wrap items-center gap-2">
+      <div class="relative min-w-56 flex-1 sm:max-w-sm">
+        <span class="pointer-events-none absolute inset-y-0 start-2.5 flex items-center text-neutral-400">
+          {% heroicon_outline "magnifying-glass" size=16 %}
+        </span>
+        <input
+          type="search"
+          name="q"
+          form="filters-form"
+          value="{{ request.GET.q|default:'' }}"
+          class="input ps-8"
+          placeholder="{% translate 'search' %}… ( / )"
+          aria-label="{% translate 'search' %}"
+          hx-get="{{ index_url }}"
+          hx-include="#filters-form"
+          hx-target="#table"
+          hx-swap="innerHTML"
+          hx-push-url="true"
+          hx-trigger="input changed delay:300ms, search"
+          hx-indicator="#spinner"
+          @keydown.slash.window="if (!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)) { $event.preventDefault(); $el.focus(); }"
+          title="{% translate 'words, or a query like' %}: name ~ &quot;sci&quot; and is_active = True"
+        />
+      </div>
+
+      <div class="ms-auto flex flex-wrap items-center gap-1.5">
+        {{ toolbar_extra }}
+
+        <!-- bulk actions on the checked rows -->
+        {% if perms_delete or perms_change and resource.bulk_actions or perms_change and resource.bulk_fields %}
+        <div class="relative" x-data="dropdown" x-show="selected" x-cloak @click.outside="close()" @keydown.escape.window="close()">
+          <button type="button" class="btn btn-default" @click="toggle()" :aria-expanded="open">
+            {% heroicon_outline "check-circle" size=16 %}
+            <span><span x-text="selected"></span> {% translate 'selected' %}</span>
+            {% heroicon_mini "chevron-down" size=16 %}
+          </button>
+          <div class="menu end-0 w-64" x-show="open" x-cloak @click="close()">
+            {% if perms_change %}
+            {% for action in resource.bulk_actions %}
+            <button
+              type="button"
+              class="menu-item{% if action.danger %} text-rose-600 dark:text-rose-400{% endif %}"
+              hx-post="{{ resource.url_bulk_action }}"
+              hx-vals='{"action": "{{ action.name }}"}'
+              hx-include="#table input[name='ids']:checked"
+              hx-target="#modal-container"
+              hx-swap="innerHTML"
+            >
+              {% heroicon_outline action.icon size=16 %} {{ action.label }}
+            </button>
+            {% endfor %}
+            {% if resource.bulk_fields %}
+            <button
+              type="button"
+              class="menu-item"
+              hx-post="{{ resource.url_bulk_edit }}"
+              hx-include="#table input[name='ids']:checked"
+              hx-target="#modal-container"
+              hx-swap="innerHTML"
+            >
+              {% heroicon_outline "pencil-square" size=16 %} {% translate 'edit fields' %}…
+            </button>
+            {% endif %}
+            {% endif %}
+            {% if perms_delete %}
+            <div class="my-1 border-t border-neutral-200 dark:border-neutral-700"></div>
+            <button
+              type="button"
+              class="menu-item text-rose-600 dark:text-rose-400"
+              hx-post="{{ resource.url_bulk_delete }}"
+              hx-include="#table input[name='ids']:checked"
+              hx-target="#modal-container"
+              hx-swap="innerHTML"
+            >
+              {% heroicon_outline "trash" size=16 %} {% translate 'delete' %}
+            </button>
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- filters: open the sidebar; the ✕ beside the count clears them -->
+        <div class="inline-flex [&:has(#filters-reset>a)>button]:rounded-e-none">
+          <button
+            type="button"
+            class="btn btn-default"
+            @click="toggleFilters()"
+            title="{% translate 'filters' %} (Alt+F)"
+          >
+            {% heroicon_outline "funnel" size=16 %}
+            <span class="hidden sm:inline">{% translate 'filters' %}</span>
+            {% include "app/crud/filters-badge.html" with part="badge" %}
+          </button>
+          {% include "app/crud/filters-badge.html" with part="reset" %}
+        </div>
+
+        <!-- columns: drag to reorder, check to show -->
+        <div class="relative" x-data="dropdown" @click.outside="close()" @keydown.escape.window="close()">
+          <button type="button" class="btn btn-default" @click="toggle()" title="{% translate 'columns' %}">
+            {% heroicon_outline "view-columns" size=16 %}
+            <span class="hidden sm:inline">{% translate 'columns' %}</span>
+          </button>
+          <div class="menu end-0 w-60" x-show="open" x-cloak>
+            <p class="px-2.5 py-1 text-xs text-neutral-500">{% translate 'drag to reorder, check to show' %}</p>
+            <ul
+              id="columns-menu"
+              x-sort="readMenuOrder()"
+              x-sort:config="{ forceFallback: true, fallbackOnBody: true, fallbackTolerance: 3, animation: 150 }"
+              class="space-y-0.5"
+            >
+              {% for column in resource.columns %}
+              <li data-col="{{ column.key }}" x-sort:item="'{{ column.key }}'" class="menu-item cursor-grab select-none">
+                <span x-sort:handle class="text-neutral-400">{% heroicon_mini "bars-2" size=16 %}</span>
+                <input
+                  type="checkbox"
+                  class="checkbox"
+                  :checked="!isHidden('{{ column.key }}')"
+                  @change="toggleColumn('{{ column.key }}')"
+                  x-sort:ignore
+                />
+                <span class="flex-1 first-letter:uppercase">{{ column.label }}</span>
+              </li>
+              {% endfor %}
+            </ul>
+            <button type="button" class="menu-item mt-1 border-t border-neutral-200 text-xs dark:border-neutral-700" @click="resetColumns()">
+              {% heroicon_outline "arrow-uturn-left" size=14 %} {% translate 'reset columns' %}
+            </button>
+          </div>
+        </div>
+
+        {% if resource.export_resource %}
+        <div class="relative" x-data="dropdown" @click.outside="close()" @keydown.escape.window="close()">
+          <button type="button" class="btn btn-default" @click="toggle()" title="{% translate 'export / import' %}">
+            {% heroicon_outline "arrows-up-down" size=16 %}
+            <span class="hidden sm:inline">{% translate 'files' %}</span>
+          </button>
+          <div class="menu end-0" x-show="open" x-cloak>
+            <a class="menu-item" href="{{ index_url }}?export=xlsx" @click="$el.href = $exportUrl('xlsx'); close()">
+              {% heroicon_outline "table-cells" size=16 %} {% translate 'export to Excel' %}
+            </a>
+            <a class="menu-item" href="{{ index_url }}?export=csv" @click="$el.href = $exportUrl('csv'); close()">
+              {% heroicon_outline "document-text" size=16 %} {% translate 'export to CSV' %}
+            </a>
+            {% if perms_add and resource.importable %}
+            <button
+              type="button"
+              class="menu-item"
+              hx-get="{{ resource.url_import }}"
+              hx-target="#modal-container"
+              hx-swap="innerHTML"
+              @click="close()"
+            >
+              {% heroicon_outline "arrow-up-tray" size=16 %} {% translate 'import a file' %}
+            </button>
+            {% endif %}
+            {% if backup_scope and current_chapter %}
+            {% if perms_backup or perms_view_backups %}<div class="my-1 border-t border-neutral-200 dark:border-neutral-700"></div>{% endif %}
+            {% if perms_backup %}
+            <form method="post" action="{% url 'backups:create' %}">
+              {% csrf_token %}
+              <input type="hidden" name="scope" value="{{ backup_scope }}" />
+              <input type="hidden" name="section" value="{{ backup_section }}" />
+              <input type="hidden" name="chapter" value="{{ current_chapter.pk }}" />
+              <input type="hidden" name="next" x-init="$el.value = location.pathname + location.search" />
+              <button type="submit" class="menu-item">
+                {% heroicon_outline "archive-box-arrow-down" size=16 %}
+                {% if backup_section %}{% blocktranslate with what=resource.title %}back up the {{ what }}{% endblocktranslate %}{% else %}{% translate 'back up this chapter' %}{% endif %}
+              </button>
+            </form>
+            {% endif %}
+            {% if perms_view_backups %}
+            <a class="menu-item" href="{% url 'backups:index' %}?scope={{ backup_scope }}{% if backup_section %}&section={{ backup_section }}{% endif %}&chapter={{ current_chapter.pk }}">
+              {% heroicon_outline "arrow-uturn-left" size=16 %} {% translate 'restore from a backup' %}
+            </a>
+            {% endif %}
+            {% endif %}
+          </div>
+        </div>
+        {% endif %}
+
+        {% if perms_add %}
+        <button
+          type="button"
+          class="btn btn-primary"
+          hx-get="{{ resource.url_create }}"
+          hx-target="#modal-container"
+          hx-swap="innerHTML"
+          @keydown.alt.n.window.prevent="$el.click()"
+          title="{% translate 'new' %} (Alt+N)"
+        >
+          {% heroicon_outline "plus" size=16 %} {% translate 'new' %}
+        </button>
+        {% endif %}
+      </div>
+    </div>
+
+    {{ before_table }}
+
+    <div id="table" class="htmx-pulse" hx-indicator="#spinner">
+      {% include "app/crud/table.html" %}
+    </div>
+    </div>
+  </div>
+</c-layout>

@@ -1,0 +1,14 @@
+{% load i18n %}
+<form hx-post="{{ action_url }}" hx-target="#modal-container" hx-swap="innerHTML">
+  <c-layout.modal-body :title="page_title" width="md">
+    <p class="mb-3 text-sm text-neutral-600 first-letter:uppercase dark:text-neutral-300">
+      {% translate 'the copy holds every specialization, faculty (with its numbers and shares), employee and contract of this chapter, notes included. Try another scenario in it without touching this one.' %}
+    </p>
+    {% for error in form.non_field_errors %}<p class="mb-2 text-sm text-rose-600">{{ error }}</p>{% endfor %}
+    <c-field :field="form.name" />
+    <c-slot name="footer">
+      <button type="button" class="btn btn-default" @click="closeModal()">{% translate 'cancel' %}</button>
+      <button type="submit" class="btn btn-primary">{% heroicon_outline "document-duplicate" size=16 %} {% translate 'duplicate' %}</button>
+    </c-slot>
+  </c-layout.modal-body>
+</form>

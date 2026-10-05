@@ -1,0 +1,16 @@
+{% load i18n domain %}
+<td data-col="position" class="text-end tabular-nums text-neutral-500">{{ obj.position }}</td>
+<td data-col="employee">
+  <button type="button" class="font-medium hover:text-indigo-600 hover:underline dark:hover:text-indigo-400"
+    hx-get="{{ obj.get_absolute_url }}" hx-target="#modal-container" hx-swap="innerHTML"
+    title="{{ obj.employee.name }}{% if obj.specialization_type %} ({{ obj.specialization_type|type_label }}){% endif %}">{{ obj.employee.name }}</button>
+  {% if not obj.employee.is_active %}<span class="badge badge-neutral">{% translate 'employee off' %}</span>{% endif %}
+</td>
+<td data-col="specialization"><c-object-link :obj="obj.employee.specialization" :allowed="perms.app.view_specialization" /></td>
+<td data-col="faculty">{% if obj.faculty %}<c-object-link :obj="obj.faculty" :allowed="perms.app.view_faculty" />{% else %}<span class="text-neutral-400">{% translate 'unsigned' %}</span>{% endif %}</td>
+<td data-col="specialization_type"><c-type-tag :kind="obj.specialization_type" /></td>
+<td data-col="degree">{{ obj.get_degree_display }}</td>
+<td data-col="terms" class="whitespace-nowrap">{{ obj.get_contract_type_display }} · {{ obj.get_employment_type_display }}</td>
+<td data-col="status"><span class="badge {{ obj.status|status_badge }}">{{ obj.status|status_label }}</span></td>
+<td data-col="is_active"><c-switch :on="obj.is_active" url="{{ obj.get_toggle_url }}" :enabled="perms_change" label="{% translate 'on' %}" /></td>
+<td data-col="notes" class="max-w-xs truncate text-neutral-500" title="{{ obj.notes }}">{{ obj.notes|truncatechars:80 }}</td>

@@ -1,0 +1,49 @@
+{% load i18n %}
+<!-- the filters sidebar, on the end side: an overlay, or pinned beside the content -->
+<div
+  x-cloak
+  x-show="filtersOpen && !filtersPinned"
+  x-transition.opacity
+  class="fixed inset-0 z-40 bg-black/30"
+  @click="filtersOpen = false"
+  aria-hidden="true"
+></div>
+
+<aside
+  x-cloak
+  x-show="filtersOpen"
+  x-trap="filtersOpen && !filtersPinned"
+  @keydown.escape.window="filtersPinned || (filtersOpen = false)"
+  x-transition:enter="transition duration-200 ease-out"
+  x-transition:enter-start="ltr:translate-x-full rtl:-translate-x-full"
+  x-transition:enter-end="translate-x-0"
+  x-transition:leave="transition duration-150 ease-in"
+  x-transition:leave-start="translate-x-0"
+  x-transition:leave-end="ltr:translate-x-full rtl:-translate-x-full"
+  class="print:hidden fixed inset-y-0 end-0 z-50 flex w-80 max-w-[90vw] flex-col border-s border-neutral-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-900"
+  :class="{'xl:static xl:z-auto xl:shadow-none': filtersPinned}"
+  aria-label="{% translate 'filters' %}"
+>
+  <div class="flex h-14 shrink-0 items-center gap-2 border-b border-neutral-200 px-3 dark:border-neutral-800">
+    {% heroicon_outline "funnel" size=18 %}
+    <h2 class="text-sm font-semibold first-letter:uppercase">{% translate 'filters' %}</h2>
+    <button
+      type="button"
+      class="btn btn-ghost btn-icon ms-auto hidden xl:inline-flex"
+      @click="filtersPinned = !filtersPinned"
+      :title="filtersPinned ? '{% translate 'unpin' %}' : '{% translate 'pin beside the table' %}'"
+    >
+      <span x-show="!filtersPinned">{% heroicon_outline "lock-open" size=18 %}</span>
+      <span x-show="filtersPinned">{% heroicon_solid "lock-closed" size=18 %}</span>
+    </button>
+    <button
+      type="button"
+      class="btn btn-ghost btn-icon"
+      @click="filtersOpen = false"
+      aria-label="{% translate 'close' %}"
+    >
+      {% heroicon_outline "x-mark" size=18 %}
+    </button>
+  </div>
+  {{ slot }}
+</aside>

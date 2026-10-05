@@ -1,0 +1,33 @@
+{% load i18n %}
+<dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:grid-cols-3">
+  <div><dt class="label">{% translate 'max students' %}</dt><dd class="tabular-nums">{{ obj.max_students|default_if_none:"—" }}</dd></div>
+  <div><dt class="label">{% translate 'default' %}</dt><dd>{{ obj.is_default|yesno:_("yes,no") }}</dd></div>
+  <div><dt class="label">{% translate 'faculties' %}</dt><dd class="tabular-nums">{{ obj.faculties_count }}</dd></div>
+  <div><dt class="label">{% translate 'employees' %}</dt><dd class="tabular-nums">{{ obj.employees_count }}</dd></div>
+  <div><dt class="label">{% translate 'signed contracts' %}</dt><dd class="tabular-nums">{{ obj.signed_count }} / {{ obj.contracts_count }}</dd></div>
+</dl>
+{% if report %}
+<div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+  <div class="rounded-lg bg-indigo-50 p-3 dark:bg-indigo-500/10">
+    <p class="text-xs text-indigo-700 first-letter:uppercase dark:text-indigo-300">{% translate 'capacity' %}</p>
+    <p class="text-xl font-semibold tabular-nums">{{ report.capacity }}</p>
+  </div>
+  <div class="rounded-lg bg-neutral-100 p-3 dark:bg-neutral-800">
+    <p class="text-xs text-neutral-600 first-letter:uppercase dark:text-neutral-300">{% translate 'faculties allow' %}</p>
+    <p class="text-xl font-semibold tabular-nums">{{ report.faculties_capacity }}</p>
+  </div>
+  <div class="rounded-lg bg-neutral-100 p-3 dark:bg-neutral-800">
+    <p class="text-xs text-neutral-600 first-letter:uppercase dark:text-neutral-300">{% translate 'overflowing' %}</p>
+    <p class="text-xl font-semibold tabular-nums">{{ report.overflowing|length }}</p>
+  </div>
+  <div class="rounded-lg p-3 {% if report.is_compliant %}bg-emerald-50 dark:bg-emerald-500/10{% else %}bg-rose-50 dark:bg-rose-500/10{% endif %}">
+    <p class="text-xs first-letter:uppercase">{% translate 'compliance' %}</p>
+    <p class="text-sm font-semibold first-letter:uppercase">{% if report.is_compliant %}{% translate 'compliant' %}{% else %}{% translate 'violations' %}{% endif %}</p>
+  </div>
+</div>
+{% elif problem %}
+<p class="mt-4 rounded-lg bg-rose-50 p-3 text-sm text-rose-800 dark:bg-rose-950/50 dark:text-rose-200">{{ problem }}</p>
+{% endif %}
+{% if obj.notes %}
+<div class="mt-4"><p class="label">{% translate 'notes' %}</p><p class="whitespace-pre-line text-sm">{{ obj.notes }}</p></div>
+{% endif %}
