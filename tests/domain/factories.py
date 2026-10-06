@@ -8,7 +8,6 @@ builds the faculty (what it accepts) together with a chapter's numbers for it
 
 from dataclasses import dataclass
 from itertools import count
-from typing import TypeAlias
 
 from unicap.domain import (
     ChapterFaculty,
@@ -31,7 +30,7 @@ PHARMACY = Specialization("Pharmacy")
 
 _ids = count(1)
 
-AnyFaculty: TypeAlias = Faculty | ChapterFaculty
+type AnyFaculty = Faculty | ChapterFaculty
 
 
 @dataclass(frozen=True, slots=True)

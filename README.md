@@ -65,7 +65,7 @@ message on the form.
 
 ## Stack
 
-Python 3.10 · Django 5.2 · HTMX 2 · Alpine.js 3 (collapse, focus, mask, persist, sort,
+Python 3.13 · Django 5.2 · HTMX 2 · Alpine.js 3 (collapse, focus, mask, persist, sort,
 autosize) · Tailwind CSS 3 · Vite 6 · django-cotton · django-filter · djangoql ·
 django-import-export · MySQL (SQLite for tests / local use).
 
@@ -100,11 +100,11 @@ are kept in the repository, so the server needs neither Node nor uv. Production 
 logged to the site's error log); `unicap/unicap/wsgi.py` picks it by default, `manage.py` does
 not (it is the development entry), so name it once per console.
 
-1. **Code and packages** (a Bash console; Python 3.10):
+1. **Code and packages** (a Bash console; Python 3.13):
 
    ```bash
    git clone <your repository> ~/unicap && cd ~/unicap
-   mkvirtualenv --python=/usr/bin/python3.10 unicap
+   mkvirtualenv --python=/usr/bin/python3.13 unicap
    pip install -r requirements.txt
    ```
 
@@ -126,7 +126,7 @@ not (it is the development entry), so name it once per console.
    python manage.py createsuperuser
    ```
 
-5. **Web tab**: a new web app, *manual configuration*, Python 3.10; then
+5. **Web tab**: a new web app, *manual configuration*, Python 3.13; then
    - *Virtualenv*: `/home/yourname/.virtualenvs/unicap`
    - *WSGI configuration file*, replaced by:
 
@@ -188,7 +188,7 @@ installation or another.
 manage.py, pyproject.toml, package.json, vite.config.mjs, tailwind.config.js
 unicap/            the Django root (BASE_DIR)
   unicap/          the project: settings (base / development / testing / deployment), urls, wsgi
-  domain/          business rules, standard library only (Python 3.10)
+  domain/          business rules, standard library only (Python 3.13)
   app/             the one Django app (label "app"), one module per model / resource:
     models/        User, Chapter, Specialization, Faculty, FacultySpecialization, Employee, Contract
     querysets/  managers/  filters/  forms/  resources/   (base.py: the shared generic parts)

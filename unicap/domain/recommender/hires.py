@@ -1,9 +1,9 @@
 """What the university could sign: a kind of contract, of a specialization, in a faculty."""
 
 from dataclasses import dataclass
-from enum import auto
+from enum import StrEnum, auto
 
-from unicap.domain.enums import ContractType, Degree, EmploymentType, StrEnum
+from unicap.domain.enums import ContractType, Degree, EmploymentType
 from unicap.domain.models import Contract, Employee, Faculty, Specialization
 
 

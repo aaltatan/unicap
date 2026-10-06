@@ -16,7 +16,7 @@ A Django web application with an HTMX-driven UI and a REST API, organized as one
 
 | Area | Tool |
 | --- | --- |
-| Language | Python 3.10 (`.python-version`, `requires-python = ">=3.10"`). Use 3.10 syntax only: `X \| Y` unions, `match`, `ParamSpec`, `TypeAlias`; **no** PEP 695 generics, `type` statements, `typing.Self`, `ExceptionGroup`, or `tomllib` |
+| Language | Python 3.13 (`.python-version`, `requires-python = ">=3.13"`). Use modern syntax: `X \| Y` unions, `match`, PEP 695 generics (`class X[T]`, `def f[T]`), `type` statements, `typing.Self`, `enum.StrEnum` |
 | Framework | Django 5.2 |
 | Database | MySQL (`mysqlclient`, `sql_mode=traditional`); SQLite in-memory for tests |
 | Config | `python-decouple` (`config("DB_NAME")` etc.), settings split into `unicap/unicap/settings/{base,development,testing,deployment}.py` |
@@ -94,7 +94,7 @@ Dependencies point inward only: **templates → views → managers/querysets →
 
 - Everything that reads or aggregates data is implemented as Django ORM on a custom `QuerySet` (`annotate`, `filter`, `Q`, `F`, `Case/When`, `Subquery`, `Window`, `GeneratedField`, db functions in `unicap/app/utils/`).
 - Translate domain specifications to ORM expressions: domain predicates for querying use `operator="bitwise"` so they compose into `Q` objects (`Q & Q`, `Q | Q`, `~Q`) and push filtering to the database instead of Python loops.
-- QuerySet methods are chainable and return the QuerySet type (`-> "EmployeeQuerySet"`, or `Self` from `typing_extensions`). Name them by intent: `annotate_*`, `get_*`, `with_*`, `for_*`.
+- QuerySet methods are chainable and return the QuerySet type (`-> "EmployeeQuerySet"`, or `Self` from `typing`). Name them by intent: `annotate_*`, `get_*`, `with_*`, `for_*`.
 - Constrain `select_related`/`prefetch_related` with `Literal` types from `constants/<model>.py` (`SELECT_RELATED_FIELDS`, `PREFETCH_RELATED_LOOKUPS`).
 - Shared behaviour goes into generic mixins in `unicap/app/querysets/base.py` (e.g. `JournalsTotalsQuerysetMixin[QS]`).
 
@@ -124,12 +124,12 @@ Dependencies point inward only: **templates → views → managers/querysets →
 
 ## Coding style (from pyspecification)
 
-- **Typing everywhere, Python 3.10 syntax.** Annotate every parameter and return value. pyspecification uses 3.12 syntax; translate it to 3.10 equivalents:
-  - Generics: `T = TypeVar("T")`, `R = TypeVar("R", bound=ReturnType)`, `P = ParamSpec("P")`, then `class Predicate(Generic[T, R])` instead of `class Predicate[T, R: ReturnType]`.
-  - Generic functions: use module-level `TypeVar`/`ParamSpec` with `Concatenate` (from `typing`) instead of `def object_rule[T, R, **P](...)`.
-  - Type aliases: `RulesDict: TypeAlias = dict[str, Callable[..., Predicate[Any, Any]]]` instead of `type RulesDict = ...`.
-  - `Self`, `override`, `Unpack` for kwargs come from `typing_extensions`, not `typing`.
-  - Use built-in generics (`list[int]`, `dict[str, Any]`) and `X | None` unions (both fine on 3.10).
+- **Typing everywhere, Python 3.13 syntax.** Annotate every parameter and return value, with PEP 695 syntax as in pyspecification:
+  - Generics: `class Predicate[T, R: ReturnType]`, not `TypeVar` + `Generic[T, R]`.
+  - Generic functions: `def object_rule[T, R, **P](...)` with `Concatenate` (from `typing`), not module-level `TypeVar`/`ParamSpec`.
+  - Type aliases: `type RulesDict = dict[str, Callable[..., Predicate[Any, Any]]]`, not `TypeAlias`.
+  - `Self`, `override`, `Unpack` for kwargs come from `typing`, not `typing_extensions`.
+  - Use built-in generics (`list[int]`, `dict[str, Any]`) and `X | None` unions.
   - `Protocol` for structural types, `Literal` for closed option sets, `collections.abc` imports (`Callable`, `Mapping`, `Iterable`, `Generator`).
   - Add `from __future__ import annotations` only where forward references need it; avoid it in Django model modules, where it can break some field/annotation introspection.
 - **Functional first.** Small pure functions, first-class callables, decorators and factories over deep class hierarchies. Compose behaviour (`rule_a & rule_b`) instead of nesting `if`s.
@@ -141,7 +141,7 @@ Dependencies point inward only: **templates → views → managers/querysets →
 - **Explicit public API:** each package `__init__.py` re-exports its public names and defines a sorted `__all__`.
 - **Naming:** `snake_case` functions, `PascalCase` classes, `UPPER_CASE` constants; rule/filter functions use Django-lookup style names (`age__between`, `name__istartswith`).
 - **Imports:** stdlib → third-party → local, absolute for the project and domain (`from unicap.domain import ...`; `from unicap.app.models import ...` from outside the app), relative within the app (`from ..querysets import EmployeeQuerySet`).
-- **Ruff** with `select = ["ALL"]`, `target-version = "py310"`, line length 100 (the `UP` rules then won't suggest 3.11+/3.12 syntax). Silence rules narrowly with `# noqa: CODE` on the line, or `# ruff: noqa: CODE` at file top when justified — never blanket `noqa`.
+- **Ruff** with `select = ["ALL"]`, `target-version = "py313"`, line length 100 (the `UP` rules then enforce the modern syntax above). Silence rules narrowly with `# noqa: CODE` on the line, or `# ruff: noqa: CODE` at file top when justified — never blanket `noqa`.
 - **Trailing commas** in multi-line calls/literals so formatting stays one-item-per-line.
 
 ## Testing
@@ -161,4 +161,4 @@ Dependencies point inward only: **templates → views → managers/querysets →
 - ❌ Raw SQL or Python-side filtering of querysets when the ORM can do it.
 - ❌ Class-based views in new code.
 - ❌ Untyped functions or bare `except:`.
-- ❌ Python 3.11+ features (`type` statements, `class X[T]` generics, `typing.Self`, `except*`, `tomllib`, `StrEnum`) — the project runs on 3.10.
+- ❌ Pre-3.12 typing idioms (`TypeVar` + `Generic`, `TypeAlias`, `typing_extensions` for names `typing` has) — the project runs on 3.13.

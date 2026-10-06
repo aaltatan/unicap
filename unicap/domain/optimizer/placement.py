@@ -1,12 +1,11 @@
 """Who is placed first, and which faculties fit a contract."""
 
 from collections.abc import Iterable
-from typing import TypeAlias
 
 from unicap.domain.enums import SpecializationType
 from unicap.domain.models import Contract, Faculty
 
-Target: TypeAlias = Faculty | None  # None means unsigned
+type Target = Faculty | None  # None means unsigned
 
 
 def placement_priority(contract: Contract) -> tuple[bool, bool, bool]:

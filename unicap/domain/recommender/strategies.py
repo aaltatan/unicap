@@ -13,16 +13,14 @@ problem (see gap.py); it decides which of those comes first:
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from enum import auto
+from enum import StrEnum, auto
 from fractions import Fraction
-from typing import TypeAlias
 
-from unicap.domain.enums import StrEnum
 from unicap.domain.models import Specialization
 from unicap.domain.recommender.hires import HireKind
 from unicap.domain.salaries import SalaryClass
 
-Key: TypeAlias = tuple[int | Fraction, ...]
+type Key = tuple[int | Fraction, ...]
 
 
 @dataclass(frozen=True, slots=True)

@@ -1,5 +1,6 @@
+from typing import Self
+
 from django.db.models import Count
-from typing_extensions import Self
 
 from ..constants import specialization as constants
 from .base import BaseQuerySet

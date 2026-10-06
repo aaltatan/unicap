@@ -1,5 +1,6 @@
+from typing import Self
+
 from django.db.models import Prefetch
-from typing_extensions import Self
 
 from ..constants import faculty as constants
 from ..utils.query import related_count

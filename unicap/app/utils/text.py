@@ -5,8 +5,6 @@
 stored name meet halfway: "إدارة" and "اداره" are the same word.
 """
 
-from typing import TypeAlias
-
 from django.db.models import Func, TextField, Value
 from django.db.models.functions import Lower, Replace
 from django.utils.functional import Promise
@@ -97,4 +95,4 @@ def Normalized(expression: str | Func) -> Func:  # noqa: N802 - reads like a db 
 
 
 # a label: a plain string, or a lazy translation (`gettext_lazy`) rendered when shown
-StrOrPromise: TypeAlias = str | Promise
+type StrOrPromise = str | Promise

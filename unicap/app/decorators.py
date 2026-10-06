@@ -1,6 +1,6 @@
 from collections.abc import Callable
 from functools import wraps
-from typing import Concatenate, ParamSpec, TypeVar, cast
+from typing import Concatenate, cast
 
 from django.contrib import messages
 from django.http import HttpResponse, HttpResponseBase
@@ -9,11 +9,8 @@ from django.utils.translation import gettext as _
 
 from .requests import AppRequest, ChapterRequest
 
-P = ParamSpec("P")
-R = TypeVar("R", bound=HttpResponseBase)
 
-
-def chapter_required(
+def chapter_required[**P, R: HttpResponseBase](
     view: Callable[Concatenate[ChapterRequest, P], R],
 ) -> Callable[Concatenate[AppRequest, P], R | HttpResponse]:
     """Chapter-owned pages need a chapter: without one, go create it first."""

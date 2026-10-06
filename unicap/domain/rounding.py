@@ -17,11 +17,9 @@ Example:
     2
 """
 
-from enum import auto
+from enum import StrEnum, auto
 from fractions import Fraction
 from math import ceil, floor
-
-from unicap.domain.enums import StrEnum
 
 HALF = Fraction(1, 2)
 

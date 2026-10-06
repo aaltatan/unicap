@@ -23,7 +23,6 @@ signed last.
 """
 
 from collections.abc import Callable, Sequence
-from typing import TypeAlias
 
 from unicap.domain.capacity.lookups import accepts, is_specialized, may_count, type_of
 from unicap.domain.enums import ContractStatus
@@ -31,9 +30,9 @@ from unicap.domain.models import ChapterFaculty, Contract, Share
 from unicap.domain.rounding import round_count
 from unicap.domain.utils import as_fraction, count, group_by, partition
 
-Statuses: TypeAlias = dict[Contract, ContractStatus]
+type Statuses = dict[Contract, ContractStatus]
 
-Rule: TypeAlias = Callable[[ChapterFaculty, Sequence[Contract]], Statuses]
+type Rule = Callable[[ChapterFaculty, Sequence[Contract]], Statuses]
 
 
 def count_contracts(faculty: ChapterFaculty, contracts: Sequence[Contract]) -> Statuses:

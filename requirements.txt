@@ -77,9 +77,7 @@ pillow==12.3.0
     # via unicap
 ply==3.11
     # via djangoql
-puremagic==1.30 ; python_full_version < '3.12'
-    # via unicap
-puremagic==2.2.0 ; python_full_version >= '3.12'
+puremagic==2.2.0
     # via unicap
 pyjwt==2.15.1
     # via djangorestframework-simplejwt
@@ -92,11 +90,6 @@ sqlparse==0.6.0
 tablib==3.10.0
     # via django-import-export
 typing-extensions==4.16.0
-    # via
-    #   asgiref
-    #   django-solo
-    #   pyjwt
-    #   python-docx
-    #   unicap
+    # via python-docx
 tzdata==2026.4 ; sys_platform == 'win32'
     # via django

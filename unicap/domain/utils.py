@@ -1,15 +1,11 @@
 from collections.abc import Callable, Iterable
 from fractions import Fraction
 from math import floor
-from typing import TypeAlias, TypeVar
 
-T = TypeVar("T")
-K = TypeVar("K")
-
-Percentage: TypeAlias = int | float
+type Percentage = int | float
 
 
-def partition(predicate: Callable[[T], bool], items: Iterable[T]) -> tuple[list[T], list[T]]:
+def partition[T](predicate: Callable[[T], bool], items: Iterable[T]) -> tuple[list[T], list[T]]:
     """Split items into (matching, not_matching), keeping the original order."""
     matching: list[T] = []
     not_matching: list[T] = []
@@ -18,14 +14,14 @@ def partition(predicate: Callable[[T], bool], items: Iterable[T]) -> tuple[list[
     return matching, not_matching
 
 
-def group_by(items: Iterable[T], key: Callable[[T], K]) -> dict[K, list[T]]:
+def group_by[T, K](items: Iterable[T], key: Callable[[T], K]) -> dict[K, list[T]]:
     groups: dict[K, list[T]] = {}
     for item in items:
         groups.setdefault(key(item), []).append(item)
     return groups
 
 
-def count(items: Iterable[T], predicate: Callable[[T], bool]) -> int:
+def count[T](items: Iterable[T], predicate: Callable[[T], bool]) -> int:
     return sum(1 for item in items if predicate(item))
 
 

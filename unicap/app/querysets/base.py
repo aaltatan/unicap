@@ -1,17 +1,14 @@
 """Shared queryset behaviour: search and validated multi-field ordering."""
 
 from collections.abc import Iterable, Mapping
-from typing import Generic, TypeVar
+from typing import Self
 
 from django.db import models
 from djangoql.exceptions import DjangoQLError
 from djangoql.queryset import apply_search
 from djangoql.schema import DjangoQLSchema
-from typing_extensions import Self
 
 from ..utils.query import keywords_query
-
-M = TypeVar("M", bound=models.Model)
 
 DJANGOQL_MARKERS = ("=", "~", ">", "<", " in ", " and ", " or ")
 
@@ -39,7 +36,7 @@ class DataSchema(DjangoQLSchema):
         return self.model_label(model) not in SEARCHABLE_MODELS
 
 
-class BaseQuerySet(models.QuerySet, Generic[M]):
+class BaseQuerySet[M: models.Model](models.QuerySet):
     """Base queryset: every model's queryset derives from it."""
 
     search_fields: tuple[str, ...] = ("name",)

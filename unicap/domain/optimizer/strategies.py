@@ -19,14 +19,12 @@ placement with the highest key wins.
 """
 
 from collections.abc import Callable
-from enum import auto
+from enum import StrEnum, auto
 from fractions import Fraction
-from typing import TypeAlias
 
-from unicap.domain.enums import StrEnum
 from unicap.domain.optimizer.outcome import Outcome
 
-Key: TypeAlias = tuple[int | Fraction, ...]
+type Key = tuple[int | Fraction, ...]
 
 
 class Strategy(StrEnum):

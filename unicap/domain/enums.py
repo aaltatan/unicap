@@ -1,15 +1,4 @@
-from enum import Enum, auto
-
-
-class StrEnum(str, Enum):
-    """`enum.StrEnum` for Python 3.10: `auto()` is the lowercase name, str() is the value."""
-
-    @staticmethod
-    def _generate_next_value_(name: str, start: int, count: int, last_values: list[str]) -> str:
-        return name.lower()
-
-    def __str__(self) -> str:
-        return str(self.value)
+from enum import StrEnum, auto
 
 
 class SpecializationType(StrEnum):

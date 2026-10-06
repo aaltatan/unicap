@@ -1,5 +1,6 @@
+from typing import Self
+
 from django.db.models import F, FilteredRelation, Q
-from typing_extensions import Self
 
 from ..constants import contract as constants
 from .base import BaseQuerySet
