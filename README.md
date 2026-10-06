@@ -108,12 +108,14 @@ not (it is the development entry), so name it once per console.
    pip install -r requirements.txt
    ```
 
-2. **Database**: on the *Databases* tab, set a MySQL password and create a database named
-   `unicap` (PythonAnywhere calls it `yourname$unicap`).
+2. **Database**: SQLite, a file (the free plan has no MySQL): nothing to create, `migrate`
+   writes `unicap/db.sqlite3`. It is not in the repository, so `git pull` never touches it;
+   copy it (or download a *whole system* backup) to keep a copy. On a plan with MySQL, create
+   the database on the *Databases* tab and use the `DB_*` values at the end of `.env.example`.
 
 3. **`.env`** (`cp .env.example .env`), with a new `SECRET_KEY`, `DEBUG=False`,
-   `VITE_DEV_MODE=False`, and the production values at the end of `.env.example`:
-   `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`.
+   `VITE_DEV_MODE=False`, `DB_ENGINE=django.db.backends.sqlite3`, `DB_NAME=db.sqlite3`, and
+   `ALLOWED_HOSTS` and `CSRF_TRUSTED_ORIGINS` as at the end of `.env.example`.
 
 4. **Tables, static files, the first admin**:
 
@@ -145,8 +147,10 @@ through the app only. After each update: `git pull`, `pip install -r requirement
 *whole system* backup from the old installation and upload and restore it on the new one.
 
 PDF reports need LibreOffice on the server (`which soffice`; set `SOFFICE_PATH`); without it
-the Word export still works. MySQL and MariaDB cannot hold the "one default chapter"
-constraint (Django's `models.W036` warning): the app keeps a single default itself.
+the Word export still works. `requirements.txt` holds `mysqlclient` for either database: if
+it does not install on the server, remove its line (SQLite does not need it). MySQL and
+MariaDB cannot hold the "one default chapter" constraint (Django's `models.W036` warning):
+the app keeps a single default itself.
 
 ## Users, roles and settings
 
