@@ -15,6 +15,10 @@ db.sqlite3
 media/
 staticfiles/
 static/
+# the Vite build ships with the repository: the server needs no Node
+!unicap/static/
+unicap/static/*
+!unicap/static/dist/
 htmlcov/
 .coverage
 .pytest_cache/

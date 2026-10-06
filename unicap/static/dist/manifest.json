@@ -1,0 +1,11 @@
+{
+  "unicap/assets/js/index.js": {
+    "file": "assets/index-kVHEqYbB.js",
+    "name": "index",
+    "src": "unicap/assets/js/index.js",
+    "isEntry": true,
+    "css": [
+      "assets/index-DcxrEnyx.css"
+    ]
+  }
+}

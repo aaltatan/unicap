@@ -92,6 +92,62 @@ the build goes to `unicap/static/dist/` with its `manifest.json`. With built ass
 Django after each build: django-vite reads the manifest once at startup (a missing manifest
 shows up as the `django_vite.W001` check warning, then `DjangoViteAssetNotFoundError`).
 
+## Deploying (PythonAnywhere)
+
+Before uploading, `uv run nox -s build` builds the assets and writes `requirements.txt`; both
+are kept in the repository, so the server needs neither Node nor uv. Production uses
+`unicap.unicap.settings.deployment` (DEBUG off, HTTPS, secure cookies, the built assets, errors
+logged to the site's error log); `unicap/unicap/wsgi.py` picks it by default, `manage.py` does
+not (it is the development entry), so name it once per console.
+
+1. **Code and packages** (a Bash console; Python 3.10):
+
+   ```bash
+   git clone <your repository> ~/unicap && cd ~/unicap
+   mkvirtualenv --python=/usr/bin/python3.10 unicap
+   pip install -r requirements.txt
+   ```
+
+2. **Database**: on the *Databases* tab, set a MySQL password and create a database named
+   `unicap` (PythonAnywhere calls it `yourname$unicap`).
+
+3. **`.env`** (`cp .env.example .env`), with a new `SECRET_KEY`, `DEBUG=False`,
+   `VITE_DEV_MODE=False`, and the production values at the end of `.env.example`:
+   `ALLOWED_HOSTS`, `CSRF_TRUSTED_ORIGINS`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DB_HOST`.
+
+4. **Tables, static files, the first admin**:
+
+   ```bash
+   export DJANGO_SETTINGS_MODULE=unicap.unicap.settings.deployment
+   python manage.py migrate
+   python manage.py collectstatic --noinput
+   python manage.py createsuperuser
+   ```
+
+5. **Web tab**: a new web app, *manual configuration*, Python 3.10; then
+   - *Virtualenv*: `/home/yourname/.virtualenvs/unicap`
+   - *WSGI configuration file*, replaced by:
+
+     ```python
+     import sys
+
+     sys.path.insert(0, "/home/yourname/unicap")
+
+     from unicap.unicap.wsgi import application  # noqa: E402,F401
+     ```
+
+   - *Static files*: `/static/` → `/home/yourname/unicap/unicap/staticfiles`
+   - *Force HTTPS*: on. Then **Reload**.
+
+Do **not** map `/media/` or the `private/` folder as static files: backups are downloaded
+through the app only. After each update: `git pull`, `pip install -r requirements.txt`,
+`migrate`, `collectstatic --noinput`, then Reload. To bring your data over, download a
+*whole system* backup from the old installation and upload and restore it on the new one.
+
+PDF reports need LibreOffice on the server (`which soffice`; set `SOFFICE_PATH`); without it
+the Word export still works. MySQL and MariaDB cannot hold the "one default chapter"
+constraint (Django's `models.W036` warning): the app keeps a single default itself.
+
 ## Users, roles and settings
 
 - **Admins** (superusers) control everything and alone open the admin panel (`/admin/`,
