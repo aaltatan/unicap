@@ -122,7 +122,9 @@ Before uploading, `uv run nox -s build` builds the assets and writes `requiremen
 are kept in the repository, so the server needs neither Node nor uv. Production uses
 `unicap.unicap.settings.deployment` (DEBUG off, HTTPS, secure cookies, the built assets, errors
 logged to the site's error log); `unicap/unicap/wsgi.py` picks it by default, `manage.py` does
-not (it is the development entry), so name it once per console.
+not (it is the development entry), so name it once per console. Forgotten, `manage.py` still
+runs: the development tools (django-silk, django-extensions) are used only where they are
+installed, and `requirements.txt` holds neither.
 
 1. **Code and packages** (a Bash console; Python 3.13):
 

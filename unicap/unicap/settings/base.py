@@ -28,7 +28,6 @@ CORE_APPS = [
 
 THIRD_PARTY_APPS = [
     "django_cotton",
-    "django_extensions",
     "django_filters",
     "django_htmx",
     "djangoql",

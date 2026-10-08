@@ -4,6 +4,7 @@ import pytest
 from django.contrib.auth.models import Group
 from django.test import Client
 from django.urls import reverse
+from pytest_mock import MockerFixture
 from selectolax.parser import HTMLParser
 
 from tests.conftest import htmx
@@ -228,3 +229,47 @@ def test_the_apps_modal_size_is_drawn_when_the_section_has_none(
 
     assert "width: min(56rem," in response.content.decode()
     assert "width: min(56rem," in details.content.decode()
+
+
+# --- the development settings on a server ------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("installed", "apps"),
+    [
+        ((), []),  # a server: the production requirements alone
+        (("silk",), ["silk"]),
+        (("django_extensions", "silk"), ["django_extensions", "silk"]),
+    ],
+)
+def test_development_tools_are_used_only_when_installed(
+    mocker: MockerFixture, installed: tuple[str, ...], apps: list[str]
+) -> None:
+    """`manage.py` defaults to these settings: a missing dev package must not stop it."""
+    import importlib  # noqa: PLC0415
+    import importlib.util  # noqa: PLC0415
+
+    from unicap.unicap.settings import development  # noqa: PLC0415
+
+    mocker.patch.object(
+        importlib.util, "find_spec", lambda name: name if name in installed else None
+    )
+
+    try:
+        settings = importlib.reload(development)
+
+        assert apps == settings.DEV_APPS
+        assert [
+            app for app in settings.INSTALLED_APPS if app in ("silk", "django_extensions")
+        ] == apps
+        assert ("silk.middleware.SilkyMiddleware" in settings.MIDDLEWARE) is ("silk" in installed)
+    finally:
+        mocker.stopall()
+        importlib.reload(development)
+
+
+def test_production_settings_need_no_development_package() -> None:
+    from unicap.unicap.settings import base  # noqa: PLC0415
+
+    assert not {"silk", "django_extensions"} & set(base.INSTALLED_APPS)
+    assert not [name for name in base.MIDDLEWARE if "silk" in name]

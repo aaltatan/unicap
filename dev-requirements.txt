@@ -27,7 +27,6 @@ distlib==0.4.3
     # via virtualenv
 django==5.2.17
     # via
-    #   django-braces
     #   django-cors-headers
     #   django-cotton
     #   django-extensions
@@ -44,8 +43,6 @@ django==5.2.17
     #   djangorestframework-simplejwt
     #   heroicons
     #   unicap
-django-braces==1.17.0
-    # via unicap
 django-cleanup==9.0.0
     # via unicap
 django-cors-headers==4.9.0
@@ -53,14 +50,12 @@ django-cors-headers==4.9.0
 django-cotton==2.7.2
     # via unicap
 django-extensions==4.1
-    # via unicap
 django-filter==25.1
     # via unicap
 django-htmx==1.27.0
     # via unicap
 django-import-export==4.4.1
     # via unicap
-django-pytest==0.2.0
 django-silk==5.6.0
 django-solo==2.5.1
     # via unicap
@@ -129,8 +124,6 @@ packaging==26.3
     #   pytest
 pathspec==1.1.1
     # via mypy
-pillow==12.3.0
-    # via unicap
 platformdirs==4.12.1
     # via
     #   nox
@@ -143,8 +136,6 @@ pluggy==1.6.0
 ply==3.11
     # via djangoql
 polib==1.2.0
-puremagic==2.2.0
-    # via unicap
 pyee==12.0.0
     # via playwright
 pygments==2.21.0
@@ -156,15 +147,9 @@ pytest==9.1.1
     #   pytest-cov
     #   pytest-django
     #   pytest-mock
-    #   pytest-order
 pytest-cov==7.1.0
-    # via pytest-cover
-pytest-cover==3.0.0
-    # via pytest-coverage
-pytest-coverage==0.0
 pytest-django==4.14.0
 pytest-mock==3.16.0
-pytest-order==1.5.0
 python-decouple==3.8
     # via unicap
 python-discovery==1.6.1

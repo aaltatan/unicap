@@ -41,4 +41,4 @@ def check(session: nox.Session) -> None:
     """Lint, format check and tests."""
     session.run("uv", "run", "ruff", "check", ".", external=True)
     session.run("uv", "run", "ruff", "format", "--check", ".", external=True)
-    session.run("uv", "run", "pytest", external=True)
+    session.run("uv", "run", "pytest", "-q", external=True)

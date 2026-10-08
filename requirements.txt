@@ -9,10 +9,8 @@ diff-match-patch==20241021
     # via django-import-export
 django==5.2.17
     # via
-    #   django-braces
     #   django-cors-headers
     #   django-cotton
-    #   django-extensions
     #   django-filter
     #   django-htmx
     #   django-import-export
@@ -23,15 +21,11 @@ django==5.2.17
     #   djangorestframework-simplejwt
     #   heroicons
     #   unicap
-django-braces==1.17.0
-    # via unicap
 django-cleanup==9.0.0
     # via unicap
 django-cors-headers==4.9.0
     # via unicap
 django-cotton==2.7.2
-    # via unicap
-django-extensions==4.1
     # via unicap
 django-filter==25.1
     # via unicap
@@ -73,12 +67,8 @@ mysqlclient==2.3.0
     # via unicap
 openpyxl==3.1.5
     # via tablib
-pillow==12.3.0
-    # via unicap
 ply==3.11
     # via djangoql
-puremagic==2.2.0
-    # via unicap
 pyjwt==2.15.1
     # via djangorestframework-simplejwt
 python-decouple==3.8

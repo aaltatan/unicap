@@ -24,7 +24,7 @@ A Django web application with an HTMX-driven UI and a REST API, organized as one
 | Filtering / search | `django-filter`, `djangoql` (custom `DjangoQLSearchFilter` backend) |
 | Import / export | `django-import-export[xlsx]` (resources per model), `docxtpl` for MS Word templates |
 | UI helpers | `django-cotton` (components in `components/`), `django-htmx`, `django-widget-tweaks`, `heroicons[django]`, `django-vite` |
-| Misc | `django-solo` (singleton settings models), `django-cleanup`, `django-braces`, `django-extensions`, `pillow`, `puremagic` (file type validation) |
+| Misc | `django-solo` (singleton settings models), `django-cleanup` |
 | i18n | English + Arabic (`LANGUAGES = (("en", ...), ("ar", ...))`), all user-facing strings wrapped in `gettext_lazy as _`; translations in `unicap/locale/` |
 
 ### Frontend
@@ -38,8 +38,8 @@ A Django web application with an HTMX-driven UI and a REST API, organized as one
 
 - Package management: `uv` (`uv.lock`, `pyproject.toml` with `[dependency-groups] dev`); npm for JS
 - Tasks: `nox` (`noxfile.py` → `build` session: `npm run build`, compiles `requirements.txt`, freezes `dev-requirements.txt`, cleans caches)
-- Tests: `pytest`, `pytest-django`, `pytest-cov`, `pytest-mock`, `pytest-order`, `factory-boy`, `selectolax` (HTML assertions), `playwright` (e2e, marked `slow`)
-- Profiling: `django-silk` (mounted at `/silk/` only when `DEBUG`)
+- Tests: `pytest`, `pytest-django`, `pytest-cov`, `pytest-mock`, `factory-boy`, `selectolax` (HTML assertions), `playwright` (e2e, marked `slow`)
+- Development only (the `dev` group, enabled in `settings/development.py` when installed): `django-silk` (profiling, at `/silk/`), `django-extensions`
 - Lint/format: Ruff (`select = ["ALL"]` style, line length 100) — see Coding style
 
 ### Commands
