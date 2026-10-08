@@ -290,6 +290,31 @@ def test_tables_remember_their_filters_but_reset_starts_fresh(
     assert html.css_first(f"aside a[href='{reverse(url_name)}'][data-url-reset]") is not None
 
 
+@pytest.mark.parametrize("url_name", TABLES)
+def test_clearing_the_filters_redraws_only_the_table(
+    admin_client: Client,
+    chapter: Chapter,
+    url_name: str,
+) -> None:
+    url = reverse(url_name)
+
+    html = HTMLParser(admin_client.get(url, {"q": "zzz-no-such"}).content)
+
+    # the sidebar's reset and the empty table's "clear filters": HTMX, not a page load
+    resets = [html.css_first("aside a[data-url-reset]"), html.css_first("#table a[data-url-reset]")]
+
+    for reset in resets:
+        assert reset.attributes["hx-get"] == url
+        assert reset.attributes["hx-target"] == "#table"
+        assert reset.attributes["hx-push-url"] == "true"
+        assert "clearFilters" in reset.attributes["@click"]
+
+    table = admin_client.get(resets[0].attributes["hx-get"], **htmx("table"))
+
+    assert HTMLParser(table.content).css_first("nav[aria-label]") is None  # the table alone
+    assert not HTMLParser(table.content).css("a[data-url-reset]")  # rows again, not "no match"
+
+
 def test_the_filters_button_counts_only_the_filters_applied(
     admin_client: Client, chapter: Chapter
 ) -> None:
@@ -304,8 +329,30 @@ def test_the_filters_button_counts_only_the_filters_applied(
     assert not sorted_only.css("#filters-reset a")
     assert filtered.css_first("#filters-badge").text(strip=True) == "1"
     # the reset clears the filters only: the search and the sorting stay
-    reset = filtered.css_first("#filters-reset a").attributes["href"]
-    assert reset == f"{url}?q=a&ordering=-position"
+    reset = filtered.css_first("#filters-reset a")
+    assert reset.attributes["href"] == f"{url}?q=a&ordering=-position"
+    # an HTMX request for the table alone, not a page load
+    assert reset.attributes["hx-get"] == reset.attributes["href"]
+    assert reset.attributes["hx-target"] == "#table"
+
+    cleared = admin_client.get(reset.attributes["hx-get"], **htmx("table"))
+    parts = HTMLParser(cleared.content)
+
+    # the table's answer also empties the badge and takes the reset away (out of band)
+    assert parts.css_first("#filters-badge").text(strip=True) == ""
+    assert not parts.css("#filters-reset a")
+
+
+def test_a_modal_marks_its_close_button(admin_client: Client, chapter: Chapter) -> None:
+    """What a modal focuses when it holds no field (assets/js/src/layout.js `focusModal`)."""
+    contract = chapter.contracts.first()
+
+    details = HTMLParser(admin_client.get(contract.get_absolute_url(), **htmx()).content)
+    form = HTMLParser(admin_client.get(contract.get_update_url(), **htmx()).content)
+
+    assert len(details.css("button[data-modal-close]")) == 1
+    assert len(form.css("button[data-modal-close]")) == 1
+    assert form.css_first("select, input:not([type=hidden])") is not None
 
 
 @pytest.mark.parametrize("value", ["abc", "", "999999"])

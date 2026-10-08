@@ -2,6 +2,7 @@
 {% with o=optimization old=optimization.before_outcome new=optimization.after_outcome %}
 <form hx-post="{% url 'board:optimize' %}" hx-target="#modal-container" hx-swap="innerHTML">
   <input type="hidden" name="placements" value="{{ placements }}" />
+  <input type="hidden" name="strategy" value="{{ strategy }}" />
   <c-layout.modal-body title="{% translate 'optimize' %}: {{ strategy_label }}" width="xl">
     <p class="mb-4 text-sm text-neutral-600 first-letter:uppercase dark:text-neutral-300">{{ strategy_description }}</p>
 
@@ -22,32 +23,75 @@
     </div>
 
     <h3 class="mb-2 mt-4 text-sm font-semibold first-letter:uppercase">
-      {% blocktranslate count counter=o.moves|length %}{{ counter }} move{% plural %}{{ counter }} moves{% endblocktranslate %}
+      {% blocktranslate count counter=o.kept %}{{ counter }} move{% plural %}{{ counter }} moves{% endblocktranslate %}
+      {% if o.removed %}<span class="font-normal text-neutral-500">· {% blocktranslate count counter=o.removed %}{{ counter }} removed{% plural %}{{ counter }} removed{% endblocktranslate %}</span>{% endif %}
     </h3>
     {% if o.moves %}
-    <ul class="scroll max-h-64 space-y-1 overflow-y-auto text-sm">
+    {# one row per move, every row the same columns: who · type · what · from → to · remove #}
+    <ul class="scroll max-h-64 space-y-1 overflow-y-auto text-sm" data-moves>
       {% for move in o.moves %}
-      <li class="flex flex-wrap items-center gap-2 rounded-md border border-neutral-200 px-2 py-1 dark:border-neutral-800">
-        <span class="font-medium">{{ move.employee.name }}</span>
+      <li
+        class="grid grid-cols-[minmax(7rem,13rem)_4.5rem_minmax(0,1fr)_auto_auto] items-center gap-2 rounded-md border border-neutral-200 px-2 py-1 dark:border-neutral-800 {% if move.is_removed %}bg-neutral-50 dark:bg-neutral-900/60{% endif %}"
+        data-move="{{ move.contract_id }}"
+        {% if move.is_removed %}data-removed{% endif %}
+      >
+        {% if move.is_removed %}<input type="hidden" name="removed" value="{{ move.contract_id }}" />{% endif %}
+        {# who makes the move: the optimizer's employee, or anyone just like them #}
+        <select
+          name="substitute-{{ move.contract_id }}"
+          class="input py-0.5 font-medium {% if move.is_removed %}opacity-50{% endif %}"
+          aria-label="{% translate 'who makes this move' %}"
+          title="{% translate 'who makes this move: anyone with the same specialization, terms and faculty' %}"
+        >
+          <option value="{{ move.contract_id }}" {% if move.chosen_id == move.contract_id %}selected{% endif %}>{{ move.employee.name }}</option>
+          {% for substitute in move.substitutes %}
+          <option value="{{ substitute.contract_id }}" {% if move.chosen_id == substitute.contract_id %}selected{% endif %}>{{ substitute.employee.name }}</option>
+          {% endfor %}
+        </select>
         {# what the specialization is in the faculty the contract moves to #}
-        {% with kind=move.contract|specialization_type %}<c-type-tag :kind="kind" />{% endwith %}
-        <span class="text-xs text-neutral-500">{{ move.employee.specialization.name }} · {{ move.contract|terms }}</span>
-        <span class="ms-auto flex items-center gap-1 text-xs">
+        <span class="{% if move.is_removed %}opacity-50{% endif %}">{% with kind=move.contract|specialization_type %}<c-type-tag :kind="kind" />{% endwith %}</span>
+        <span class="truncate text-xs text-neutral-500 {% if move.is_removed %}line-through opacity-60{% endif %}">{{ move.employee.specialization.name }} · {{ move.contract|terms }}</span>
+        <span class="flex items-center gap-1 text-xs {% if move.is_removed %}line-through opacity-60{% endif %}">
           <span>{{ move.before.name|default:_("unsigned") }}</span>
           <span class="rtl:rotate-180">{% heroicon_mini "arrow-right" size=14 %}</span>
           <span class="font-semibold">{{ move.after.name|default:_("unsigned") }}</span>
         </span>
+        {% if move.is_removed %}
+        <button
+          type="button"
+          class="btn btn-ghost btn-icon"
+          hx-post="{% url 'board:optimize' %}"
+          hx-vals='{"restore": "{{ move.contract_id }}"}'
+          hx-target="#modal-container"
+          hx-swap="innerHTML"
+          title="{% translate 'put this move back' %}"
+          aria-label="{% translate 'put this move back' %}"
+          {% if focused == move.contract_id %}autofocus{% endif %}
+        >{% heroicon_mini "arrow-uturn-left" size=16 %}</button>
+        {% else %}
+        <button
+          type="button"
+          class="btn btn-ghost btn-icon text-rose-600 hover:text-rose-700 dark:text-rose-400"
+          hx-post="{% url 'board:optimize' %}"
+          hx-vals='{"remove": "{{ move.contract_id }}"}'
+          hx-target="#modal-container"
+          hx-swap="innerHTML"
+          title="{% translate 'remove this move: the contract stays where it is' %}"
+          aria-label="{% translate 'remove this move' %}"
+          {% if focused == move.contract_id %}autofocus{% endif %}
+        >{% heroicon_mini "trash" size=16 %}</button>
+        {% endif %}
       </li>
       {% endfor %}
     </ul>
     {% else %}
     <p class="text-sm text-neutral-500 first-letter:uppercase">{% translate 'the current placement is already the best this strategy finds.' %}</p>
     {% endif %}
-    <p class="mt-3 text-xs text-neutral-500 first-letter:uppercase">{% translate 'a heuristic search (two starts and local moves), not a proven optimum. Employment terms never change, only faculties.' %}</p>
-
+    <p class="mt-3 text-xs text-neutral-500 first-letter:uppercase">{% translate 'a heuristic search (two starts and local moves), not a proven optimum. Employment terms never change, only faculties; locked contracts stay where they are.' %}</p>
+    {% if o.moves %}<p class="mt-1 text-xs text-neutral-500 first-letter:uppercase">{% translate 'each move names who makes it: where the list holds others, they have the same specialization, terms and faculty, so the result is the same. Remove the moves you do not want: the figures above follow.' %}</p>{% endif %}
     <c-slot name="footer">
       <button type="button" class="btn btn-default" @click="closeModal()">{% translate 'cancel' %}</button>
-      <button type="submit" class="btn btn-primary" {% if not o.moves %}disabled{% endif %}>{% heroicon_outline "check" size=16 %} {% translate 'apply these moves' %}</button>
+      <button type="submit" class="btn btn-primary" {% if not o.kept %}disabled{% endif %}>{% heroicon_outline "check" size=16 %} {% translate 'apply these moves' %}</button>
     </c-slot>
   </c-layout.modal-body>
 </form>

@@ -14,7 +14,7 @@ from selectolax.parser import HTMLParser
 
 from unicap.app.choices import ReportChoices
 from unicap.app.models import Chapter, Faculty
-from unicap.app.reports import PdfError, documents, pdf, to_pdf
+from unicap.app.reports import PdfError, documents, join, pdf, to_pdf
 from unicap.app.reports.docx import DOCX_CONTENT_TYPE
 from unicap.app.reports.pdf import PDF_CONTENT_TYPE
 
@@ -300,3 +300,148 @@ def test_the_staff_report_names_each_teachers_type(admin_client: Client, faculty
     assert staff.rows[0].cells[3].text == "specialization type"
     assert types <= {"specialized", "supported", ""}
     assert types & {"specialized", "supported"}
+
+
+# --- every faculty's report in one file -----------------------------------------------------
+
+
+def faculty_names(chapter: Chapter) -> list[str]:
+    return list(Faculty.objects.for_chapter(chapter.pk).values_list("name", flat=True))
+
+
+def page_breaks(content: bytes) -> list[str]:
+    """The text of each paragraph that starts a new page."""
+    document = Document(BytesIO(content))
+
+    return [p.text for p in document.paragraphs if p.paragraph_format.page_break_before]
+
+
+@pytest.mark.parametrize("url_name", ["reports:all-staff-docx", "reports:all-staff-pivot-docx"])
+def test_every_facultys_report_downloads_as_one_word_file(
+    admin_client: Client, chapter: Chapter, url_name: str
+) -> None:
+    response = admin_client.get(reverse(url_name))
+
+    content = b"".join(response.streaming_content)
+    text = docx_text(content)
+    names = faculty_names(chapter)
+
+    assert response["Content-Type"] == DOCX_CONTENT_TYPE
+    assert "all_faculties" in response["Content-Disposition"]
+    assert ".docx" in response["Content-Disposition"]
+    # every faculty, in the tables' order, each after the first on a page of its own
+    assert [text.index(name) for name in names] == sorted(text.index(name) for name in names)
+    assert len(page_breaks(content)) == len(names) - 1
+    assert all(any(name in start for name in names[1:]) for start in page_breaks(content))
+
+
+def test_the_one_file_holds_what_each_facultys_own_file_holds(
+    admin_client: Client, chapter: Chapter
+) -> None:
+    together = docx_text(
+        b"".join(admin_client.get(reverse("reports:all-staff-docx")).streaming_content)
+    )
+
+    for faculty in Faculty.objects.for_chapter(chapter.pk):
+        own = admin_client.get(reverse("reports:staff-docx", args=(faculty.pk,)))
+
+        for line in docx_text(b"".join(own.streaming_content)).splitlines():
+            assert line in together
+
+    # every teacher signed to a faculty is in it once
+    for name in chapter.contracts.signed().values_list("employee__name", flat=True):
+        assert together.count(f"\n{name}\n") == 1
+
+
+@pytest.mark.parametrize("url_name", ["reports:all-staff-pdf", "reports:all-staff-pivot-pdf"])
+def test_every_facultys_report_downloads_as_one_pdf(
+    admin_client: Client, chapter: Chapter, converter: list[bytes], url_name: str
+) -> None:
+    for _again in range(2):
+        response = admin_client.get(reverse(url_name))
+
+        assert response["Content-Type"] == PDF_CONTENT_TYPE
+        assert b"".join(response.streaming_content) == PDF
+
+    # one conversion, of the one file holding every faculty (and it is remembered)
+    assert len(converter) == 1
+    assert all(name in docx_text(converter[0]) for name in faculty_names(chapter))
+
+
+def test_a_chapter_without_faculties_has_nothing_to_export(
+    admin_client: Client, chapter: Chapter
+) -> None:
+    chapter.contracts.all().delete()
+    chapter.employees.all().delete()
+    chapter.faculties.all().delete()
+
+    page = HTMLParser(admin_client.get(reverse("reports:faculties")).content)
+    response = admin_client.get(reverse("reports:all-staff-docx"), follow=True)
+
+    assert page.css_first("[data-export-all]") is None
+    assert response.redirect_chain[-1][0] == reverse("reports:faculties")
+    assert "no faculty yet" in response.content.decode()
+
+
+def test_the_faculties_page_exports_them_all_from_one_menu(
+    admin_client: Client, viewer_client: Client, chapter: Chapter
+) -> None:
+    html = HTMLParser(admin_client.get(reverse("reports:faculties")).content)
+
+    links = [a.attributes["href"] for a in html.css("[data-export-all] [role=menu] a")]
+
+    assert links == [
+        reverse(name)
+        for name in (
+            "reports:all-staff-docx",
+            "reports:all-staff-pdf",
+            "reports:all-staff-pivot-docx",
+            "reports:all-staff-pivot-pdf",
+        )
+    ]
+    assert viewer_client.get(links[0]).status_code == 200  # whoever may see the reports
+
+
+def test_all_faculties_need_view_permission(client: Client, chapter: Chapter) -> None:
+    response = client.get(reverse("reports:all-staff-docx"))
+
+    assert response.status_code == 302
+    assert "/login" in response["Location"] or "accounts" in response["Location"]
+
+
+def test_join_keeps_the_first_documents_page_setup() -> None:
+    def document(*paragraphs: str) -> bytes:
+        made = Document()
+        for text in paragraphs:
+            made.add_paragraph(text)
+        output = BytesIO()
+        made.save(output)
+        return output.getvalue()
+
+    joined = Document(BytesIO(join([document("one", "1"), document("two"), document("three")])))
+
+    assert [p.text for p in joined.paragraphs] == ["one", "1", "two", "three"]
+    assert [p.text for p in joined.paragraphs if p.paragraph_format.page_break_before] == [
+        "two",
+        "three",
+    ]
+    assert len(joined.sections) == 1
+    assert joined.element.body[-1].tag.endswith("sectPr")  # still the body's last element
+    assert join([document("alone")]) is not None
+
+    with pytest.raises(ValueError, match="at least one"):
+        join([])
+
+
+def test_a_joined_document_starting_with_a_table_still_breaks_the_page() -> None:
+    def document(cell: str) -> bytes:
+        made = Document()
+        made.add_table(rows=1, cols=1).cell(0, 0).text = cell
+        output = BytesIO()
+        made.save(output)
+        return output.getvalue()
+
+    joined = Document(BytesIO(join([document("a"), document("b")])))
+
+    assert [table.cell(0, 0).text for table in joined.tables] == ["a", "b"]
+    assert len([p for p in joined.paragraphs if p.paragraph_format.page_break_before]) == 1

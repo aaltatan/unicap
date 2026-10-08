@@ -2,6 +2,7 @@
 
 capacity/            capacity/pivot/          audit/
 faculties/           faculties/<pk>/staff/    faculties/<pk>/staff/pivot/
+faculties/all/staff/ faculties/all/staff/pivot/    (files only: every faculty's, in one)
 """
 
 from collections.abc import Callable
@@ -48,6 +49,13 @@ urlpatterns = [
     ),
     *_files("audit/", views.chapter_file, "audit", ReportChoices.AUDIT),
     path(route="faculties/", view=views.faculties, name="faculties"),
+    *_files("faculties/all/staff/", views.faculties_file, "all-staff", ReportChoices.FACULTY_STAFF),
+    *_files(
+        "faculties/all/staff/pivot/",
+        views.faculties_file,
+        "all-staff-pivot",
+        ReportChoices.FACULTY_STAFF_PIVOT,
+    ),
     path(route="faculties/<int:pk>/staff/", view=views.staff, name="staff"),
     *_files("faculties/<int:pk>/staff/", views.faculty_file, "staff", ReportChoices.FACULTY_STAFF),
     path(

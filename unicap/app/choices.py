@@ -57,7 +57,6 @@ class StrategyChoices(models.TextChoices):
     MAXIMIZE_STUDENTS = Strategy.MAXIMIZE_STUDENTS.value, _("maximize students")
     MAXIMIZE_TEACHER_USAGE = Strategy.MAXIMIZE_TEACHER_USAGE.value, _("maximize teacher usage")
     MINIMIZE_OVERFLOW = Strategy.MINIMIZE_OVERFLOW.value, _("minimize overflowing")
-    MEET_TARGETS = Strategy.MEET_TARGETS.value, _("meet student targets")
     MINIMIZE_CHANGES = Strategy.MINIMIZE_CHANGES.value, _("fewest changes")
     MINIMIZE_TEACHERS = Strategy.MINIMIZE_TEACHERS.value, _("fewest teachers")
     LESS_SALARIES = Strategy.LESS_SALARIES.value, _("less salaries")
@@ -68,7 +67,6 @@ STRATEGY_DESCRIPTIONS = {
     Strategy.MAXIMIZE_STUDENTS: _("The most students the ministry allows."),
     Strategy.MAXIMIZE_TEACHER_USAGE: _("As many counted teachers as possible, as few wasted."),
     Strategy.MINIMIZE_OVERFLOW: _("The lowest share of signed contracts that are not counted."),
-    Strategy.MEET_TARGETS: _("Reach every faculty's target students first, then maximize."),
     Strategy.MINIMIZE_CHANGES: _("Become compliant re-signing as few contracts as possible."),
     Strategy.MINIMIZE_TEACHERS: _("The most students with the fewest teachers: frees the rest."),
     Strategy.LESS_SALARIES: _(
@@ -252,6 +250,7 @@ DOMAIN_ERROR_MESSAGES = {
     ErrorCode.NO_CONTRACT: _("%(chapter)s: %(employee)s has no contract"),
     ErrorCode.NEGATIVE: _("%(owner)s: %(fields)s cannot be negative"),
     ErrorCode.MASTERS_PER_PHD_NOT_POSITIVE: _("masters per PhD must be positive"),
+    ErrorCode.CONTRACT_LOCKED: _("%(employee)s: the contract is locked to %(faculty)s"),
 }
 
 # the numbers a `NEGATIVE` error names, labelled as on the forms

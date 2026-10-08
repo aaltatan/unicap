@@ -13,4 +13,5 @@
 <td data-col="terms" class="whitespace-nowrap">{{ obj.get_contract_type_display }} · {{ obj.get_employment_type_display }}</td>
 <td data-col="status"><span class="badge {{ obj.status|status_badge }}">{{ obj.status|status_label }}</span></td>
 <td data-col="is_active"><c-switch :on="obj.is_active" url="{{ obj.get_toggle_url }}" :enabled="perms_change" label="{% translate 'on' %}" /></td>
+<td data-col="is_locked"><c-switch :on="obj.is_locked" url="{{ obj.get_toggle_lock_url }}" :enabled="perms_change" label="{% translate 'locked to its faculty' %}" /></td>
 <td data-col="notes" class="max-w-xs truncate text-neutral-500" title="{{ obj.notes }}">{{ obj.notes|truncatechars:80 }}</td>

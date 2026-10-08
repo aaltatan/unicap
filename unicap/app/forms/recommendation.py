@@ -20,11 +20,6 @@ class RecommendationForm(forms.Form):
         initial=HireKindChoices.values,
         widget=forms.CheckboxSelectMultiple,
     )
-    meet_targets = forms.BooleanField(
-        label=_("also reach every target"),
-        required=False,
-        help_text=_("besides solving the violations, reach every faculty's target students"),
-    )
     optimize_first = forms.BooleanField(
         label=_("optimize the current contracts first"),
         required=False,

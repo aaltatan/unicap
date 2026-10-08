@@ -12,6 +12,7 @@ ORDERING_FIELDS: dict[str, StrOrPromise] = {
     "contract_type": _("contract type"),
     "employment_type": _("employment type"),
     "is_active": _("is active"),
+    "is_locked": _("locked"),
     "notes": _("notes"),
 }
 

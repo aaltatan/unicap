@@ -107,21 +107,21 @@ AR: dict[str, str] = {
     "PhD": "دكتوراه",
     "master": "ماجستير",
     "masters": "حملة الماجستير",
-    "fulltime": "متفرغ",
+    "fulltime": "كلي",
     "parttime": "جزئي",
     "staff": "ملاك",
     "borrowed": "معار",
     "MA": "ماجستير",
     "PT": "جزئي",
-    "FT staff": "متفرغ ملاك",
-    "FT borrowed": "متفرغ معار",
+    "FT staff": "كلي ملاك",
+    "FT borrowed": "كلي معار",
     "counted": "محتسب",
     "not counted": "غير محتسب",
     "unsigned": "غير موقّع",
     "not calculated": "خارج الحساب",
     "specialization not accepted here": "الاختصاص غير مقبول هنا",
-    "parttime beyond fulltime of its type": "جزئي يتجاوز المتفرغين من نوعه",
-    "masters beyond specialized fulltime": "ماجستير يتجاوز متفرغي الاختصاص",
+    "parttime beyond fulltime of its type": "جزئي يتجاوز الكليين من نوعه",
+    "masters beyond specialized fulltime": "ماجستير يتجاوز الاختصاصيين الكليين",
     "specialization above its max share": "الاختصاص فوق حصته العليا",
     "specialization above its max teachers": "الاختصاص فوق حده الأعلى من المدرّسين",
     "above the faculty's max of its type": "فوق الحد الأعلى للكلية من نوعه",
@@ -149,8 +149,8 @@ AR: dict[str, str] = {
     "Become compliant re-signing as few contracts as possible.": "تحقيق الامتثال بإعادة توقيع أقل عدد من العقود.",
     "The most students with the fewest teachers: frees the rest.": "أكبر عدد من الطلاب بأقل عدد من المدرّسين: يحرّر الباقين.",
     "The most students with the cheapest team: masters and parttime before fulltime, borrowed "
-    "before staff, supported before specialized.": "أكبر عدد من الطلاب بأقل كلفة: الماجستير وغير "
-    "المتفرغين قبل المتفرغين، والمعار قبل الملاك، والداعم قبل الاختصاصي.",
+    "before staff, supported before specialized.": "أكبر عدد من الطلاب بأقل كلفة: الماجستير "
+    "والجزئيون قبل الكليين، والمعار قبل الملاك، والداعم قبل الاختصاصي.",
     "The highest staff share in the weakest faculty, then overall; may give up students.": "أعلى "
     "نسبة ملاك في أضعف كلية ثم عموماً؛ قد يتنازل عن بعض الطلاب.",
     # dashboard, board, report
@@ -205,15 +205,74 @@ AR: dict[str, str] = {
     "the current placement is already the best this strategy finds.": "التوزيع الحالي هو الأفضل "
     "الذي تجده هذه الاستراتيجية.",
     "a heuristic search (two starts and local moves), not a proven optimum. Employment terms "
-    "never change, only faculties.": "بحث تقريبي (بدايتان وتنقلات محلية) وليس حلاً أمثل مثبتاً. "
-    "شروط التعيين لا تتغير، الكليات فقط.",
+    "never change, only faculties; locked contracts stay where they are.": "بحث تقريبي (بدايتان "
+    "وتنقلات محلية) وليس حلاً أمثل مثبتاً. شروط التعيين لا تتغير، الكليات فقط؛ والعقود المقفلة "
+    "تبقى في مكانها.",
+    "who makes this move": "من ينفّذ هذا التنقل",
+    "who makes this move: anyone with the same specialization, terms and "
+    "faculty": "من ينفّذ هذا التنقل: أي مدرّس له الاختصاص والشروط والكلية نفسها",
+    "each move names who makes it: where the list holds others, they have the same "
+    "specialization, terms and faculty, so the result is the same. Remove the moves you do not "
+    "want: the figures above follow.": "كل تنقل يسمّي من ينفّذه: حيث تضم القائمة غيره فلهم "
+    "الاختصاص والشروط والكلية نفسها، فالنتيجة واحدة. أزل التنقلات التي لا تريدها: الأرقام أعلاه "
+    "تتبعها.",
+    "put this move back": "إعادة هذا التنقل",
+    "remove this move": "إزالة هذا التنقل",
+    "remove this move: the contract stays where it is": "إزالة هذا التنقل: يبقى العقد في مكانه",
+    # the board: a card's menu, full screen, the dock
+    "drag a card to another lane · click: details · right-click: more · double-click a "
+    "faculty: edit": "اسحب بطاقة إلى عمود آخر · نقرة: التفاصيل · نقرة يمنى: المزيد · نقرتان على "
+    "كلية: تعديل",
+    "lock to its faculty": "قفل على كليته",
+    "make it a master": "جعله ماجستير",
+    "make it a PhD": "جعله دكتوراه",
+    "make it parttime": "جعله جزئياً",
+    "make it fulltime": "جعله كلياً",
+    "make it borrowed": "جعله معاراً",
+    "make it staff": "جعله ملاكاً",
+    "%(field)s cannot be switched: %(fields)s": "لا يمكن تبديل %(field)s: %(fields)s",
+    "full screen": "ملء الشاشة",
+    # every faculty's report in one file
+    "export all": "تصدير الكل",
+    "every faculty in one file, each from a new page": "كل الكليات في ملف واحد، كل كلية في "
+    "صفحة جديدة",
+    "staff reports": "تقارير الكادر",
+    "pivots": "الملخصات",
+    "all faculties": "كل الكليات",
+    "this chapter has no faculty yet.": "لا توجد كلية في هذا الفصل بعد.",
+    "find here": "ابحث هنا",
+    "leave full screen": "الخروج من ملء الشاشة",
+    "full screen: the whole screen, every faculty side by side": "ملء الشاشة: الشاشة كلها، وكل "
+    "الكليات جنباً إلى جنب",
+    "drag: make this row taller or shorter · double-click: back to its own height": "اسحب: "
+    "لتكبير هذا الصف أو تصغيره · نقرتان: العودة إلى ارتفاعه",
+    "%(name)s is locked to its faculty.": "%(name)s مقفل على كليته.",
+    "%(name)s is unlocked.": "أُلغي قفل %(name)s.",
+    "FT": "كلي",
+    "drop here to sign without scrolling": "أفلت هنا للتوقيع دون تمرير",
+    "choose another employee: this one cannot make that move.": "اختر مدرّساً آخر: هذا المدرّس لا "
+    "يمكنه تنفيذ ذلك التنقل.",
+    # locked contracts
+    "locked": "مقفل",
+    "not locked": "غير مقفل",
+    "locked to its faculty": "مقفل على كليته",
+    "locked to this faculty": "مقفل على هذه الكلية",
+    "locked once signed": "يُقفل عند توقيعه",
+    "lock to their faculty": "قفل على كلياتها",
+    "unlock": "إلغاء القفل",
+    "once signed, the contract cannot be moved to another faculty or "
+    "unsigned": "بعد توقيعه لا يمكن نقل العقد إلى كلية أخرى ولا إلغاء توقيعه",
+    "locked to their faculty (unlock them first): %(names)s": "مقفلة على كلياتها (ألغِ قفلها "
+    "أولاً): %(names)s",
+    "%(employee)s: the contract is locked to %(faculty)s": "%(employee)s: العقد مقفل على "
+    "%(faculty)s",
     "apply these moves": "تطبيق هذه التنقلات",
     "print": "طباعة",
-    "specialized FT staff": "اختصاصي متفرغ ملاك",
-    "specialized FT borrowed": "اختصاصي متفرغ معار",
+    "specialized FT staff": "اختصاصي كلي ملاك",
+    "specialized FT borrowed": "اختصاصي كلي معار",
     "specialized PT": "اختصاصي جزئي",
-    "supported FT staff": "داعم متفرغ ملاك",
-    "supported FT borrowed": "داعم متفرغ معار",
+    "supported FT staff": "داعم كلي ملاك",
+    "supported FT borrowed": "داعم كلي معار",
     "supported PT": "داعم جزئي",
     "PhD equivalents": "مكافئ الدكاترة",
     "per PhD": "لكل دكتور",
@@ -338,11 +397,11 @@ AR: dict[str, str] = {
     "supported PhDs": "الدكاترة الداعمون",
     "head counts": "الأعداد",
     "signed": "موقّع",
-    "specialized fulltime staff": "اختصاصي متفرغ ملاك",
-    "specialized fulltime borrowed": "اختصاصي متفرغ معار",
+    "specialized fulltime staff": "اختصاصي كلي ملاك",
+    "specialized fulltime borrowed": "اختصاصي كلي معار",
     "specialized parttime": "اختصاصي جزئي",
-    "supported fulltime staff": "داعم متفرغ ملاك",
-    "supported fulltime borrowed": "داعم متفرغ معار",
+    "supported fulltime staff": "داعم كلي ملاك",
+    "supported fulltime borrowed": "داعم كلي معار",
     "supported parttime": "داعم جزئي",
     "share": "الحصة",
     "min – max": "الأدنى – الأعلى",
@@ -555,7 +614,7 @@ AR: dict[str, str] = {
     ),
     "min staff rounding": "تقريب الحد الأدنى للملاك",
     "the min staff percentage in whole fulltime staff: the fewest it needs": (
-        "النسبة الدنيا للملاك بعدد كامل من المتفرغين الملاك: أقل ما يحتاجه"
+        "النسبة الدنيا للملاك بعدد كامل من الكليين الملاك: أقل ما يحتاجه"
     ),
     # masters
     "specialized masters only": "الماجستير المختصون فقط",
@@ -600,7 +659,7 @@ AR: dict[str, str] = {
     "the contracts to sign to solve every problem": "العقود الواجب توقيعها لحل كل المشكلات",
     "fewest contracts": "أقل عدد من العقود",
     "low salaries": "رواتب منخفضة",
-    "fulltime staff first": "المتفرغون الملاك أولاً",
+    "fulltime staff first": "الكليون الملاك أولاً",
     "borrowed first": "المعارون أولاً",
     "specialized first": "الاختصاصيون أولاً",
     "The fewest new contracts: each one solves as much as possible.": (
@@ -608,21 +667,21 @@ AR: dict[str, str] = {
     ),
     "The cheapest contracts that help: masters and parttime before fulltime, "
     "borrowed before staff, supported before specialized.": (
-        "أرخص العقود المفيدة: الماجستير والجزئيون قبل المتفرغين، "
+        "أرخص العقود المفيدة: الماجستير والجزئيون قبل الكليين، "
         "والمعارون قبل الملاك، والداعمون قبل الاختصاصيين."
     ),
     "Fulltime staff PhDs whenever they help: they raise the staff percentage too.": (
-        "دكاترة متفرغون ملاك كلما أفادوا: فهم يرفعون نسبة الملاك أيضاً."
+        "دكاترة كليون ملاك كلما أفادوا: فهم يرفعون نسبة الملاك أيضاً."
     ),
     "Fulltime borrowed PhDs whenever they help: no new permanent staff.": (
-        "دكاترة متفرغون معارون كلما أفادوا: دون ملاك دائم جديد."
+        "دكاترة كليون معارون كلما أفادوا: دون ملاك دائم جديد."
     ),
     "Teachers of the faculty's own (specialized) specializations whenever they help.": (
         "مدرّسون من اختصاصات الكلية نفسها (الاختصاصية) كلما أفادوا."
     ),
-    "fulltime staff PhD": "دكتور متفرغ ملاك",
-    "fulltime borrowed PhD": "دكتور متفرغ معار",
-    "parttime PhD": "دكتور غير متفرغ",
+    "fulltime staff PhD": "دكتور كلي ملاك",
+    "fulltime borrowed PhD": "دكتور كلي معار",
+    "parttime PhD": "دكتور جزئي",
     "contracts the university may sign": "العقود التي يمكن للجامعة توقيعها",
     "also reach every target": "بلوغ كل الأهداف أيضاً",
     "besides solving the violations, reach every faculty's target students": (
@@ -633,14 +692,16 @@ AR: dict[str, str] = {
         "إعادة توزيع العقود الحالية أولاً: العقود الجديدة تسد ما تبقى فقط"
     ),
     "how many contracts, of which kind, specialization and faculty, the university should "
-    "sign so that no violation is left. Nothing is saved.": (
-        "كم عقداً، ومن أي نوع واختصاص وكلية، يجب أن توقع الجامعة كي لا تبقى أي مخالفة. لا يُحفظ شيء."
+    "sign so that no violation is left and every faculty reaches its target students. Nothing "
+    "is saved.": (
+        "كم عقداً، ومن أي نوع واختصاص وكلية، يجب أن توقع الجامعة كي لا تبقى أي مخالفة وتبلغ كل "
+        "كلية طلابها المستهدفين. لا يُحفظ شيء."
     ),
     "nothing to sign: no problem is left.": "لا شيء للتوقيع: لم تبقَ أي مشكلة.",
     "some problems need more than new contracts (max teachers, max shares, max students): "
-    "see what is left below.": (
+    "see what is left below, and the students still missing to the targets above.": (
         "بعض المشكلات تحتاج أكثر من عقود جديدة (الحد الأعلى للمدرّسين أو النسب أو الطلاب): "
-        "انظر ما تبقى أدناه."
+        "انظر ما تبقى أدناه، والنقص عن الأهداف أعلاه."
     ),
     "current students without a seat": "الطلاب الحاليون دون مقعد",
     "count": "العدد",
@@ -655,8 +716,8 @@ AR: dict[str, str] = {
     "clear the filters": "مسح عوامل التصفية",
     "clear the filters (search and sorting stay)": "مسح عوامل التصفية (يبقى البحث والترتيب)",
     # masters and contract type per accepted specialization
-    "specialized fulltime": "اختصاصي متفرغ",
-    "supported fulltime": "داعم متفرغ",
+    "specialized fulltime": "اختصاصي كلي",
+    "supported fulltime": "داعم كلي",
     "masters of this specialization not calculated here": "ماجستير هذا الاختصاص لا يُحتسب هنا",
     "its contract type does not count here": "نوع عقده لا يُحتسب هنا",
     "the faculty's masters in whole PhDs (e.g. one master alone)": (
@@ -717,6 +778,22 @@ AR: dict[str, str] = {
 
 # Arabic has six plural forms: zero, one, two, few (3-10), many (11-99), other
 AR_PLURALS: dict[str, tuple[str, str, str, str, str, str]] = {
+    "%(counter)s removed": (
+        "لم يُزل شيء",
+        "أزيل واحد",
+        "أزيل اثنان",
+        "أزيلت %(counter)s",
+        "أزيل %(counter)s",
+        "أزيل %(counter)s",
+    ),
+    "%(counter)s locked contract stays in its faculty.": (
+        "لا عقود مقفلة.",
+        "يبقى عقد مقفل واحد في كليته.",
+        "يبقى عقدان مقفلان في كليتيهما.",
+        "تبقى %(counter)s عقود مقفلة في كلياتها.",
+        "يبقى %(counter)s عقداً مقفلاً في كلياتها.",
+        "يبقى %(counter)s عقد مقفل في كلياتها.",
+    ),
     "sign %(counter)s contract": (
         "لا عقود للتوقيع",
         "توقيع عقد واحد",

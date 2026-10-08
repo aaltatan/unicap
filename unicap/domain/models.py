@@ -360,6 +360,18 @@ class Contract:
 
     `faculty=None` means unsigned. The degree belongs to the contract, so the same person
     can be counted as a master in one chapter and as a PhD in a later one.
+
+    `is_locked` (optional): once signed, the contract stays in its faculty: it is neither
+    moved to another one nor unsigned. Unsigned, a locked contract can still be signed.
+
+    Example:
+        >>> science, pharmacy = Faculty("Science"), Faculty("Pharmacy")
+        >>> hind = Employee(1, "Dr. Hind", Specialization("Biology"))
+        >>> contract = Contract(
+        ...     hind, ContractType.FULLTIME, EmploymentType.STAFF, science, is_locked=True
+        ... )
+        >>> contract.can_move_to(pharmacy), contract.can_move_to(science)
+        (False, True)
     """
 
     employee: Employee
@@ -368,6 +380,7 @@ class Contract:
     faculty: Faculty | None = None
     degree: Degree = Degree.PHD
     is_active: bool = True
+    is_locked: bool = False
 
     def __post_init__(self) -> None:
         if (
@@ -398,6 +411,15 @@ class Contract:
     @property
     def is_signed(self) -> bool:
         return self.faculty is not None
+
+    @property
+    def is_pinned(self) -> bool:
+        """Locked and signed: it stays in the faculty it is signed to."""
+        return self.is_locked and self.is_signed
+
+    def can_move_to(self, faculty: Faculty | None) -> bool:
+        """Whether the contract may be signed to `faculty` (None: unsigned) from where it is."""
+        return not self.is_pinned or faculty == self.faculty
 
     def signed_to(self, faculty: Faculty | None) -> "Contract":
         return replace(self, faculty=faculty)
@@ -581,11 +603,20 @@ class Chapter:
         )
 
     def move(self, employee: Employee, faculty: Faculty | None) -> "Chapter":
-        """Drag an employee's contract to a faculty (or back to unsigned with None)."""
-        if self.contract_of(employee) is None:
+        """Drag an employee's contract to a faculty (or back to unsigned with None).
+
+        Raises:
+            DomainError: the employee has no contract, or it is locked to another faculty.
+        """
+        if (contract := self.contract_of(employee)) is None:
             msg = f"{self.name}: {employee.name} has no contract"
             params = {"chapter": self.name, "employee": employee.name}
             raise DomainError(msg, ErrorCode.NO_CONTRACT, params)
+
+        if not contract.can_move_to(faculty) and contract.faculty is not None:
+            msg = f"{employee.name}: the contract is locked to {contract.faculty.name}"
+            params = {"employee": employee.name, "faculty": contract.faculty.name}
+            raise DomainError(msg, ErrorCode.CONTRACT_LOCKED, params)
 
         return self.with_contracts(
             contract.signed_to(faculty) if contract.employee == employee else contract

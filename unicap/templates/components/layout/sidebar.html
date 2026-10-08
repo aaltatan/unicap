@@ -87,6 +87,8 @@
     <button
       type="button"
       class="nav-link hidden w-full lg:flex"
+      data-nav-collapse
+      :aria-expanded="!navCollapsed"
       :class="{'lg:justify-center lg:px-0': navCollapsed}"
       @click="navCollapsed = !navCollapsed"
       title="{% translate 'collapse sidebar' %} (Alt+S)"

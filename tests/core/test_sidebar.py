@@ -36,3 +36,17 @@ def test_the_new_buttons_open_the_form_in_the_modal(admin_client: Client, chapte
 
 def test_a_viewer_gets_no_new_button(viewer_client: Client, chapter: Chapter) -> None:
     assert new_buttons(viewer_client) == []
+
+
+def test_the_headers_menu_button_is_for_small_screens_only(
+    admin_client: Client, chapter: Chapter
+) -> None:
+    """On a large screen the sidebar's own "collapse" button does it."""
+    html = HTMLParser(admin_client.get(reverse("hr:contracts:index")).content)
+
+    toggle = html.css_first("header button[data-nav-toggle]")
+    collapse = html.css_first("nav[aria-label='main navigation'] button[data-nav-collapse]")
+
+    assert "lg:hidden" in toggle.attributes["class"].split()
+    assert "lg:flex" in collapse.attributes["class"].split()
+    assert len(html.css("header button[data-nav-toggle]")) == 1

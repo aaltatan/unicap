@@ -1,6 +1,7 @@
 import pytest
 
 from tests.factories import ContractFactory, EmployeeFactory, FacultyFactory
+from unicap.app.exceptions import UserError
 from unicap.app.models import Chapter, Contract, Employee, Faculty
 from unicap.domain import ContractStatus, DomainError
 
@@ -73,3 +74,69 @@ def test_signed_and_unsigned() -> None:
 
     assert list(Contract.objects.signed()) == [signed]
     assert list(Contract.objects.unsigned()) == [unsigned]
+
+
+# --- switching a contract's two-valued terms --------------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("name", "field", "before", "after"),
+    [
+        ("Dr. Sami", "is_active", True, False),
+        ("Dr. Sami", "is_locked", False, True),
+        ("Dr. Sami", "degree", "phd", "master"),
+        ("Nabil", "degree", "master", "phd"),
+        ("Dr. Sami", "employment_type", "staff", "borrowed"),
+        ("Dr. Omar", "employment_type", "borrowed", "staff"),
+        ("Dr. Omar", "contract_type", "fulltime", "parttime"),
+        ("Dr. Nour", "contract_type", "parttime", "fulltime"),
+    ],
+)
+def test_switch_takes_the_other_value(
+    chapter: Chapter, name: str, field: str, before: object, after: object
+) -> None:
+    contract = Contract.objects.get(chapter=chapter, employee__name=name)
+    assert getattr(contract, field) == before
+
+    Contract.objects.switch(contract, field)
+
+    contract.refresh_from_db()
+    assert getattr(contract, field) == after
+
+    Contract.objects.switch(contract, field)
+
+    contract.refresh_from_db()
+    assert getattr(contract, field) == before
+
+
+@pytest.mark.parametrize(
+    ("name", "field"),
+    [("Dr. Sami", "contract_type"), ("Dr. Nour", "employment_type")],
+)
+def test_switch_keeps_a_parttime_contract_borrowed(chapter: Chapter, name: str, field: str) -> None:
+    contract = Contract.objects.get(chapter=chapter, employee__name=name)
+    before = getattr(contract, field)
+
+    with pytest.raises(DomainError, match="always borrowed"):
+        Contract.objects.switch(contract, field)
+
+    contract.refresh_from_db()
+    assert getattr(contract, field) == before
+
+
+@pytest.mark.parametrize("field", ["faculty", "position", "notes", "", "no_such"])
+def test_switch_refuses_any_other_field(chapter: Chapter, field: str) -> None:
+    contract = Contract.objects.get(chapter=chapter, employee__name="Dr. Sami")
+
+    with pytest.raises(UserError, match="cannot be switched"):
+        Contract.objects.switch(contract, field)
+
+
+def test_switching_keeps_the_signing_order(chapter: Chapter) -> None:
+    sami = Contract.objects.get(chapter=chapter, employee__name="Dr. Sami")
+    position = sami.position
+
+    Contract.objects.switch(sami, "employment_type")
+
+    sami.refresh_from_db()
+    assert sami.position == position  # only a new faculty signs a contract last

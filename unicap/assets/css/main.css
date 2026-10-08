@@ -217,15 +217,39 @@
     @apply flex min-h-40 flex-col rounded-xl border-2 border-transparent bg-neutral-100/80 transition-colors dark:bg-neutral-900/60;
   }
 
-  .lane.would-count {
+  /* a lane's bottom edge, dragged to size its row */
+  .lane-resize {
+    @apply flex h-2.5 shrink-0 cursor-row-resize touch-none items-center justify-center rounded-b-xl transition-colors hover:bg-indigo-200/70 dark:hover:bg-indigo-500/30;
+  }
+
+  .lane-resize::after {
+    content: "";
+    @apply h-0.5 w-8 rounded-full bg-neutral-300 dark:bg-neutral-600;
+  }
+
+  /* the lanes again, small, over the page header while a card is dragged (the card dropped
+     in one is cut off: the board is redrawn at once) */
+  .dock-target {
+    @apply relative flex min-w-28 max-w-60 flex-1 flex-col justify-center overflow-hidden rounded-lg border-2 border-dashed border-neutral-300 bg-neutral-50 px-2 text-xs leading-tight transition-colors dark:border-neutral-700 dark:bg-neutral-800/60;
+  }
+
+  /* the card held over a target stays out of its labels' way: the outline says where it goes */
+  .dock-target .board-card {
+    @apply absolute inset-x-1 bottom-0 !opacity-0;
+  }
+
+  .lane.would-count,
+  .dock-target.would-count {
     @apply border-emerald-500 bg-emerald-50/70 dark:bg-emerald-900/20;
   }
 
-  .lane.would-not-count {
+  .lane.would-not-count,
+  .dock-target.would-not-count {
     @apply border-rose-500 bg-rose-50/70 dark:bg-rose-900/20;
   }
 
-  .lane.would-unsign {
+  .lane.would-unsign,
+  .dock-target.would-unsign {
     @apply border-neutral-400 dark:border-neutral-500;
   }
 }
@@ -258,6 +282,12 @@
 body.sorting,
 body.sorting * {
   cursor: grabbing !important;
+}
+
+/* while a lane's bottom edge is dragged (assets/js/src/board.js) */
+.resizing-row,
+.resizing-row * {
+  cursor: row-resize !important;
 }
 
 /* checkbox lists rendered by Django (filters) */

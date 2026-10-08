@@ -1,6 +1,11 @@
 """A chapter as the board sees it: the domain aggregate plus the row ids to write back."""
 
+from collections.abc import Collection, Mapping
 from dataclasses import dataclass, replace
+from enum import Enum
+from typing import Any
+
+from django.utils.translation import gettext as _
 
 from unicap.domain import (
     Chapter,
@@ -8,6 +13,7 @@ from unicap.domain import (
     ChapterReport,
     Contract,
     ContractStatus,
+    DomainError,
     Employee,
     Faculty,
     FacultyReport,
@@ -21,7 +27,10 @@ from unicap.domain import (
     optimize,
     outcome_of,
     recommend,
+    substitutes_for,
 )
+
+from .exceptions import UserError
 
 DEFAULT_ROUNDS = 20
 
@@ -48,6 +57,29 @@ class Card:
         """The employee row id (the domain employee's id)."""
         return self.contract.employee.id
 
+    @property
+    def blocked_switches(self) -> tuple[str, ...]:
+        """The two-valued terms the domain refuses to switch on this contract.
+
+        `contract_type`, `employment_type` or `degree`, each tried with its other value
+        (a fulltime staff contract cannot become parttime: parttime is always borrowed).
+        """
+        return tuple(
+            name
+            for name in ("degree", "contract_type", "employment_type")
+            if not self._accepts(name, _other(getattr(self.contract, name)))
+        )
+
+    def _accepts(self, name: str, value: Enum) -> bool:
+        changes: dict[str, Any] = {name: value}
+
+        try:
+            replace(self.contract, **changes)
+        except DomainError:
+            return False
+
+        return True
+
 
 @dataclass(frozen=True)
 class Lane:
@@ -64,18 +96,39 @@ class Lane:
 
 
 @dataclass(frozen=True)
+class Substitute:
+    """An employee whose contract could make a move in another's place."""
+
+    employee: Employee
+    contract_id: int
+
+
+@dataclass(frozen=True)
 class Move:
-    """One contract the optimizer re-signs."""
+    """One contract the optimizer re-signs.
+
+    `substitutes`: the employees who could move in this one's place, the same in everything
+    a placement reads (the domain's `substitutes_for`) and not moved themselves.
+    `chosen_id`: the contract that makes the move (the employee's own, or a substitute's).
+    `is_removed`: the user took the move out: the employee stays where they are.
+    """
 
     employee: Employee
     contract: Contract
     before: Faculty | None
     after: Faculty | None
+    contract_id: int = 0
+    substitutes: tuple[Substitute, ...] = ()
+    chosen_id: int = 0
+    is_removed: bool = False
 
 
 @dataclass(frozen=True)
 class Optimization:
-    """A strategy's placement next to the current one. Nothing is saved."""
+    """A strategy's placement next to the current one. Nothing is saved.
+
+    `after` and `after_outcome` are the chapter with the moves kept (not `is_removed`).
+    """
 
     strategy: Strategy
     before: ChapterReport
@@ -84,6 +137,21 @@ class Optimization:
     after_outcome: Outcome
     moves: tuple[Move, ...]
     placements: dict[int, int | None]  # contract id -> faculty id, to apply it
+
+    @property
+    def has_substitutes(self) -> bool:
+        """Whether a move could be made by someone else."""
+        return any(move.substitutes for move in self.moves)
+
+    @property
+    def kept(self) -> int:
+        """How many moves would be applied."""
+        return sum(1 for move in self.moves if not move.is_removed)
+
+    @property
+    def removed(self) -> int:
+        """How many moves the user took out."""
+        return len(self.moves) - self.kept
 
 
 @dataclass(frozen=True)
@@ -206,7 +274,6 @@ class Snapshot:
         strategy: RecommendationStrategy,
         *,
         kinds: frozenset[HireKind],
-        meet_targets: bool = False,
         optimize_first: bool = False,
         max_rounds: int = DEFAULT_ROUNDS,
     ) -> Recommendation:
@@ -217,29 +284,124 @@ class Snapshot:
         """
         chapter = self.optimized(Strategy.MAXIMIZE_STUDENTS, max_rounds) if optimize_first else self
 
-        return recommend(chapter.chapter, strategy, kinds=kinds, meet_targets=meet_targets)
+        return recommend(chapter.chapter, strategy, kinds=kinds)
 
     def optimization(self, strategy: Strategy, max_rounds: int = DEFAULT_ROUNDS) -> Optimization:
         """Run the optimizer and compare its placement with the current one."""
-        optimized = self.optimized(strategy, max_rounds)
+        return self.review(strategy, self.optimized(strategy, max_rounds).placements())
 
-        before = {c.employee: c for c in self.chapter.contracts}
+    def review(
+        self,
+        strategy: Strategy,
+        placements: Mapping[int, int | None],
+        *,
+        removed: Collection[int] = (),
+        substitutes: Mapping[int, int] | None = None,
+    ) -> Optimization:
+        """A proposed placement next to the current one, as the user trimmed it.
+
+        Args:
+            strategy: the strategy that proposed it.
+            placements: contract id -> faculty id (None: unsigned): the whole proposal.
+            removed: the ids of the moved contracts left where they are.
+            substitutes: a moved contract's id -> the id of the contract moved in its place.
+
+        Raises:
+            UserError: a faculty or a substitute the proposal cannot have.
+        """
+        substitutes = substitutes or {}
+
+        current = self.placements()
+
+        contracts = {self.contract_ids[c.employee]: c for c in self.chapter.contracts}
+
+        proposal = {pk: placements.get(pk, faculty_id) for pk, faculty_id in current.items()}
+
+        moved = [pk for pk, faculty_id in current.items() if proposal[pk] != faculty_id]
+
+        staying = set(current) - set(moved)
+
+        applied = self.placed(self.resolved(proposal, removed=removed, substitutes=substitutes))
 
         moves = tuple(
-            Move(c.employee, c, before[c.employee].faculty, c.faculty)
-            for c in optimized.chapter.contracts
-            if before[c.employee].faculty != c.faculty
+            Move(
+                contracts[pk].employee,
+                applied.sign(contracts[pk], proposal[pk]),
+                contracts[pk].faculty,
+                applied.faculty_of(proposal[pk]),
+                contract_id=pk,
+                substitutes=tuple(
+                    Substitute(other.employee, self.contract_ids[other.employee])
+                    for other in substitutes_for(self.chapter, contracts[pk])
+                    if self.contract_ids[other.employee] in staying
+                ),
+                chosen_id=substitutes.get(pk, pk),
+                is_removed=pk in removed,
+            )
+            for pk in moved
         )
 
         return Optimization(
             strategy=strategy,
             before=self.report(),
-            after=optimized.report(),
+            after=applied.report(),
             before_outcome=outcome_of(self.chapter),
-            after_outcome=outcome_of(optimized.chapter, self.chapter),
+            after_outcome=outcome_of(applied.chapter, self.chapter),
             moves=moves,
-            placements=optimized.placements(),
+            placements=proposal,
         )
+
+    def resolved(
+        self,
+        placements: Mapping[int, int | None],
+        *,
+        removed: Collection[int] = (),
+        substitutes: Mapping[int, int] | None = None,
+    ) -> dict[int, int | None]:
+        """The placements to apply: `removed` contracts left out, substitutes moved instead.
+
+        Raises:
+            UserError: a substitute that cannot make its move (see `substituted`).
+        """
+        kept = {pk: faculty_id for pk, faculty_id in placements.items() if pk not in removed}
+
+        chosen = {pk: other for pk, other in (substitutes or {}).items() if pk in kept}
+
+        return self.substituted(kept, chosen)
+
+    def placed(self, placements: Mapping[int, int | None]) -> "Snapshot":
+        """The chapter with each contract id signed to its faculty id (None: unsigned).
+
+        Raises:
+            UserError: a faculty id is not one of the chapter's.
+        """
+        by_employee = {
+            employee: placements[pk]
+            for employee, pk in self.contract_ids.items()
+            if pk in placements
+        }
+
+        contracts = tuple(
+            self.sign(contract, by_employee[contract.employee])
+            if contract.employee in by_employee
+            else contract
+            for contract in self.chapter.contracts
+        )
+
+        return replace(self, chapter=self.chapter.with_contracts(contracts))
+
+    def sign(self, contract: Contract, faculty_id: int | None) -> Contract:
+        """`contract` signed to a faculty row id (None: unsigned).
+
+        Raises:
+            UserError: the faculty id is not one of the chapter's.
+        """
+        faculty = self.faculty_of(faculty_id)
+
+        if faculty_id is not None and faculty is None:
+            raise UserError(_("a faculty of this placement is not in the chapter."))
+
+        return contract.signed_to(faculty)
 
     def placements(self) -> dict[int, int | None]:
         """Contract id -> faculty id (None: unsigned), to save a placement."""
@@ -247,3 +409,57 @@ class Snapshot:
             self.contract_ids[c.employee]: self.faculty_id(c.faculty)
             for c in self.chapter.contracts
         }
+
+    def substituted(
+        self, placements: Mapping[int, int | None], substitutes: Mapping[int, int]
+    ) -> dict[int, int | None]:
+        """`placements`, each substitute making its contract's move in its place.
+
+        Args:
+            placements: contract id -> faculty id (None: unsigned), as `placements()` gives.
+            substitutes: a moved contract's id -> the id of the contract moved instead
+                (itself: no substitute).
+
+        Raises:
+            UserError: a substitute is not one of its contract's (`substitutes_for`), moves
+                already, or is chosen for two moves.
+        """
+        current = self.placements()
+
+        by_id = {
+            pk: self.chapter.contract_of(employee) for employee, pk in self.contract_ids.items()
+        }
+
+        result = dict(placements)
+
+        chosen: set[int] = set()
+
+        for contract_id, substitute_id in substitutes.items():
+            if substitute_id == contract_id:
+                continue
+
+            contract = by_id.get(contract_id)
+
+            allowed = {
+                self.contract_ids[other.employee]
+                for other in (substitutes_for(self.chapter, contract) if contract else ())
+            }
+
+            stays = placements.get(substitute_id, current.get(substitute_id)) == current.get(
+                substitute_id
+            )
+
+            if substitute_id not in allowed or not stays or substitute_id in chosen:
+                raise UserError(_("choose another employee: this one cannot make that move."))
+
+            chosen.add(substitute_id)
+
+            result[substitute_id] = placements.get(contract_id, current[contract_id])
+            result[contract_id] = current[contract_id]
+
+        return result
+
+
+def _other(value: Enum) -> Enum:
+    """The other value of a two-valued domain enum (fulltime: parttime)."""
+    return next(member for member in type(value) if member is not value)

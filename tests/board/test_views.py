@@ -20,7 +20,7 @@ def _lane_names(content: bytes) -> dict[str, list[str]]:
         lane.attributes["data-lane"]: [
             card.css_first("span").text(strip=True) for card in lane.css(".board-card")
         ]
-        for lane in html.css("[data-lane]")
+        for lane in html.css("section [data-lane]")
     }
 
 
@@ -154,6 +154,32 @@ def test_recommend_opens_its_form(admin_client: Client, chapter: Chapter) -> Non
     assert html.css_first("select[name=strategy]")
     assert len(html.css("input[name=kinds]")) == 4
     assert not html.css("tbody td")  # nothing recommended before asking
+    assert not html.css("input[name=meet_targets]")  # targets are not a choice: always reached
+
+
+def test_recommend_reaches_the_targets(admin_client: Client, chapter: Chapter) -> None:
+    before = Chapter.objects.get_snapshot(chapter.pk).report()
+    assert before.target_shortfall > 0
+
+    response = admin_client.get(
+        reverse("board:recommend"),
+        {"strategy": "fewest_contracts", "kinds": ["fulltime_staff", "fulltime_borrowed"]},
+        **htmx(),
+    )
+
+    recommendation = response.context["recommendation"]
+
+    assert recommendation.after.target_shortfall == 0
+    assert recommendation.is_solved
+
+
+def test_the_board_offers_the_domains_strategies(admin_client: Client, chapter: Chapter) -> None:
+    response = admin_client.get(reverse("board:index"))
+
+    # reaching the targets is every strategy's, not one of them
+    assert [value for value, _label in response.context["strategies"]] == [
+        s.value for s in Strategy
+    ]
 
 
 def test_recommend_lists_the_contracts_to_sign(admin_client: Client, chapter: Chapter) -> None:
@@ -367,3 +393,202 @@ def test_a_broken_chapter_can_still_be_fixed(admin_client: Client, broken: Chapt
 
     assert "close-modal" in response["HX-Trigger"]
     assert admin_client.get(reverse("board:index")).status_code == 200
+
+
+# --- a card's menu, a lane's double click, the dock ---------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("field", "before", "after"),
+    [
+        ("is_active", True, False),
+        ("is_locked", False, True),
+        ("degree", "phd", "master"),
+        ("employment_type", "staff", "borrowed"),
+    ],
+)
+def test_the_cards_menu_switches_a_term(
+    admin_client: Client, chapter: Chapter, field: str, before: object, after: object
+) -> None:
+    sami = Contract.objects.get(chapter=chapter, employee__name="Dr. Sami")
+    assert getattr(sami, field) == before
+
+    response = admin_client.post(
+        reverse("board:toggle"), {"employee": sami.employee_id, "field": field}, **htmx("board")
+    )
+
+    sami.refresh_from_db()
+    assert getattr(sami, field) == after
+    assert HTMLParser(response.content).css_first("#board") is not None  # the board, redrawn
+
+
+def test_a_switch_the_domain_refuses_says_why(admin_client: Client, chapter: Chapter) -> None:
+    sami = Contract.objects.get(chapter=chapter, employee__name="Dr. Sami")  # fulltime staff
+
+    response = admin_client.post(
+        reverse("board:toggle"),
+        {"employee": sami.employee_id, "field": "contract_type"},
+        **htmx("board"),
+    )
+
+    sami.refresh_from_db()
+    assert sami.contract_type == "fulltime"
+    assert "always borrowed" in response.content.decode()
+
+
+def test_a_card_carries_what_its_menu_shows(admin_client: Client, chapter: Chapter) -> None:
+    html = HTMLParser(admin_client.get(reverse("board:index")).content)
+
+    def card(name: str) -> dict[str, str | None]:
+        contract = Contract.objects.get(chapter=chapter, employee__name=name)
+        return html.css_first(f".board-card[data-employee='{contract.employee_id}']").attributes
+
+    sami, nour, nabil = card("Dr. Sami"), card("Dr. Nour"), card("Nabil")
+
+    assert (sami["data-active"], sami["data-lock"]) == ("1", "0")
+    assert (sami["data-degree"], sami["data-contract-type"], sami["data-employment-type"]) == (
+        "phd",
+        "fulltime",
+        "staff",
+    )
+    # what the domain refuses: fulltime staff cannot become parttime (parttime is borrowed),
+    # a parttime contract cannot become staff
+    assert sami["data-blocked"] == "contract_type"
+    assert nour["data-blocked"] == "employment_type"
+    assert nabil["data-degree"] == "master"
+    assert sami["data-details"].endswith("/")
+    assert sami["data-edit"].endswith("/update/")
+    assert "@dblclick" not in sami  # the double click is gone: the menu switches
+
+
+def test_the_board_draws_one_menu_for_every_card(admin_client: Client, chapter: Chapter) -> None:
+    html = HTMLParser(admin_client.get(reverse("board:index")).content)
+
+    menus = html.css("#card-menu")
+    switches = [node.attributes["data-switch"] for node in menus[0].css("[data-switch]")]
+
+    assert len(menus) == 1
+    assert switches == ["is_active", "is_locked", "degree", "contract_type", "employment_type"]
+    assert len(html.css(".board-card button[data-card-menu]")) == 16
+
+
+def test_a_viewers_menu_only_opens_the_details(viewer_client: Client, chapter: Chapter) -> None:
+    html = HTMLParser(viewer_client.get(reverse("board:index")).content)
+
+    assert [item.text(strip=True) for item in html.css("#card-menu [role=menuitem]")] == ["details"]
+    assert viewer_client.post(reverse("board:toggle"), {"employee": 1}).status_code == 403
+
+
+def test_a_double_click_on_a_lane_edits_its_faculty(admin_client: Client, chapter: Chapter) -> None:
+    html = HTMLParser(admin_client.get(reverse("board:index")).content)
+
+    for faculty in Faculty.objects.for_chapter(chapter.pk):
+        lane = html.css_first(f"section[data-key='{faculty.pk}']")
+
+        assert lane.attributes["data-edit"] == faculty.get_update_url()
+        assert "editLane" in lane.attributes["@dblclick"]
+
+
+def test_a_viewers_lanes_do_not_open_the_form(viewer_client: Client, chapter: Chapter) -> None:
+    html = HTMLParser(viewer_client.get(reverse("board:index")).content)
+
+    assert not html.css("section[data-edit]")
+    assert html.css_first("[data-dock]") is None  # no dragging, no dock
+
+
+def test_the_dock_repeats_every_lane_as_a_drop_target(
+    admin_client: Client, chapter: Chapter
+) -> None:
+    html = HTMLParser(admin_client.get(reverse("board:index")).content)
+
+    lanes = [node.attributes["data-lane"] for node in html.css("section.lane [data-lane]")]
+    targets = html.css("[data-dock] .dock-target")
+
+    assert [node.attributes["data-lane"] for node in targets] == lanes
+    assert all("x-sort" in node.attributes for node in targets)
+    assert html.css_first("button[data-fullscreen]") is not None
+
+
+# --- what a card and a lane show ----------------------------------------------------------
+
+
+def test_a_card_in_a_faculty_leaves_the_room_to_the_name(
+    admin_client: Client, chapter: Chapter
+) -> None:
+    html = HTMLParser(admin_client.get(reverse("board:index")).content)
+
+    def texts(name: str) -> list[str]:
+        contract = Contract.objects.get(chapter=chapter, employee__name=name)
+        card = html.css_first(f".board-card[data-employee='{contract.employee_id}']")
+        return [span.text(strip=True) for span in card.css("span") if span.text(strip=True)]
+
+    # name, specialized / supported, the terms: staff is said, borrowed is not
+    assert texts("Dr. Sami") == ["Dr. Sami", "specialized", "FT staff"]
+    assert texts("Dr. Omar") == ["Dr. Omar", "specialized", "FT"]
+    assert texts("Dr. Nour") == ["Dr. Nour", "supported", "PT"]
+    assert texts("Nabil") == ["Nabil", "specialized", "MA"]
+    # unsigned, a card has no type yet: its specialization says where it could go
+    assert texts("Dr. Karim") == ["Dr. Karim", "Pharmacy", "PT"]
+
+    sami = Contract.objects.get(chapter=chapter, employee__name="Dr. Sami")
+    title = html.css_first(f".board-card[data-employee='{sami.employee_id}']").attributes["title"]
+
+    assert "Dentistry" in title  # still a hover away
+    assert "fulltime staff" in title
+
+
+def test_a_facultys_lane_has_an_edge_to_size_its_row(
+    admin_client: Client, chapter: Chapter
+) -> None:
+    html = HTMLParser(admin_client.get(reverse("board:index")).content)
+
+    lanes = html.css("section.lane")
+
+    assert [len(lane.css("[data-lane-resize]")) for lane in lanes] == [0, 1, 1, 1]  # not unsigned
+    assert all("sizeLane" in lane.css_first("[data-lane]").attributes["x-effect"] for lane in lanes)
+
+
+def test_a_cards_type_sits_at_its_end_beside_the_terms(
+    admin_client: Client, chapter: Chapter
+) -> None:
+    html = HTMLParser(admin_client.get(reverse("board:index")).content)
+
+    sami = Contract.objects.get(chapter=chapter, employee__name="Dr. Sami")
+    card = html.css_first(f".board-card[data-employee='{sami.employee_id}']")
+    end = card.css_first("[data-card-end]")
+
+    # pushed to the card's end together: in line from card to card, whatever the name's length
+    assert "ms-auto" in end.attributes["class"].split()
+    assert [node.text(strip=True) for node in end.css("span")] == ["specialized", "FT staff"]
+    assert card.css_first("span").text(strip=True) == "Dr. Sami"  # the name still comes first
+
+
+def test_the_board_does_not_duplicate_the_chapter(admin_client: Client, chapter: Chapter) -> None:
+    """One click too close to the others: a chapter is duplicated from the chapters' table."""
+    board = HTMLParser(admin_client.get(reverse("board:index")).content)
+    chapters = HTMLParser(admin_client.get(reverse("chapters:index")).content)
+
+    url = reverse("chapters:duplicate", kwargs={"pk": chapter.pk})
+
+    assert not board.css(f"[hx-get='{url}']")
+    assert len(chapters.css(f"[hx-get='{url}']")) == 1
+
+
+def test_every_lane_has_its_own_search(admin_client: Client, chapter: Chapter) -> None:
+    html = HTMLParser(admin_client.get(reverse("board:index")).content)
+
+    for lane in html.css("section.lane"):
+        key = lane.css_first("[data-lane]").attributes["data-lane"]
+        search = lane.css_first("[data-lane-search] input[type=search]")
+
+        assert search.attributes["x-model"] == f"laneSearch['{key}']"
+        assert f"laneCount('{key}'," in lane.css_first("[data-lane-count]").attributes["x-text"]
+
+    # what a lane's search reads of a card: who, what and on which terms
+    sami = Contract.objects.get(chapter=chapter, employee__name="Dr. Sami")
+    card = html.css_first(f".board-card[data-employee='{sami.employee_id}']")
+
+    assert card.attributes["data-search"].split() == [
+        *["Dr.", "Sami", "Dentistry", "specialized", "fulltime", "staff", "FT", "staff"]
+    ]
+    assert "cardClass('" in card.attributes[":class"]

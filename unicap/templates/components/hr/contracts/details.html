@@ -3,6 +3,7 @@
   <span class="badge {{ obj.status|status_badge }}">{{ obj.status|status_label }}</span>
   <c-type-tag :kind="obj.specialization_type" />
   {% if not obj.is_active %}<span class="badge badge-neutral">{% translate 'switched off' %}</span>{% endif %}
+  {% if obj.is_locked %}<span class="badge badge-neutral inline-flex items-center gap-1">{% heroicon_mini "lock-closed" size=12 %} {% translate 'locked to its faculty' %}</span>{% endif %}
 </div>
 <dl class="grid grid-cols-2 gap-x-4 gap-y-3 text-sm sm:grid-cols-3">
   <div><dt class="label">{% translate 'employee' %}</dt><dd><c-object-link :obj="obj.employee" :allowed="perms.app.view_employee" /></dd></div>

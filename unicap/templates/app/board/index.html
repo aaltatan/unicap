@@ -3,6 +3,9 @@
   <div
     x-data="board({ previewUrl: '{% url 'board:preview' %}', moveUrl: '{% url 'board:move' %}', toggleUrl: '{% url 'board:toggle' %}' })"
     class="space-y-3"
+    {# full screen: the device's, and the board over the whole page in it (modals and toasts stay above) #}
+    :class="fullscreen ? 'fixed inset-0 z-[55] overflow-y-auto bg-neutral-50 p-3 dark:bg-neutral-950' : ''"
+    @keydown.escape.window="fullscreen && !modalOpen && !menu && !dragging && leaveFullscreen()"
   >
     <!-- toolbar -->
     <div class="flex flex-wrap items-center gap-2">
@@ -33,11 +36,18 @@
         <button type="button" class="btn btn-default" hx-get="{% url 'board:recommend' %}" hx-target="#modal-container" hx-swap="innerHTML" title="{% translate 'the contracts to sign to solve every problem' %}">
           {% heroicon_outline "light-bulb" size=16 %} <span class="hidden md:inline">{% translate 'recommend' %}…</span>
         </button>
-        {% if perms.app.add_chapter %}
-        <button type="button" class="btn btn-default" hx-get="{% url 'chapters:duplicate' current_chapter.pk %}" hx-target="#modal-container" hx-swap="innerHTML" title="{% translate 'copy this chapter with all of its data to try another scenario' %}">
-          {% heroicon_outline "document-duplicate" size=16 %} <span class="hidden md:inline">{% translate 'duplicate chapter' %}</span>
+        <button
+          type="button"
+          class="btn btn-default"
+          data-fullscreen
+          @click="toggleFullscreen()"
+          :aria-pressed="fullscreen"
+          :title="fullscreen ? '{% translate 'leave full screen' %} (Esc)' : '{% translate 'full screen: the whole screen, every faculty side by side' %}'"
+        >
+          <span x-show="!fullscreen">{% heroicon_outline "arrows-pointing-out" size=16 %}</span>
+          <span x-show="fullscreen" x-cloak>{% heroicon_outline "arrows-pointing-in" size=16 %}</span>
+          <span class="hidden md:inline">{% translate 'full screen' %}</span>
         </button>
-        {% endif %}
       </div>
     </div>
 
@@ -46,7 +56,7 @@
       <span x-show="hint" x-text="hint" class="font-medium text-neutral-900 dark:text-white"></span>
       <template x-if="!hint">
         <span class="flex flex-wrap items-center gap-x-4 gap-y-1">
-          <span class="first-letter:uppercase">{% translate 'drag a card to another lane · click: details · double-click: on / off' %}</span>
+          <span class="first-letter:uppercase">{% translate 'drag a card to another lane · click: details · right-click: more · double-click a faculty: edit' %}</span>
           <span class="flex items-center gap-1"><span class="size-3 rounded-sm border border-emerald-400 bg-emerald-100 dark:bg-emerald-900"></span>{% translate 'counted' %}</span>
           <span class="flex items-center gap-1"><span class="size-3 rounded-sm border border-rose-400 bg-rose-100 dark:bg-rose-900"></span>{% translate 'not counted' %}</span>
           <span class="flex items-center gap-1"><span class="size-3 rounded-sm border border-neutral-300 bg-white dark:bg-neutral-800"></span>{% translate 'unsigned' %}</span>
@@ -56,5 +66,78 @@
     </div>
 
     {% include "components/board/board.html" %}
+
+    {# a card's menu (a right click, or its "⋮"): drawn once, filled from the card pressed #}
+    <div
+      x-show="menu"
+      x-cloak
+      x-ref="cardMenu"
+      id="card-menu"
+      role="menu"
+      class="menu !fixed !mt-0 z-[57] min-w-52"
+      :style="menu ? menu.style : ''"
+      data-blocked-reason="{% translate 'a parttime contract is always borrowed.' %}"
+      @click.outside="closeMenu()"
+      @keydown.escape.window="closeMenu()"
+      @click="closeMenu()"
+    >
+      <p class="truncate px-2.5 py-1 text-xs font-semibold text-neutral-500" x-text="menu?.name"></p>
+      <button type="button" class="menu-item" role="menuitem" @click="openFromMenu('details')">
+        {% heroicon_outline "eye" size=16 %} {% translate 'details' %}
+      </button>
+      {% if can_move %}
+      <button type="button" class="menu-item" role="menuitem" @click="openFromMenu('edit')">
+        {% heroicon_outline "pencil-square" size=16 %} {% translate 'edit' %}
+      </button>
+      <div class="my-1 border-t border-neutral-200 dark:border-neutral-700"></div>
+      <button type="button" class="menu-item" role="menuitem" data-switch="is_active" @click="switchCard('is_active')">
+        {% heroicon_outline "power" size=16 %}
+        <span x-show="menu?.active">{% translate 'deactivate' %}</span>
+        <span x-show="!menu?.active">{% translate 'activate' %}</span>
+      </button>
+      <button type="button" class="menu-item" role="menuitem" data-switch="is_locked" @click="switchCard('is_locked')">
+        <span x-show="!menu?.locked" class="contents">{% heroicon_outline "lock-closed" size=16 %} {% translate 'lock to its faculty' %}</span>
+        <span x-show="menu?.locked" class="contents">{% heroicon_outline "lock-open" size=16 %} {% translate 'unlock' %}</span>
+      </button>
+      <button
+        type="button"
+        class="menu-item disabled:cursor-not-allowed disabled:opacity-40"
+        role="menuitem"
+        data-switch="degree"
+        :disabled="isBlocked('degree')"
+        @click="switchCard('degree')"
+      >
+        {% heroicon_outline "academic-cap" size=16 %}
+        <span x-show="menu?.degree === 'phd'">{% translate 'make it a master' %}</span>
+        <span x-show="menu?.degree !== 'phd'">{% translate 'make it a PhD' %}</span>
+      </button>
+      <button
+        type="button"
+        class="menu-item disabled:cursor-not-allowed disabled:opacity-40"
+        role="menuitem"
+        data-switch="contract_type"
+        :disabled="isBlocked('contract_type')"
+        :title="isBlocked('contract_type') ? $refs.cardMenu.dataset.blockedReason : null"
+        @click="switchCard('contract_type')"
+      >
+        {% heroicon_outline "clock" size=16 %}
+        <span x-show="menu?.contractType === 'fulltime'">{% translate 'make it parttime' %}</span>
+        <span x-show="menu?.contractType !== 'fulltime'">{% translate 'make it fulltime' %}</span>
+      </button>
+      <button
+        type="button"
+        class="menu-item disabled:cursor-not-allowed disabled:opacity-40"
+        role="menuitem"
+        data-switch="employment_type"
+        :disabled="isBlocked('employment_type')"
+        :title="isBlocked('employment_type') ? $refs.cardMenu.dataset.blockedReason : null"
+        @click="switchCard('employment_type')"
+      >
+        {% heroicon_outline "arrows-right-left" size=16 %}
+        <span x-show="menu?.employmentType === 'staff'">{% translate 'make it borrowed' %}</span>
+        <span x-show="menu?.employmentType !== 'staff'">{% translate 'make it staff' %}</span>
+      </button>
+      {% endif %}
+    </div>
   </div>
 </c-layout>

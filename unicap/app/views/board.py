@@ -9,7 +9,7 @@ import json
 
 from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, QueryDict
 from django.shortcuts import get_object_or_404, render
 from django.utils.translation import gettext as _
 from django.views.decorators.http import require_GET, require_http_methods, require_POST
@@ -22,6 +22,7 @@ from ..decorators import chapter_required
 from ..exceptions import UserError
 from ..models import AppSettings, Chapter, Contract
 from ..requests import ChapterRequest
+from ..snapshot import Optimization
 from ..templatetags.domain import status_label
 from ..texts import error_text
 from .crud import trigger
@@ -97,11 +98,11 @@ def preview(request: ChapterRequest) -> JsonResponse:
 @permission_required("app.change_contract", raise_exception=True)
 @chapter_required
 def toggle(request: ChapterRequest) -> HttpResponse:
-    """Double-click a card: switch its contract on or off."""
+    """A card's menu: switch one of its contract's two-valued terms (default: on / off)."""
     contract = _contract_of(request, request.POST.get("employee"))
 
     try:
-        Contract.objects.toggle_active(contract)
+        Contract.objects.switch(contract, request.POST.get("field", "is_active"))
     except (DomainError, UserError) as error:
         messages.error(request, error_text(error))
 
@@ -120,42 +121,64 @@ def reset(request: ChapterRequest) -> HttpResponse:
         messages.success(request, _("%(count)s contract(s) are unsigned now.") % {"count": count})
         return trigger(HttpResponse(""), refresh=True, **{"close-modal": True})
 
-    signed = Contract.objects.for_chapter(chapter.pk).signed().count()
+    signed = Contract.objects.for_chapter(chapter.pk).signed()
 
-    return render(request, "app/board/reset-modal.html", {"signed": signed, "chapter": chapter})
+    context = {
+        "signed": signed.movable().count(),
+        "locked": signed.pinned().count(),
+        "chapter": chapter,
+    }
+
+    return render(request, "app/board/reset-modal.html", context)
 
 
 @require_http_methods(["GET", "POST"])
 @permission_required("app.change_contract", raise_exception=True)
 @chapter_required
 def optimize(request: ChapterRequest) -> HttpResponse:
-    """GET: preview a strategy's placement next to the current one. POST: apply it."""
-    if request.method == "POST":
-        placements = _placements(request.POST.get("placements", "{}"))
+    """GET: preview a strategy's placement next to the current one. POST: trim or apply it.
+
+    A move's select names the employee who makes it: the optimizer's, or one just like them.
+    Its button removes it (`remove`) or puts it back (`restore`): the preview is drawn again
+    with the figures of the moves kept. Any other POST applies the moves kept.
+    """
+    if request.method == "GET":
+        strategy = _strategy(request.GET.get("strategy"))
+
+        snapshot = Chapter.objects.get_snapshot(request.chapter.pk)
+
+        optimization = snapshot.optimization(strategy, AppSettings.get_solo().optimizer_rounds)
+
+        return _optimization(request, optimization)
+
+    placements = _placements(request.POST.get("placements", "{}"))
+    substitutes = _substitutes(request.POST)
+    removed = _removed(request.POST)
+
+    if "remove" in request.POST or "restore" in request.POST:
+        snapshot = Chapter.objects.get_snapshot(request.chapter.pk)
+        strategy = _strategy(request.POST.get("strategy"))
 
         try:
-            moved = Chapter.objects.apply_placements(request.chapter, placements)
-        except (DomainError, UserError) as error:
+            optimization = snapshot.review(
+                strategy, placements, removed=removed, substitutes=substitutes
+            )
+        except UserError as error:  # a substitute chosen twice: drawn again without them
             messages.error(request, error_text(error))
-        else:
-            messages.success(request, _("%(count)s contract(s) re-signed.") % {"count": moved})
+            optimization = snapshot.review(strategy, placements, removed=removed)
 
-        return trigger(HttpResponse(""), refresh=True, **{"close-modal": True})
+        return _optimization(request, optimization, focused=_changed_move(request.POST))
 
-    strategy = _strategy(request.GET.get("strategy"))
+    try:
+        moved = Chapter.objects.apply_placements(
+            request.chapter, placements, substitutes=substitutes, removed=removed
+        )
+    except (DomainError, UserError) as error:
+        messages.error(request, error_text(error))
+    else:
+        messages.success(request, _("%(count)s contract(s) re-signed.") % {"count": moved})
 
-    snapshot = Chapter.objects.get_snapshot(request.chapter.pk)
-
-    optimization = snapshot.optimization(strategy, AppSettings.get_solo().optimizer_rounds)
-
-    context = {
-        "optimization": optimization,
-        "strategy_label": StrategyChoices(strategy.value).label,
-        "strategy_description": STRATEGY_DESCRIPTIONS[strategy],
-        "placements": json.dumps({str(k): v for k, v in optimization.placements.items()}),
-    }
-
-    return render(request, "app/board/optimize-modal.html", context)
+    return trigger(HttpResponse(""), refresh=True, **{"close-modal": True})
 
 
 @require_GET
@@ -176,7 +199,6 @@ def recommend(request: ChapterRequest) -> HttpResponse:
             "recommendation": snapshot.recommendation(
                 strategy,
                 kinds=form.kinds_value(),
-                meet_targets=form.cleaned_data["meet_targets"],
                 optimize_first=form.cleaned_data["optimize_first"],
                 max_rounds=AppSettings.get_solo().optimizer_rounds,
             ),
@@ -184,6 +206,24 @@ def recommend(request: ChapterRequest) -> HttpResponse:
         }
 
     return render(request, "app/board/recommend-modal.html", context)
+
+
+def _optimization(
+    request: ChapterRequest, optimization: Optimization, *, focused: int | None = None
+) -> HttpResponse:
+    """The optimizer's modal; `focused`: the move whose button was just pressed."""
+    strategy = optimization.strategy
+
+    context = {
+        "optimization": optimization,
+        "strategy": strategy.value,
+        "strategy_label": StrategyChoices(strategy.value).label,
+        "strategy_description": STRATEGY_DESCRIPTIONS[strategy],
+        "placements": json.dumps({str(k): v for k, v in optimization.placements.items()}),
+        "focused": focused,
+    }
+
+    return render(request, "app/board/optimize-modal.html", context)
 
 
 def _board(request: ChapterRequest) -> HttpResponse:
@@ -202,6 +242,7 @@ def _board_context(request: ChapterRequest) -> dict[str, object]:
         "strategies": StrategyChoices.choices,
         "strategy_descriptions": {s.value: str(d) for s, d in STRATEGY_DESCRIPTIONS.items()},
         "can_move": request.user.has_perm("app.change_contract"),
+        "can_edit_faculties": request.user.has_perm("app.change_faculty"),
     }
 
 
@@ -215,6 +256,39 @@ def _contract_of(request: ChapterRequest, employee_id: str | None) -> Contract:
 def _strategy(value: str | None) -> Strategy:
     """The strategy the select sent; anything else is the default one."""
     return Strategy(value) if value in StrategyChoices.values else Strategy.MAXIMIZE_STUDENTS
+
+
+def _removed(data: QueryDict) -> set[int]:
+    """The moves taken out: those marked `removed`, plus `remove`, minus `restore`."""
+    removed = {int(value) for value in data.getlist("removed") if value.isdigit()}
+
+    if (remove := data.get("remove", "")).isdigit():
+        removed.add(int(remove))
+
+    if (restore := data.get("restore", "")).isdigit():
+        removed.discard(int(restore))
+
+    return removed
+
+
+def _changed_move(data: QueryDict) -> int | None:
+    """The move whose remove / restore button was pressed."""
+    value = data.get("remove") or data.get("restore") or ""
+
+    return int(value) if value.isdigit() else None
+
+
+def _substitutes(data: QueryDict) -> dict[int, int]:
+    """`substitute-12=15` (a moved contract's id = the contract moved instead) from the form."""
+    prefix = "substitute-"
+
+    return {
+        int(name.removeprefix(prefix)): int(value)
+        for name in data
+        if name.startswith(prefix)
+        and name.removeprefix(prefix).isdigit()
+        and (value := data.get(name, "")).isdigit()
+    }
 
 
 def _placements(value: str) -> dict[int, int | None]:

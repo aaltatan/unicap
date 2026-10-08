@@ -15,7 +15,8 @@
     :aria-expanded="isOpen"
     placeholder="{% translate 'type to search' %}…"
     x-model="query"
-    @focus="open(); $el.select()"
+    {# focus alone opens nothing: an open list covers the fields under it (a click, typing or ↑ ↓ opens it) #}
+    @focus="$el.select()"
     @click="open()"
     @input="type()"
     @blur="close()"

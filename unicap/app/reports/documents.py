@@ -28,7 +28,7 @@ from .context import (
     faculty_context,
     faculty_pivot_context,
 )
-from .docx import render
+from .docx import join, render
 from .pdf import to_pdf
 
 Context = dict[str, Any]
@@ -102,18 +102,64 @@ def faculty_document(
     return _document(report, language, extension, context)
 
 
+def faculties_document(chapter: Chapter, report: str, language: str, extension: str) -> bytes:
+    """Every faculty's report of the chapter in one .docx or .pdf file, each from a new page.
+
+    The faculties come in their tables' order (by name); each is the report's template,
+    filled for it. A PDF is the whole file converted once.
+
+    Raises:
+        DomainError: the chapter's data breaks a domain rule.
+        UserError: the chapter has no faculty.
+        ReportTemplateError: the template cannot be filled.
+        PdfError: the PDF cannot be made.
+
+    Example:
+        ```python
+        faculties_document(chapter, ReportChoices.FACULTY_STAFF, "ar", "pdf")
+        ```
+    """
+    faculties = Faculty.objects.attach_reports(Faculty.objects.for_chapter(chapter.pk), chapter.pk)
+
+    if not faculties:
+        raise UserError(_("this chapter has no faculty yet."))
+
+    contexts = [
+        FACULTY_REPORTS[report](chapter, faculty, faculty.report)
+        for faculty in faculties
+        if faculty.report is not None  # each is the chapter's: it has one
+    ]
+
+    template = _template(report, language)
+
+    def document() -> bytes:
+        return join([render(BytesIO(template), context) for context in contexts])
+
+    return document() if extension != "pdf" else _pdf(template, {"faculties": contexts}, document)
+
+
 def _document(report: str, language: str, extension: str, context: Context) -> bytes:
+    template = _template(report, language)
+
+    def document() -> bytes:
+        return render(BytesIO(template), context)
+
+    return document() if extension != "pdf" else _pdf(template, context, document)
+
+
+def _pdf(template: bytes, values: Context, document: Callable[[], bytes]) -> bytes:
+    """`document()` (a .docx) as a PDF, converted once for this template and these values."""
+    return caches[settings.REPORTS_CACHE].get_or_set(
+        _pdf_key(template, values),
+        lambda: to_pdf(document()),
+    )
+
+
+def _template(report: str, language: str) -> bytes:
+    """The report's Word template (the uploaded one, else the built-in), as bytes."""
     source = ReportTemplate.objects.get_source(report, language)
 
-    if extension != "pdf":
-        return render(source, context)
-
-    template = source.read_bytes() if isinstance(source, Path) else source.read()
-
-    return caches[settings.REPORTS_CACHE].get_or_set(
-        _pdf_key(template, context),
-        lambda: to_pdf(render(BytesIO(template), context)),
-    )
+    return source.read_bytes() if isinstance(source, Path) else source.read()
 
 
 def _pdf_key(template: bytes, context: Context) -> str:

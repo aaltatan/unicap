@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: unicap 0.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-05 20:15+0300\n"
+"POT-Creation-Date: 2026-10-08 21:12+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: UniCap\n"
 "Language-Team: Arabic\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
-#: .\tests\core\test_errors.py:62 .\unicap\app\choices.py:263
+#: .\tests\core\test_errors.py:62 .\unicap\app\choices.py:262
 #: .\unicap\app\constants\chapter.py:7 .\unicap\app\constants\faculty.py:13
 #: .\unicap\app\filters\chapter.py:8 .\unicap\app\filters\faculty.py:23
 #: .\unicap\app\models\chapter.py:21 .\unicap\app\models\faculty.py:49
@@ -41,16 +41,16 @@ msgstr "الحد الأعلى للطلاب"
 msgid "supported"
 msgstr "داعم"
 
-#: .\unicap\app\admin.py:190 .\unicap\app\models\backup.py:40
+#: .\unicap\app\admin.py:198 .\unicap\app\models\backup.py:40
 #: .\unicap\app\models\report_template.py:31
 msgid "file"
 msgstr "الملف"
 
-#: .\unicap\app\admin.py:205
+#: .\unicap\app\admin.py:213
 msgid "built-in templates"
 msgstr "القوالب المضمّنة"
 
-#: .\unicap\app\admin.py:218
+#: .\unicap\app\admin.py:226
 msgid "variables"
 msgstr "المتغيرات"
 
@@ -58,23 +58,22 @@ msgstr "المتغيرات"
 msgid "UniCap"
 msgstr "UniCap"
 
-#: .\unicap\app\backups\payload.py:190
-#| msgid "this backup is incomplete."
+#: .\unicap\app\backups\payload.py:191
 msgid "this backup is incomplete: a chapter has no name."
 msgstr "هذه النسخة الاحتياطية ناقصة: فصل بلا اسم."
 
-#: .\unicap\app\backups\payload.py:203
+#: .\unicap\app\backups\payload.py:204
 #, python-format
 msgid "this backup is incomplete: %(section)s is not a list of rows."
 msgstr "هذه النسخة الاحتياطية ناقصة: %(section)s ليست قائمة صفوف."
 
-#: .\unicap\app\backups\payload.py:210
+#: .\unicap\app\backups\payload.py:211
 #, python-format
 msgid "this backup is incomplete: %(section)s, row %(row)s has no %(fields)s."
 msgstr ""
 "هذه النسخة الاحتياطية ناقصة: %(section)s، الصف %(row)s ينقصه %(fields)s."
 
-#: .\unicap\app\backups\payload.py:360
+#: .\unicap\app\backups\payload.py:361
 #, python-format
 msgid ""
 "%(section)s: %(names)s cannot be removed, still used by %(users)s; restore "
@@ -83,14 +82,13 @@ msgstr ""
 "%(section)s: لا يمكن حذف %(names)s لأنها مستخدمة في %(users)s؛ استعد الفصل "
 "كاملاً بدلاً من ذلك."
 
-#: .\unicap\app\backups\payload.py:390
+#: .\unicap\app\backups\payload.py:391
 #, python-format
 msgid "%(owner)s: no %(name)s in this chapter; restore it first."
 msgstr "%(owner)s: لا يوجد %(name)s في هذا الفصل؛ استعده أولاً."
 
 #: .\unicap\app\backups\service.py:41
 #, python-format
-#| msgid "The Word template cannot be used: %(error)s"
 msgid "this backup holds values that cannot be saved: %(error)s"
 msgstr "في هذه النسخة الاحتياطية قيم لا يمكن حفظها: %(error)s"
 
@@ -165,7 +163,7 @@ msgstr "اختصاصي"
 msgid "PhD"
 msgstr "دكتوراه"
 
-#: .\unicap\app\choices.py:37 .\unicap\app\choices.py:133
+#: .\unicap\app\choices.py:37 .\unicap\app\choices.py:131
 msgid "master"
 msgstr "ماجستير"
 
@@ -174,7 +172,7 @@ msgstr "ماجستير"
 #: .\unicap\templates\app\reports\capacity-pivot.html:89
 #: .\unicap\templates\app\reports\staff-pivot.html:44
 msgid "fulltime"
-msgstr "متفرغ"
+msgstr "كلي"
 
 #: .\unicap\app\choices.py:44 .\unicap\app\reports\context.py:47
 #: .\unicap\app\reports\context.py:55
@@ -192,11 +190,11 @@ msgstr "جزئي"
 #: .\unicap\templates\app\board\dashboard.html:87
 #: .\unicap\templates\app\reports\capacity-pivot.html:81
 #: .\unicap\templates\app\reports\capacity.html:36
-#: .\unicap\templates\app\reports\faculties.html:19
+#: .\unicap\templates\app\reports\faculties.html:47
 #: .\unicap\templates\app\reports\staff-pivot.html:27
 #: .\unicap\templates\app\reports\staff.html:24
 #: .\unicap\templates\app\reports\staff.html:46
-#: .\unicap\templates\components\board\board.html:91
+#: .\unicap\templates\components\board\board.html:97
 #: .\unicap\templates\components\edu\faculties\details.html:21
 msgid "staff"
 msgstr "ملاك"
@@ -218,173 +216,165 @@ msgid "minimize overflowing"
 msgstr "أقل فائض"
 
 #: .\unicap\app\choices.py:60
-msgid "meet student targets"
-msgstr "بلوغ أهداف الطلاب"
-
-#: .\unicap\app\choices.py:61
 msgid "fewest changes"
 msgstr "أقل تغييرات"
 
-#: .\unicap\app\choices.py:62
+#: .\unicap\app\choices.py:61
 msgid "fewest teachers"
 msgstr "أقل عدد من المدرّسين"
 
-#: .\unicap\app\choices.py:63
+#: .\unicap\app\choices.py:62
 msgid "less salaries"
 msgstr "أقل رواتب"
 
-#: .\unicap\app\choices.py:64
+#: .\unicap\app\choices.py:63
 msgid "best staff percentage"
 msgstr "أفضل نسبة ملاك"
 
-#: .\unicap\app\choices.py:68
+#: .\unicap\app\choices.py:67
 msgid "The most students the ministry allows."
 msgstr "أكبر عدد من الطلاب تسمح به الوزارة."
 
-#: .\unicap\app\choices.py:69
+#: .\unicap\app\choices.py:68
 msgid "As many counted teachers as possible, as few wasted."
 msgstr "أكبر عدد ممكن من المدرّسين المحتسبين وأقل هدر."
 
-#: .\unicap\app\choices.py:70
+#: .\unicap\app\choices.py:69
 msgid "The lowest share of signed contracts that are not counted."
 msgstr "أقل نسبة من العقود الموقّعة غير المحتسبة."
 
-#: .\unicap\app\choices.py:71
-msgid "Reach every faculty's target students first, then maximize."
-msgstr "بلوغ هدف كل كلية أولاً، ثم زيادة الطلاب."
-
-#: .\unicap\app\choices.py:72
+#: .\unicap\app\choices.py:70
 msgid "Become compliant re-signing as few contracts as possible."
 msgstr "تحقيق الامتثال بإعادة توقيع أقل عدد من العقود."
 
-#: .\unicap\app\choices.py:73
+#: .\unicap\app\choices.py:71
 msgid "The most students with the fewest teachers: frees the rest."
 msgstr "أكبر عدد من الطلاب بأقل عدد من المدرّسين: يحرّر الباقين."
 
-#: .\unicap\app\choices.py:75
+#: .\unicap\app\choices.py:73
 msgid ""
 "The most students with the cheapest team: masters and parttime before "
 "fulltime, borrowed before staff, supported before specialized."
 msgstr ""
-"أكبر عدد من الطلاب بأقل كلفة: الماجستير وغير المتفرغين قبل المتفرغين، "
-"والمعار قبل الملاك، والداعم قبل الاختصاصي."
+"أكبر عدد من الطلاب بأقل كلفة: الماجستير والجزئيون قبل الكليين، والمعار قبل "
+"الملاك، والداعم قبل الاختصاصي."
 
-#: .\unicap\app\choices.py:79
+#: .\unicap\app\choices.py:77
 msgid ""
 "The highest staff share in the weakest faculty, then overall; may give up "
 "students."
 msgstr "أعلى نسبة ملاك في أضعف كلية ثم عموماً؛ قد يتنازل عن بعض الطلاب."
 
-#: .\unicap\app\choices.py:87
+#: .\unicap\app\choices.py:85
 msgid "down (floor)"
 msgstr "للأسفل (floor)"
 
-#: .\unicap\app\choices.py:88
+#: .\unicap\app\choices.py:86
 msgid "up (ceiling)"
 msgstr "للأعلى (ceiling)"
 
-#: .\unicap\app\choices.py:89
+#: .\unicap\app\choices.py:87
 msgid "mathematical (half up)"
 msgstr "رياضي (النصف للأعلى)"
 
-#: .\unicap\app\choices.py:90
+#: .\unicap\app\choices.py:88
 msgid "half down"
 msgstr "النصف للأسفل"
 
-#: .\unicap\app\choices.py:91
+#: .\unicap\app\choices.py:89
 msgid "half to even (banker's)"
 msgstr "النصف للزوجي (المصرفي)"
 
-#: .\unicap\app\choices.py:97
+#: .\unicap\app\choices.py:95
 msgid "fewest contracts"
 msgstr "أقل عدد من العقود"
 
-#: .\unicap\app\choices.py:98
+#: .\unicap\app\choices.py:96
 msgid "low salaries"
 msgstr "رواتب منخفضة"
 
-#: .\unicap\app\choices.py:101
+#: .\unicap\app\choices.py:99
 msgid "fulltime staff first"
-msgstr "المتفرغون الملاك أولاً"
+msgstr "الكليون الملاك أولاً"
 
-#: .\unicap\app\choices.py:103
+#: .\unicap\app\choices.py:101
 msgid "borrowed first"
 msgstr "المعارون أولاً"
 
-#: .\unicap\app\choices.py:104
+#: .\unicap\app\choices.py:102
 msgid "specialized first"
 msgstr "الاختصاصيون أولاً"
 
-#: .\unicap\app\choices.py:109
+#: .\unicap\app\choices.py:107
 msgid "The fewest new contracts: each one solves as much as possible."
 msgstr "أقل عدد من العقود الجديدة: كل عقد يحل أكبر قدر ممكن."
 
-#: .\unicap\app\choices.py:112
+#: .\unicap\app\choices.py:110
 msgid ""
 "The cheapest contracts that help: masters and parttime before fulltime, "
 "borrowed before staff, supported before specialized."
 msgstr ""
-"أرخص العقود المفيدة: الماجستير والجزئيون قبل المتفرغين، والمعارون قبل "
-"الملاك، والداعمون قبل الاختصاصيين."
+"أرخص العقود المفيدة: الماجستير والجزئيون قبل الكليين، والمعارون قبل الملاك، "
+"والداعمون قبل الاختصاصيين."
 
-#: .\unicap\app\choices.py:116
+#: .\unicap\app\choices.py:114
 msgid ""
 "Fulltime staff PhDs whenever they help: they raise the staff percentage too."
-msgstr "دكاترة متفرغون ملاك كلما أفادوا: فهم يرفعون نسبة الملاك أيضاً."
+msgstr "دكاترة كليون ملاك كلما أفادوا: فهم يرفعون نسبة الملاك أيضاً."
 
-#: .\unicap\app\choices.py:119
+#: .\unicap\app\choices.py:117
 msgid "Fulltime borrowed PhDs whenever they help: no new permanent staff."
-msgstr "دكاترة متفرغون معارون كلما أفادوا: دون ملاك دائم جديد."
+msgstr "دكاترة كليون معارون كلما أفادوا: دون ملاك دائم جديد."
 
-#: .\unicap\app\choices.py:122
+#: .\unicap\app\choices.py:120
 msgid ""
 "Teachers of the faculty's own (specialized) specializations whenever they "
 "help."
 msgstr "مدرّسون من اختصاصات الكلية نفسها (الاختصاصية) كلما أفادوا."
 
-#: .\unicap\app\choices.py:130
+#: .\unicap\app\choices.py:128
 msgid "fulltime staff PhD"
-msgstr "دكتور متفرغ ملاك"
+msgstr "دكتور كلي ملاك"
 
-#: .\unicap\app\choices.py:131
+#: .\unicap\app\choices.py:129
 msgid "fulltime borrowed PhD"
-msgstr "دكتور متفرغ معار"
+msgstr "دكتور كلي معار"
 
-#: .\unicap\app\choices.py:132
+#: .\unicap\app\choices.py:130
 msgid "parttime PhD"
-msgstr "دكتور غير متفرغ"
+msgstr "دكتور جزئي"
 
-#: .\unicap\app\choices.py:137
+#: .\unicap\app\choices.py:135
 msgid "specialized fulltime"
-msgstr "اختصاصي متفرغ"
+msgstr "اختصاصي كلي"
 
-#: .\unicap\app\choices.py:138
+#: .\unicap\app\choices.py:136
 msgid "supported fulltime"
-msgstr "داعم متفرغ"
+msgstr "داعم كلي"
 
-#: .\unicap\app\choices.py:139 .\unicap\app\reports\context.py:36
-#: .\unicap\templates\app\reports\staff.html:88
+#: .\unicap\app\choices.py:137 .\unicap\app\reports\context.py:36
+#: .\unicap\templates\app\reports\staff.html:91
 #: .\unicap\templates\components\edu\faculties\details.html:81
 msgid "specialized parttime"
 msgstr "اختصاصي جزئي"
 
-#: .\unicap\app\choices.py:140 .\unicap\app\reports\context.py:39
-#: .\unicap\templates\app\reports\staff.html:91
+#: .\unicap\app\choices.py:138 .\unicap\app\reports\context.py:39
+#: .\unicap\templates\app\reports\staff.html:94
 #: .\unicap\templates\components\edu\faculties\details.html:84
 msgid "supported parttime"
 msgstr "داعم جزئي"
 
-#: .\unicap\app\choices.py:141 .\unicap\app\reports\context.py:40
+#: .\unicap\app\choices.py:139 .\unicap\app\reports\context.py:40
 #: .\unicap\app\reports\context.py:57 .\unicap\app\reports\defaults.py:237
 #: .\unicap\app\reports\defaults.py:341
-#: .\unicap\app\templatetags\domain.py:123
+#: .\unicap\app\templatetags\domain.py:126
 #: .\unicap\templates\app\reports\audit.html:87
 #: .\unicap\templates\app\reports\capacity-pivot.html:78
 #: .\unicap\templates\app\reports\capacity-pivot.html:90
 #: .\unicap\templates\app\reports\capacity.html:29
 #: .\unicap\templates\app\reports\staff-pivot.html:45
 #: .\unicap\templates\app\reports\staff-pivot.html:61
-#: .\unicap\templates\app\reports\staff.html:92
+#: .\unicap\templates\app\reports\staff.html:95
 #: .\unicap\templates\components\edu\faculties\details.html:85
 #: .\unicap\templates\components\edu\faculties\details.html:98
 #: .\unicap\templates\components\edu\faculties\form.html:36
@@ -392,100 +382,100 @@ msgstr "داعم جزئي"
 msgid "masters"
 msgstr "حملة الماجستير"
 
-#: .\unicap\app\choices.py:145 .\unicap\app\reports\context.py:271
+#: .\unicap\app\choices.py:143 .\unicap\app\reports\context.py:271
 #: .\unicap\app\reports\defaults.py:165
 #: .\unicap\templates\app\board\dashboard.html:156
 #: .\unicap\templates\app\board\dashboard.html:162
-#: .\unicap\templates\app\board\index.html:50
-#: .\unicap\templates\app\reports\staff.html:84
+#: .\unicap\templates\app\board\index.html:60
+#: .\unicap\templates\app\reports\staff.html:87
 #: .\unicap\templates\components\edu\faculties\details.html:77
 msgid "counted"
 msgstr "محتسب"
 
-#: .\unicap\app\choices.py:146
+#: .\unicap\app\choices.py:144
 msgid "specialization not accepted here"
 msgstr "الاختصاص غير مقبول هنا"
 
-#: .\unicap\app\choices.py:147
+#: .\unicap\app\choices.py:145
 msgid "parttime beyond fulltime of its type"
-msgstr "جزئي يتجاوز المتفرغين من نوعه"
+msgstr "جزئي يتجاوز الكليين من نوعه"
 
-#: .\unicap\app\choices.py:148
+#: .\unicap\app\choices.py:146
 msgid "masters beyond specialized fulltime"
-msgstr "ماجستير يتجاوز متفرغي الاختصاص"
+msgstr "ماجستير يتجاوز الاختصاصيين الكليين"
 
-#: .\unicap\app\choices.py:149
+#: .\unicap\app\choices.py:147
 msgid "specialization above its max share"
 msgstr "الاختصاص فوق حصته العليا"
 
-#: .\unicap\app\choices.py:150
+#: .\unicap\app\choices.py:148
 msgid "specialization above its max teachers"
 msgstr "الاختصاص فوق حده الأعلى من المدرّسين"
 
-#: .\unicap\app\choices.py:151
+#: .\unicap\app\choices.py:149
 msgid "above the faculty's max of its type"
 msgstr "فوق الحد الأعلى للكلية من نوعه"
 
-#: .\unicap\app\choices.py:152
+#: .\unicap\app\choices.py:150
 msgid "inactive: not calculated"
 msgstr "معطّل: خارج الحساب"
 
-#: .\unicap\app\choices.py:153
+#: .\unicap\app\choices.py:151
 msgid "masters of this specialization not calculated here"
 msgstr "ماجستير هذا الاختصاص لا يُحتسب هنا"
 
-#: .\unicap\app\choices.py:154
+#: .\unicap\app\choices.py:152
 msgid "its contract type does not count here"
 msgstr "نوع عقده لا يُحتسب هنا"
 
-#: .\unicap\app\choices.py:155
+#: .\unicap\app\choices.py:153
 msgid "the employee cannot be counted in this faculty"
 msgstr "لا يمكن احتساب الموظف في هذه الكلية"
 
-#: .\unicap\app\choices.py:159
+#: .\unicap\app\choices.py:157
 msgid "staff ratio too low"
 msgstr "نسبة الملاك منخفضة"
 
-#: .\unicap\app\choices.py:160
+#: .\unicap\app\choices.py:158
 msgid "specialization share too low"
 msgstr "حصة الاختصاص منخفضة"
 
-#: .\unicap\app\choices.py:161
+#: .\unicap\app\choices.py:159
 msgid "current students over capacity"
 msgstr "الطلاب الحاليون فوق الطاقة"
 
-#: .\unicap\app\choices.py:162
+#: .\unicap\app\choices.py:160
 msgid "too few teachers"
 msgstr "عدد المدرّسين قليل"
 
-#: .\unicap\app\choices.py:163
+#: .\unicap\app\choices.py:161
 msgid "too few of a type"
 msgstr "عدد نوع ما قليل"
 
-#: .\unicap\app\choices.py:174 .\unicap\app\reports\defaults.py:61
+#: .\unicap\app\choices.py:172 .\unicap\app\reports\defaults.py:61
 #: .\unicap\app\views\reports.py:53 .\unicap\unicap\constants.py:59
 msgid "capacity report"
 msgstr "تقرير الطاقة الاستيعابية"
 
-#: .\unicap\app\choices.py:175
+#: .\unicap\app\choices.py:173
 msgid "faculty staff"
 msgstr "كادر الكلية"
 
-#: .\unicap\app\choices.py:176 .\unicap\app\reports\defaults.py:180
+#: .\unicap\app\choices.py:174 .\unicap\app\reports\defaults.py:180
 msgid "capacity pivot"
 msgstr "ملخص الطاقة الاستيعابية"
 
-#: .\unicap\app\choices.py:177
+#: .\unicap\app\choices.py:175
 msgid "faculty staff pivot"
 msgstr "ملخص كادر الكلية"
 
-#: .\unicap\app\choices.py:178 .\unicap\app\reports\defaults.py:270
+#: .\unicap\app\choices.py:176 .\unicap\app\reports\defaults.py:270
 #: .\unicap\templates\app\reports\audit.html:12
 #: .\unicap\unicap\constants.py:61
 msgid "calculation audit"
 msgstr "تدقيق الحساب"
 
-#: .\unicap\app\choices.py:184
+#: .\unicap\app\choices.py:182
 #, python-format
 msgid ""
 "%(faculty)s: staff are %(percentage)s%% of PhDs, minimum is %(minimum)s%%"
@@ -493,7 +483,7 @@ msgstr ""
 "%(faculty)s: نسبة الملاك %(percentage)s%% من حملة الدكتوراه، والحد الأدنى "
 "%(minimum)s%%"
 
-#: .\unicap\app\choices.py:187
+#: .\unicap\app\choices.py:185
 #, python-format
 msgid ""
 "%(faculty)s: %(specialization)s is %(share)s%% of counted teachers, minimum "
@@ -502,7 +492,7 @@ msgstr ""
 "%(faculty)s: نسبة %(specialization)s %(share)s%% من المدرّسين المحتسبين، "
 "والحد الأدنى %(minimum)s%%"
 
-#: .\unicap\app\choices.py:191
+#: .\unicap\app\choices.py:189
 #, python-format
 msgid ""
 "%(faculty)s: %(current_students)s current students, but the capacity is "
@@ -511,7 +501,7 @@ msgstr ""
 "%(faculty)s: عدد الطلاب الحاليين %(current_students)s، لكن الطاقة "
 "الاستيعابية %(capacity)s"
 
-#: .\unicap\app\choices.py:194
+#: .\unicap\app\choices.py:192
 #, python-format
 msgid ""
 "%(faculty)s: %(specialization)s has %(counted)s counted teacher(s), minimum "
@@ -520,7 +510,7 @@ msgstr ""
 "%(faculty)s: لدى %(specialization)s %(counted)s مدرّس محتسب، والحد الأدنى "
 "%(minimum)s"
 
-#: .\unicap\app\choices.py:198
+#: .\unicap\app\choices.py:196
 #, python-format
 msgid ""
 "%(faculty)s: %(counted)s counted %(type)s PhD(s), minimum is %(minimum)s"
@@ -528,17 +518,17 @@ msgstr ""
 "%(faculty)s: %(counted)s من حملة الدكتوراه المحتسبين من النوع %(type)s، "
 "والحد الأدنى %(minimum)s"
 
-#: .\unicap\app\choices.py:204
+#: .\unicap\app\choices.py:202
 #, python-format
 msgid "%(faculty)s: duplicated specializations %(names)s"
 msgstr "%(faculty)s: اختصاصات مكررة %(names)s"
 
-#: .\unicap\app\choices.py:205
+#: .\unicap\app\choices.py:203
 #, python-format
 msgid "%(faculty)s does not accept %(names)s"
 msgstr "%(faculty)s لا تقبل %(names)s"
 
-#: .\unicap\app\choices.py:207
+#: .\unicap\app\choices.py:205
 #, python-format
 msgid ""
 "%(specialization)s: min teachers (%(minimum)s) cannot exceed max teachers "
@@ -547,7 +537,7 @@ msgstr ""
 "%(specialization)s: لا يمكن أن يتجاوز الحد الأدنى للمدرسين (%(minimum)s) "
 "الحد الأعلى (%(maximum)s)"
 
-#: .\unicap\app\choices.py:210
+#: .\unicap\app\choices.py:208
 #, python-format
 msgid ""
 "%(specialization)s: the min share (%(minimum)s%%) must be between 0 and the "
@@ -556,7 +546,7 @@ msgstr ""
 "%(specialization)s: يجب أن تكون النسبة الدنيا (%(minimum)s%%) بين 0 والنسبة "
 "العليا (%(maximum)s%%)، وألا تتجاوز 100%%"
 
-#: .\unicap\app\choices.py:214
+#: .\unicap\app\choices.py:212
 #, python-format
 msgid ""
 "%(specialization)s: share %(percentage)s%% is not between %(minimum)s%% and "
@@ -565,12 +555,12 @@ msgstr ""
 "%(specialization)s: النسبة %(percentage)s%% ليست بين %(minimum)s%% "
 "و%(maximum)s%%"
 
-#: .\unicap\app\choices.py:216
+#: .\unicap\app\choices.py:214
 #, python-format
 msgid "%(faculty)s: students per PhD must be positive"
 msgstr "%(faculty)s: يجب أن يكون عدد الطلاب لكل دكتوراه أكبر من صفر"
 
-#: .\unicap\app\choices.py:218
+#: .\unicap\app\choices.py:216
 #, python-format
 msgid ""
 "%(faculty)s: min %(type)s PhDs (%(minimum)s) cannot exceed max %(type)s PhDs"
@@ -579,7 +569,7 @@ msgstr ""
 "%(faculty)s: لا يمكن أن يتجاوز الحد الأدنى لحملة الدكتوراه من النوع %(type)s"
 " (%(minimum)s) الحد الأعلى (%(maximum)s)"
 
-#: .\unicap\app\choices.py:222
+#: .\unicap\app\choices.py:220
 #, python-format
 msgid ""
 "%(faculty)s: target students (%(target)s) cannot exceed max students "
@@ -588,23 +578,23 @@ msgstr ""
 "%(faculty)s: لا يمكن أن يتجاوز عدد الطلاب المستهدف (%(target)s) الحد الأعلى "
 "للطلاب (%(maximum)s)"
 
-#: .\unicap\app\choices.py:224
+#: .\unicap\app\choices.py:222
 #, python-format
 msgid "%(faculty)s: duplicated shares %(names)s"
 msgstr "%(faculty)s: نسب مكررة %(names)s"
 
-#: .\unicap\app\choices.py:226
+#: .\unicap\app\choices.py:224
 #, python-format
 msgid ""
 "%(faculty)s: specialization percentages sum to %(total)s%%, more than 100%%"
 msgstr "%(faculty)s: مجموع نسب الاختصاصات %(total)s%%، أي أكثر من 100%%"
 
-#: .\unicap\app\choices.py:228
+#: .\unicap\app\choices.py:226
 #, python-format
 msgid "%(employee)s: a parttime contract is always borrowed"
 msgstr "%(employee)s: العقد الجزئي يكون دائماً معاراً"
 
-#: .\unicap\app\choices.py:230
+#: .\unicap\app\choices.py:228
 #, python-format
 msgid ""
 "%(chapter)s: max students (%(max_students)s) cannot exceed the faculties' "
@@ -613,82 +603,87 @@ msgstr ""
 "%(chapter)s: لا يمكن أن يتجاوز الحد الأعلى للطلاب (%(max_students)s) مجموع "
 "حدود الكليات (%(limit)s)"
 
-#: .\unicap\app\choices.py:234
+#: .\unicap\app\choices.py:232
 #, python-format
 msgid "%(chapter)s: specializations listed more than once: %(names)s"
 msgstr "%(chapter)s: اختصاصات مذكورة أكثر من مرة: %(names)s"
 
-#: .\unicap\app\choices.py:236
+#: .\unicap\app\choices.py:234
 #, python-format
 msgid "%(chapter)s: employees listed more than once: %(names)s"
 msgstr "%(chapter)s: موظفون مذكورون أكثر من مرة: %(names)s"
 
-#: .\unicap\app\choices.py:237
+#: .\unicap\app\choices.py:235
 #, python-format
 msgid "%(chapter)s: faculties listed more than once: %(names)s"
 msgstr "%(chapter)s: كليات مذكورة أكثر من مرة: %(names)s"
 
-#: .\unicap\app\choices.py:238
+#: .\unicap\app\choices.py:236
 #, python-format
 msgid "%(chapter)s: employees with more than one contract: %(names)s"
 msgstr "%(chapter)s: موظفون لديهم أكثر من عقد: %(names)s"
 
-#: .\unicap\app\choices.py:240
+#: .\unicap\app\choices.py:238
 #, python-format
 msgid ""
 "%(chapter)s: employees of specializations not in this chapter: %(names)s"
 msgstr "%(chapter)s: موظفون من اختصاصات ليست في هذا الفصل: %(names)s"
 
-#: .\unicap\app\choices.py:243
+#: .\unicap\app\choices.py:241
 #, python-format
 msgid ""
 "%(chapter)s: faculties accepting specializations not in this chapter: "
 "%(names)s"
 msgstr "%(chapter)s: كليات تقبل اختصاصات ليست في هذا الفصل: %(names)s"
 
-#: .\unicap\app\choices.py:246
+#: .\unicap\app\choices.py:244
 #, python-format
 msgid "%(chapter)s: contracts of employees not in this chapter: %(names)s"
 msgstr "%(chapter)s: عقود لموظفين ليسوا في هذا الفصل: %(names)s"
 
-#: .\unicap\app\choices.py:249
+#: .\unicap\app\choices.py:247
 #, python-format
 msgid ""
 "%(chapter)s: contracts signed to faculties not in this chapter: %(names)s"
 msgstr "%(chapter)s: عقود موقعة لكليات ليست في هذا الفصل: %(names)s"
 
-#: .\unicap\app\choices.py:251
+#: .\unicap\app\choices.py:249
 #, python-format
 msgid "%(chapter)s: %(faculty)s is not in this chapter"
 msgstr "%(chapter)s: %(faculty)s ليست في هذا الفصل"
 
-#: .\unicap\app\choices.py:252
+#: .\unicap\app\choices.py:250
 #, python-format
 msgid "%(chapter)s: %(employee)s has no contract"
 msgstr "%(chapter)s: ليس لدى %(employee)s عقد"
 
-#: .\unicap\app\choices.py:253
+#: .\unicap\app\choices.py:251
 #, python-format
 msgid "%(owner)s: %(fields)s cannot be negative"
 msgstr "%(owner)s: لا يمكن أن تكون القيم سالبة: %(fields)s"
 
-#: .\unicap\app\choices.py:254
+#: .\unicap\app\choices.py:252
 msgid "masters per PhD must be positive"
 msgstr "عدد حملة الماجستير لكل دكتور يجب أن يكون موجباً"
 
-#: .\unicap\app\choices.py:259
+#: .\unicap\app\choices.py:253
+#, python-format
+msgid "%(employee)s: the contract is locked to %(faculty)s"
+msgstr "%(employee)s: العقد مقفل على %(faculty)s"
+
+#: .\unicap\app\choices.py:258
 #: .\unicap\app\models\faculty_specialization.py:61
 #: .\unicap\templates\components\edu\faculties\form.html:33
 msgid "min teachers"
 msgstr "أدنى عدد مدرّسين"
 
-#: .\unicap\app\choices.py:260
+#: .\unicap\app\choices.py:259
 #: .\unicap\app\models\faculty_specialization.py:66
 #: .\unicap\templates\components\edu\faculties\form.html:34
 msgid "max teachers"
 msgstr "أعلى عدد مدرّسين"
 
-#: .\unicap\app\choices.py:261 .\unicap\app\constants\faculty.py:11
+#: .\unicap\app\choices.py:260 .\unicap\app\constants\faculty.py:11
 #: .\unicap\app\filters\faculty.py:25 .\unicap\app\models\faculty.py:39
 #: .\unicap\app\reports\defaults.py:76 .\unicap\app\reports\defaults.py:109
 #: .\unicap\app\reports\defaults.py:190 .\unicap\app\reports\defaults.py:246
@@ -700,51 +695,51 @@ msgstr "أعلى عدد مدرّسين"
 msgid "current students"
 msgstr "الطلاب الحاليون"
 
-#: .\unicap\app\choices.py:262 .\unicap\app\constants\faculty.py:12
+#: .\unicap\app\choices.py:261 .\unicap\app\constants\faculty.py:12
 #: .\unicap\app\models\faculty.py:44
 #: .\unicap\templates\components\edu\faculties\details.html:61
 msgid "target students"
 msgstr "الطلاب المستهدفون"
 
-#: .\unicap\app\choices.py:264 .\unicap\app\models\faculty.py:54
+#: .\unicap\app\choices.py:263 .\unicap\app\models\faculty.py:54
 msgid "min specialized PhDs"
 msgstr "الحد الأدنى لدكاترة الاختصاص"
 
-#: .\unicap\app\choices.py:265 .\unicap\app\models\faculty.py:59
+#: .\unicap\app\choices.py:264 .\unicap\app\models\faculty.py:59
 msgid "max specialized PhDs"
 msgstr "الحد الأعلى لدكاترة الاختصاص"
 
-#: .\unicap\app\choices.py:266 .\unicap\app\models\faculty.py:64
+#: .\unicap\app\choices.py:265 .\unicap\app\models\faculty.py:64
 msgid "min supported PhDs"
 msgstr "الحد الأدنى للدكاترة الداعمين"
 
-#: .\unicap\app\choices.py:267 .\unicap\app\models\faculty.py:69
+#: .\unicap\app\choices.py:266 .\unicap\app\models\faculty.py:69
 msgid "max supported PhDs"
 msgstr "الحد الأعلى للدكاترة الداعمين"
 
-#: .\unicap\app\choices.py:277
+#: .\unicap\app\choices.py:276
 msgid "medium"
 msgstr "متوسط"
 
-#: .\unicap\app\choices.py:278
+#: .\unicap\app\choices.py:277
 msgid "large"
 msgstr "كبير"
 
-#: .\unicap\app\choices.py:279
+#: .\unicap\app\choices.py:278
 msgid "extra large"
 msgstr "كبير جداً"
 
-#: .\unicap\app\choices.py:280
+#: .\unicap\app\choices.py:279
 msgid "full width"
 msgstr "بعرض الشاشة"
 
-#: .\unicap\app\choices.py:286
+#: .\unicap\app\choices.py:285
 msgid "whole system"
 msgstr "النظام كاملاً"
 
-#: .\unicap\app\choices.py:287 .\unicap\app\models\backup.py:36
+#: .\unicap\app\choices.py:286 .\unicap\app\models\backup.py:36
 #: .\unicap\app\models\backup.py:38 .\unicap\app\models\chapter.py:32
-#: .\unicap\app\models\contract.py:25 .\unicap\app\models\employee.py:23
+#: .\unicap\app\models\contract.py:27 .\unicap\app\models\employee.py:23
 #: .\unicap\app\models\faculty.py:26 .\unicap\app\models\specialization.py:18
 #: .\unicap\app\reports\defaults.py:396
 #: .\unicap\templates\app\backups\index.html:43
@@ -752,34 +747,34 @@ msgstr "النظام كاملاً"
 #: .\unicap\templates\app\board\dashboard.html:12
 #: .\unicap\templates\app\reports\capacity-pivot.html:11
 #: .\unicap\templates\app\reports\capacity.html:9
-#: .\unicap\templates\components\layout\header.html:84
-#: .\unicap\templates\components\layout\header.html:94
+#: .\unicap\templates\components\layout\header.html:86
+#: .\unicap\templates\components\layout\header.html:96
 msgid "chapter"
 msgstr "الفصل"
 
-#: .\unicap\app\choices.py:288 .\unicap\app\models\backup.py:24
+#: .\unicap\app\choices.py:287 .\unicap\app\models\backup.py:24
 #: .\unicap\templates\app\backups\index.html:36
 msgid "section"
 msgstr "القسم"
 
-#: .\unicap\app\choices.py:294 .\unicap\app\models\specialization.py:27
+#: .\unicap\app\choices.py:293 .\unicap\app\models\specialization.py:27
 #: .\unicap\app\search.py:46 .\unicap\app\views\specializations.py:28
 #: .\unicap\unicap\constants.py:99
 msgid "specializations"
 msgstr "الاختصاصات"
 
-#: .\unicap\app\choices.py:295 .\unicap\app\constants\chapter.py:8
+#: .\unicap\app\choices.py:294 .\unicap\app\constants\chapter.py:8
 #: .\unicap\app\constants\specialization.py:8
 #: .\unicap\app\models\faculty.py:109 .\unicap\app\search.py:42
 #: .\unicap\app\views\chapters.py:42 .\unicap\app\views\faculties.py:62
 #: .\unicap\app\views\specializations.py:34
-#: .\unicap\templates\components\board\board.html:102
+#: .\unicap\templates\components\board\board.html:116
 #: .\unicap\templates\components\chapters\chapters\details.html:5
 #: .\unicap\unicap\constants.py:91
 msgid "faculties"
 msgstr "الكليات"
 
-#: .\unicap\app\choices.py:296 .\unicap\app\constants\chapter.py:9
+#: .\unicap\app\choices.py:295 .\unicap\app\constants\chapter.py:9
 #: .\unicap\app\constants\specialization.py:9
 #: .\unicap\app\models\employee.py:48 .\unicap\app\search.py:50
 #: .\unicap\app\views\chapters.py:43 .\unicap\app\views\employees.py:28
@@ -790,10 +785,10 @@ msgstr "الكليات"
 msgid "employees"
 msgstr "المدرّسون"
 
-#: .\unicap\app\choices.py:297 .\unicap\app\constants\chapter.py:10
-#: .\unicap\app\constants\faculty.py:16 .\unicap\app\models\contract.py:70
+#: .\unicap\app\choices.py:296 .\unicap\app\constants\chapter.py:10
+#: .\unicap\app\constants\faculty.py:16 .\unicap\app\models\contract.py:77
 #: .\unicap\app\search.py:51 .\unicap\app\views\chapters.py:44
-#: .\unicap\app\views\contracts.py:29 .\unicap\app\views\faculties.py:73
+#: .\unicap\app\views\contracts.py:31 .\unicap\app\views\faculties.py:73
 #: .\unicap\templates\app\board\dashboard.html:151
 #: .\unicap\unicap\constants.py:75
 msgid "contracts"
@@ -818,14 +813,14 @@ msgstr "الاسم"
 msgid "created at"
 msgstr "تاريخ الإنشاء"
 
-#: .\unicap\app\constants\contract.py:6 .\unicap\app\models\contract.py:60
-#: .\unicap\templates\components\hr\contracts\details.html:14
+#: .\unicap\app\constants\contract.py:6 .\unicap\app\models\contract.py:67
+#: .\unicap\templates\components\hr\contracts\details.html:15
 msgid "signing order"
 msgstr "ترتيب التوقيع"
 
-#: .\unicap\app\constants\contract.py:7 .\unicap\app\models\contract.py:31
-#: .\unicap\app\models\employee.py:47 .\unicap\app\views\contracts.py:35
-#: .\unicap\templates\components\hr\contracts\details.html:8
+#: .\unicap\app\constants\contract.py:7 .\unicap\app\models\contract.py:33
+#: .\unicap\app\models\employee.py:47 .\unicap\app\views\contracts.py:37
+#: .\unicap\templates\components\hr\contracts\details.html:9
 msgid "employee"
 msgstr "المدرّس"
 
@@ -835,61 +830,61 @@ msgstr "المدرّس"
 #: .\unicap\app\models\faculty_specialization.py:34
 #: .\unicap\app\models\specialization.py:26
 #: .\unicap\app\reports\defaults.py:142 .\unicap\app\reports\defaults.py:310
-#: .\unicap\app\reports\defaults.py:338 .\unicap\app\views\contracts.py:36
+#: .\unicap\app\reports\defaults.py:338 .\unicap\app\views\contracts.py:38
 #: .\unicap\app\views\employees.py:33
-#: .\unicap\templates\app\board\recommend-modal.html:59
+#: .\unicap\templates\app\board\recommend-modal.html:58
 #: .\unicap\templates\app\reports\audit.html:98
 #: .\unicap\templates\app\reports\staff-pivot.html:56
 #: .\unicap\templates\app\reports\staff.html:54
 #: .\unicap\templates\components\edu\faculties\details.html:98
 #: .\unicap\templates\components\edu\faculties\form.html:28
-#: .\unicap\templates\components\hr\contracts\details.html:9
+#: .\unicap\templates\components\hr\contracts\details.html:10
 #: .\unicap\templates\components\hr\employees\details.html:3
 msgid "specialization"
 msgstr "الاختصاص"
 
 #: .\unicap\app\constants\contract.py:9 .\unicap\app\constants\employee.py:10
 #: .\unicap\app\filters\contract.py:22 .\unicap\app\filters\employee.py:27
-#: .\unicap\app\models\contract.py:37 .\unicap\app\models\faculty.py:108
+#: .\unicap\app\models\contract.py:39 .\unicap\app\models\faculty.py:108
 #: .\unicap\app\models\faculty_specialization.py:28
 #: .\unicap\app\reports\defaults.py:71 .\unicap\app\reports\defaults.py:187
-#: .\unicap\app\views\contracts.py:37 .\unicap\app\views\employees.py:35
-#: .\unicap\templates\app\board\recommend-modal.html:58
+#: .\unicap\app\views\contracts.py:39 .\unicap\app\views\employees.py:35
+#: .\unicap\templates\app\board\recommend-modal.html:57
 #: .\unicap\templates\app\reports\capacity.html:22
-#: .\unicap\templates\app\reports\faculties.html:17
+#: .\unicap\templates\app\reports\faculties.html:45
 #: .\unicap\templates\components\edu\specializations\details.html:11
-#: .\unicap\templates\components\hr\contracts\details.html:10
+#: .\unicap\templates\components\hr\contracts\details.html:11
 msgid "faculty"
 msgstr "الكلية"
 
 #: .\unicap\app\constants\contract.py:10 .\unicap\app\constants\employee.py:8
 #: .\unicap\app\filters\contract.py:36 .\unicap\app\filters\employee.py:22
 #: .\unicap\app\reports\defaults.py:143 .\unicap\app\reports\defaults.py:339
-#: .\unicap\app\views\contracts.py:38 .\unicap\app\views\employees.py:34
+#: .\unicap\app\views\contracts.py:40 .\unicap\app\views\employees.py:34
 #: .\unicap\templates\app\reports\staff-pivot.html:57
 #: .\unicap\templates\app\reports\staff.html:55
 msgid "specialization type"
 msgstr "نوع الاختصاص"
 
 #: .\unicap\app\constants\contract.py:11 .\unicap\app\filters\contract.py:41
-#: .\unicap\app\models\contract.py:54 .\unicap\app\reports\defaults.py:144
-#: .\unicap\app\views\contracts.py:39
-#: .\unicap\templates\components\hr\contracts\details.html:11
+#: .\unicap\app\models\contract.py:56 .\unicap\app\reports\defaults.py:144
+#: .\unicap\app\views\contracts.py:41
+#: .\unicap\templates\components\hr\contracts\details.html:12
 msgid "degree"
 msgstr "الشهادة"
 
 #: .\unicap\app\constants\contract.py:12 .\unicap\app\filters\contract.py:46
-#: .\unicap\app\forms\faculty.py:56 .\unicap\app\models\contract.py:42
+#: .\unicap\app\forms\faculty.py:56 .\unicap\app\models\contract.py:44
 #: .\unicap\app\models\faculty_specialization.py:71
 #: .\unicap\templates\components\edu\faculties\details.html:98
 #: .\unicap\templates\components\edu\faculties\form.html:35
-#: .\unicap\templates\components\hr\contracts\details.html:12
+#: .\unicap\templates\components\hr\contracts\details.html:13
 msgid "contract type"
 msgstr "نوع العقد"
 
 #: .\unicap\app\constants\contract.py:13 .\unicap\app\filters\contract.py:51
-#: .\unicap\app\models\contract.py:48
-#: .\unicap\templates\components\hr\contracts\details.html:13
+#: .\unicap\app\models\contract.py:50
+#: .\unicap\templates\components\hr\contracts\details.html:14
 msgid "employment type"
 msgstr "نوع التعيين"
 
@@ -897,22 +892,27 @@ msgstr "نوع التعيين"
 #: .\unicap\app\constants\specialization.py:7
 #: .\unicap\app\filters\contract.py:54 .\unicap\app\filters\employee.py:32
 #: .\unicap\app\filters\specialization.py:10
-#: .\unicap\app\models\contract.py:59 .\unicap\app\models\employee.py:32
+#: .\unicap\app\models\contract.py:61 .\unicap\app\models\employee.py:32
 #: .\unicap\app\models\specialization.py:21
 msgid "is active"
 msgstr "مفعّل"
 
-#: .\unicap\app\constants\contract.py:15 .\unicap\app\constants\employee.py:11
+#: .\unicap\app\constants\contract.py:15 .\unicap\app\filters\contract.py:56
+#: .\unicap\app\views\contracts.py:45
+msgid "locked"
+msgstr "مقفل"
+
+#: .\unicap\app\constants\contract.py:16 .\unicap\app\constants\employee.py:11
 #: .\unicap\app\constants\faculty.py:17
 #: .\unicap\app\constants\specialization.py:10 .\unicap\app\forms\backup.py:26
 #: .\unicap\app\models\abstracts.py:8 .\unicap\app\views\chapters.py:45
-#: .\unicap\app\views\contracts.py:43 .\unicap\app\views\employees.py:39
+#: .\unicap\app\views\contracts.py:46 .\unicap\app\views\employees.py:39
 #: .\unicap\app\views\faculties.py:75 .\unicap\app\views\specializations.py:36
 #: .\unicap\templates\app\backups\index.html:64
 #: .\unicap\templates\components\chapters\chapters\details.html:32
-#: .\unicap\templates\components\edu\faculties\details.html:140
+#: .\unicap\templates\components\edu\faculties\details.html:142
 #: .\unicap\templates\components\edu\specializations\details.html:53
-#: .\unicap\templates\components\hr\contracts\details.html:20
+#: .\unicap\templates\components\hr\contracts\details.html:21
 #: .\unicap\templates\components\hr\employees\details.html:32
 msgid "notes"
 msgstr "ملاحظات"
@@ -930,13 +930,13 @@ msgstr "طلاب لكل دكتور"
 msgid "min staff percentage"
 msgstr "الحد الأدنى لنسبة الملاك"
 
-#: .\unicap\app\decorators.py:24
+#: .\unicap\app\decorators.py:21
 msgid "Create a chapter first: every page shows one chapter."
 msgstr "أنشئ فصلاً أولاً: كل صفحة تعرض فصلاً واحداً."
 
 #: .\unicap\app\filters\base.py:24 .\unicap\app\filters\base.py:25
-#: .\unicap\templates\app\crud\index.html:49
-#: .\unicap\templates\app\crud\index.html:50
+#: .\unicap\templates\app\crud\index.html:60
+#: .\unicap\templates\app\crud\index.html:61
 #: .\unicap\templates\components\field.html:20
 msgid "search"
 msgstr "بحث"
@@ -957,7 +957,7 @@ msgstr "الكل"
 
 #: .\unicap\app\filters\contract.py:26 .\unicap\app\reports\context.py:271
 #: .\unicap\app\reports\defaults.py:165
-#: .\unicap\templates\app\reports\staff.html:84
+#: .\unicap\templates\app\reports\staff.html:87
 #: .\unicap\templates\components\edu\faculties\details.html:77
 msgid "signed"
 msgstr "موقّع"
@@ -966,24 +966,26 @@ msgstr "موقّع"
 msgid "signed to a faculty"
 msgstr "موقّع على كلية"
 
-#: .\unicap\app\filters\contract.py:26 .\unicap\app\forms\contract.py:42
+#: .\unicap\app\filters\contract.py:26 .\unicap\app\forms\contract.py:43
 #: .\unicap\app\templatetags\domain.py:35
-#: .\unicap\app\templatetags\domain.py:204 .\unicap\app\views\board.py:78
+#: .\unicap\app\templatetags\domain.py:207 .\unicap\app\views\board.py:79
 #: .\unicap\templates\app\board\dashboard.html:158
 #: .\unicap\templates\app\board\dashboard.html:164
-#: .\unicap\templates\app\board\index.html:52
-#: .\unicap\templates\app\board\optimize-modal.html:36
-#: .\unicap\templates\app\board\optimize-modal.html:38
-#: .\unicap\templates\components\board\board.html:49
+#: .\unicap\templates\app\board\index.html:62
+#: .\unicap\templates\app\board\optimize-modal.html:55
+#: .\unicap\templates\app\board\optimize-modal.html:57
+#: .\unicap\templates\components\board\board.html:50
+#: .\unicap\templates\components\board\board.html:145
+#: .\unicap\templates\components\board\cards.html:20
 #: .\unicap\templates\components\edu\specializations\details.html:35
 #: .\unicap\templates\components\hr\contracts\cells.html:10
-#: .\unicap\templates\components\hr\contracts\details.html:10
+#: .\unicap\templates\components\hr\contracts\details.html:11
 #: .\unicap\templates\components\hr\employees\cells.html:9
 #: .\unicap\templates\components\hr\employees\details.html:18
 msgid "unsigned"
 msgstr "غير موقّع"
 
-#: .\unicap\app\filters\contract.py:54 .\unicap\app\views\contracts.py:42
+#: .\unicap\app\filters\contract.py:54 .\unicap\app\views\contracts.py:44
 #: .\unicap\templates\components\hr\contracts\cells.html:15
 #: .\unicap\templates\components\switch.html:11
 msgid "on"
@@ -994,6 +996,16 @@ msgstr "مفعّل"
 #: .\unicap\templates\components\switch.html:11
 msgid "off"
 msgstr "معطّل"
+
+#: .\unicap\app\filters\contract.py:56 .\unicap\app\models\contract.py:63
+#: .\unicap\templates\components\hr\contracts\cells.html:16
+#: .\unicap\templates\components\hr\contracts\details.html:6
+msgid "locked to its faculty"
+msgstr "مقفل على كليته"
+
+#: .\unicap\app\filters\contract.py:56
+msgid "not locked"
+msgstr "غير مقفل"
 
 #: .\unicap\app\filters\employee.py:32
 #: .\unicap\app\filters\specialization.py:10
@@ -1011,8 +1023,8 @@ msgstr "مفعّل"
 msgid "inactive"
 msgstr "معطّل"
 
-#: .\unicap\app\filters\employee.py:35 .\unicap\app\models\contract.py:69
-#: .\unicap\templates\app\board\recommend-modal.html:60
+#: .\unicap\app\filters\employee.py:35 .\unicap\app\models\contract.py:76
+#: .\unicap\templates\app\board\recommend-modal.html:59
 msgid "contract"
 msgstr "العقد"
 
@@ -1039,7 +1051,7 @@ msgid "used by a faculty or employee"
 msgstr "مستخدم من كلية أو مدرّس"
 
 #: .\unicap\app\filters\specialization.py:13
-#: .\unicap\templates\components\board\board.html:88
+#: .\unicap\templates\components\board\board.html:94
 #: .\unicap\templates\components\edu\faculties\cells.html:20
 #: .\unicap\templates\components\edu\faculties\details.html:18
 msgid "unused"
@@ -1077,7 +1089,7 @@ msgstr "اسم النسخة"
 msgid "a chapter with this name already exists."
 msgstr "يوجد فصل بهذا الاسم."
 
-#: .\unicap\app\forms\contract.py:43
+#: .\unicap\app\forms\contract.py:44
 msgid "empty: unsigned (placed on the board later)"
 msgstr "فارغ: غير موقّع (يوضع على اللوحة لاحقاً)"
 
@@ -1097,7 +1109,7 @@ msgstr "في هذا الفصل كلية بهذا الاسم."
 #: .\unicap\templates\app\board\dashboard.html:136
 #: .\unicap\templates\app\reports\staff-pivot.html:29
 #: .\unicap\templates\app\reports\staff.html:26
-#: .\unicap\templates\components\board\board.html:91
+#: .\unicap\templates\components\board\board.html:97
 #: .\unicap\templates\components\edu\faculties\cells.html:27
 #: .\unicap\templates\components\edu\faculties\details.html:23
 msgid "min"
@@ -1105,7 +1117,7 @@ msgstr "الأدنى"
 
 #: .\unicap\app\forms\faculty.py:82
 #: .\unicap\templates\app\board\dashboard.html:53
-#: .\unicap\templates\components\board\board.html:92
+#: .\unicap\templates\components\board\board.html:98
 msgid "max"
 msgstr "الأعلى"
 
@@ -1115,7 +1127,7 @@ msgid "each specialization is accepted once: %(names)s"
 msgstr "يُقبل كل اختصاص مرة واحدة: %(names)s"
 
 #: .\unicap\app\forms\recommendation.py:13
-#: .\unicap\templates\app\board\index.html:18
+#: .\unicap\templates\app\board\index.html:21
 msgid "strategy"
 msgstr "الاستراتيجية"
 
@@ -1124,18 +1136,10 @@ msgid "contracts the university may sign"
 msgstr "العقود التي يمكن للجامعة توقيعها"
 
 #: .\unicap\app\forms\recommendation.py:24
-msgid "also reach every target"
-msgstr "بلوغ كل الأهداف أيضاً"
-
-#: .\unicap\app\forms\recommendation.py:26
-msgid "besides solving the violations, reach every faculty's target students"
-msgstr "إضافة إلى حل المخالفات، بلوغ العدد المستهدف من الطلاب في كل كلية"
-
-#: .\unicap\app\forms\recommendation.py:29
 msgid "optimize the current contracts first"
 msgstr "تحسين العقود الحالية أولاً"
 
-#: .\unicap\app\forms\recommendation.py:31
+#: .\unicap\app\forms\recommendation.py:26
 msgid "re-sign the current contracts first: new ones only fill what is left"
 msgstr "إعادة توزيع العقود الحالية أولاً: العقود الجديدة تسد ما تبقى فقط"
 
@@ -1152,14 +1156,27 @@ msgstr "في هذا الفصل اختصاص بهذا الاسم."
 msgid "still in use by %(users)s: remove it from them first."
 msgstr "ما زال مستخدماً من قبل %(users)s: أزله منها أولاً."
 
-#: .\unicap\app\managers\chapter.py:304
-#| msgid "%(faculty)s is not in this chapter"
+#: .\unicap\app\managers\chapter.py:327 .\unicap\app\snapshot.py:402
 msgid "a faculty of this placement is not in the chapter."
 msgstr "إحدى كليات هذا التوزيع ليست في الفصل."
 
-#: .\unicap\app\managers\contract.py:69
+#: .\unicap\app\managers\contract.py:86
 msgid "this faculty is not there any more."
 msgstr "لم تعد هذه الكلية موجودة."
+
+#: .\unicap\app\managers\contract.py:109
+#, python-format
+msgid "%(field)s cannot be switched: %(fields)s"
+msgstr "لا يمكن تبديل %(field)s: %(fields)s"
+
+#: .\unicap\app\managers\contract.py:192
+#, python-format
+msgid "locked to their faculty (unlock them first): %(names)s"
+msgstr "مقفلة على كلياتها (ألغِ قفلها أولاً): %(names)s"
+
+#: .\unicap\app\managers\contract.py:193 .\unicap\app\texts.py:67
+msgid ", "
+msgstr "، "
 
 #: .\unicap\app\middlewares.py:100
 msgid "a broken rule"
@@ -1210,7 +1227,13 @@ msgstr "افتراضي"
 msgid "chapters"
 msgstr "الفصول"
 
-#: .\unicap\app\models\contract.py:76
+#: .\unicap\app\models\contract.py:65
+msgid ""
+"once signed, the contract cannot be moved to another faculty or unsigned"
+msgstr "بعد توقيعه لا يمكن نقل العقد إلى كلية أخرى ولا إلغاء توقيعه"
+
+#: .\unicap\app\models\contract.py:83
+#: .\unicap\templates\app\board\index.html:79
 msgid "a parttime contract is always borrowed."
 msgstr "العقد الجزئي يكون دائماً معاراً."
 
@@ -1260,7 +1283,7 @@ msgstr "تقريب الحد الأدنى للملاك"
 
 #: .\unicap\app\models\faculty.py:99
 msgid "the min staff percentage in whole fulltime staff: the fewest it needs"
-msgstr "النسبة الدنيا للملاك بعدد كامل من المتفرغين الملاك: أقل ما يحتاجه"
+msgstr "النسبة الدنيا للملاك بعدد كامل من الكليين الملاك: أقل ما يحتاجه"
 
 #: .\unicap\app\models\faculty.py:119
 msgid "students per PhD must be positive."
@@ -1352,7 +1375,7 @@ msgid "project name"
 msgstr "اسم المشروع"
 
 #: .\unicap\app\models\settings.py:21 .\unicap\app\models\settings.py:64
-#: .\unicap\templates\app\crud\table.html:170
+#: .\unicap\templates\app\crud\table.html:179
 msgid "rows per page"
 msgstr "صفوف في الصفحة"
 
@@ -1441,8 +1464,8 @@ msgid ""
 "Parttime PhDs of a type (specialized / supported) are counted up to the "
 "number of counted fulltime PhDs (staff and borrowed) of the same type."
 msgstr ""
-"يُحتسب الدكاترة الجزئيون من كل نوع (اختصاصي / داعم) حتى عدد الدكاترة "
-"المتفرغين المحتسبين (ملاك ومعار) من النوع نفسه."
+"يُحتسب الدكاترة الجزئيون من كل نوع (اختصاصي / داعم) حتى عدد الدكاترة الكليين"
+" المحتسبين (ملاك ومعار) من النوع نفسه."
 
 #: .\unicap\app\reports\audit.py:37
 msgid ""
@@ -1462,8 +1485,8 @@ msgid ""
 " specialization's masters per PhD says how many masters make one PhD, and "
 "the faculty's masters rounding how that rounds to whole PhDs."
 msgstr ""
-"يُحتسب حملة الماجستير حتى عدد الدكاترة الاختصاصيين المتفرغين المحتسبين؛ يحدد"
-" «عدد حملة الماجستير لكل دكتور» في الاختصاص كم حامل ماجستير يعادل دكتوراً "
+"يُحتسب حملة الماجستير حتى عدد الدكاترة الاختصاصيين الكليين المحتسبين؛ يحدد "
+"«عدد حملة الماجستير لكل دكتور» في الاختصاص كم حامل ماجستير يعادل دكتوراً "
 "واحداً، ويحدد تقريب الماجستير في الكلية طريقة التقريب إلى دكاترة كاملين."
 
 #: .\unicap\app\reports\audit.py:47
@@ -1471,8 +1494,8 @@ msgid ""
 "Fulltime staff must be at least the min staff percentage of all PhDs signed "
 "to the faculty, the uncounted ones included."
 msgstr ""
-"يجب ألا يقل المتفرغون من الملاك عن الحد الأدنى لنسبة الملاك من جميع الدكاترة"
-" الموقّعين مع الكلية، بمن فيهم غير المحتسبين."
+"يجب ألا يقل الكليون من الملاك عن الحد الأدنى لنسبة الملاك من جميع الدكاترة "
+"الموقّعين مع الكلية، بمن فيهم غير المحتسبين."
 
 #: .\unicap\app\reports\audit.py:51
 msgid ""
@@ -1527,7 +1550,7 @@ msgstr "غير محتسب (القواعد 1 إلى 4)"
 
 #: .\unicap\app\reports\audit.py:111
 #: .\unicap\templates\app\board\dashboard.html:26
-#: .\unicap\templates\app\board\optimize-modal.html:13
+#: .\unicap\templates\app\board\optimize-modal.html:14
 msgid "counted teachers"
 msgstr "المدرّسون المحتسبون"
 
@@ -1542,9 +1565,8 @@ msgid ""
 "%(sfb)s + parttime %(sp)s) + supported %(supported)s (fulltime staff %(ufs)s"
 " + fulltime borrowed %(ufb)s + parttime %(up)s)"
 msgstr ""
-"اختصاصي %(specialized)s (متفرغ ملاك %(sfs)s + متفرغ معار %(sfb)s + جزئي "
-"%(sp)s) + داعم %(supported)s (متفرغ ملاك %(ufs)s + متفرغ معار %(ufb)s + جزئي"
-" %(up)s)"
+"اختصاصي %(specialized)s (كلي ملاك %(sfs)s + كلي معار %(sfb)s + جزئي %(sp)s) "
+"+ داعم %(supported)s (كلي ملاك %(ufs)s + كلي معار %(ufb)s + جزئي %(up)s)"
 
 #: .\unicap\app\reports\audit.py:135
 msgid "counted masters, as PhDs"
@@ -1564,7 +1586,7 @@ msgstr ""
 #: .\unicap\app\reports\defaults.py:238
 #: .\unicap\templates\app\reports\capacity-pivot.html:79
 #: .\unicap\templates\app\reports\capacity.html:30
-#: .\unicap\templates\app\reports\staff.html:93
+#: .\unicap\templates\app\reports\staff.html:96
 #: .\unicap\templates\components\edu\faculties\details.html:86
 msgid "PhD equivalents"
 msgstr "مكافئ الدكاترة"
@@ -1587,10 +1609,10 @@ msgstr "%(phds)s مكافئ دكاترة × %(students)s طالباً لكل د�
 #: .\unicap\app\views\faculties.py:69
 #: .\unicap\templates\app\board\dashboard.html:21
 #: .\unicap\templates\app\board\dashboard.html:52
-#: .\unicap\templates\app\board\recommend-modal.html:45
+#: .\unicap\templates\app\board\recommend-modal.html:44
 #: .\unicap\templates\app\reports\capacity-pivot.html:82
 #: .\unicap\templates\app\reports\capacity.html:32
-#: .\unicap\templates\app\reports\faculties.html:18
+#: .\unicap\templates\app\reports\faculties.html:46
 #: .\unicap\templates\app\reports\staff-pivot.html:23
 #: .\unicap\templates\app\reports\staff.html:20
 #: .\unicap\templates\components\board\board.html:16
@@ -1620,7 +1642,7 @@ msgid ""
 "%(staff)s fulltime staff ÷ %(phds)s signed PhDs × 100 (minimum "
 "%(minimum)s%%)"
 msgstr ""
-"%(staff)s متفرغ ملاك ÷ %(phds)s دكتوراً موقّعاً × 100 (الحد الأدنى "
+"%(staff)s كلي ملاك ÷ %(phds)s دكتوراً موقّعاً × 100 (الحد الأدنى "
 "%(minimum)s%%)"
 
 #: .\unicap\app\reports\audit.py:180 .\unicap\app\reports\audit.py:209
@@ -1668,42 +1690,42 @@ msgid "chapter capacity %(capacity)s - current students %(current)s"
 msgstr "طاقة الفصل %(capacity)s - الطلاب الحاليون %(current)s"
 
 #: .\unicap\app\reports\context.py:34
-#: .\unicap\templates\app\reports\staff.html:86
+#: .\unicap\templates\app\reports\staff.html:89
 #: .\unicap\templates\components\edu\faculties\details.html:79
 msgid "specialized fulltime staff"
-msgstr "اختصاصي متفرغ ملاك"
+msgstr "اختصاصي كلي ملاك"
 
 #: .\unicap\app\reports\context.py:35
-#: .\unicap\templates\app\reports\staff.html:87
+#: .\unicap\templates\app\reports\staff.html:90
 #: .\unicap\templates\components\edu\faculties\details.html:80
 msgid "specialized fulltime borrowed"
-msgstr "اختصاصي متفرغ معار"
+msgstr "اختصاصي كلي معار"
 
 #: .\unicap\app\reports\context.py:37
-#: .\unicap\templates\app\reports\staff.html:89
+#: .\unicap\templates\app\reports\staff.html:92
 #: .\unicap\templates\components\edu\faculties\details.html:82
 msgid "supported fulltime staff"
-msgstr "داعم متفرغ ملاك"
+msgstr "داعم كلي ملاك"
 
 #: .\unicap\app\reports\context.py:38
-#: .\unicap\templates\app\reports\staff.html:90
+#: .\unicap\templates\app\reports\staff.html:93
 #: .\unicap\templates\components\edu\faculties\details.html:83
 msgid "supported fulltime borrowed"
-msgstr "داعم متفرغ معار"
+msgstr "داعم كلي معار"
 
 #: .\unicap\app\reports\context.py:45
 #: .\unicap\templates\app\reports\capacity-pivot.html:53
 #: .\unicap\templates\app\reports\staff-pivot.html:58
 msgid "fulltime staff"
-msgstr "متفرغ ملاك"
+msgstr "كلي ملاك"
 
 #: .\unicap\app\reports\context.py:46
 #: .\unicap\templates\app\reports\capacity-pivot.html:54
 #: .\unicap\templates\app\reports\staff-pivot.html:59
 msgid "fulltime borrowed"
-msgstr "متفرغ معار"
+msgstr "كلي معار"
 
-#: .\unicap\app\reports\context.py:56 .\unicap\app\templatetags\domain.py:118
+#: .\unicap\app\reports\context.py:56 .\unicap\app\templatetags\domain.py:121
 #: .\unicap\templates\app\reports\audit.html:87
 #: .\unicap\templates\app\reports\capacity-pivot.html:90
 #: .\unicap\templates\app\reports\staff-pivot.html:45
@@ -1712,11 +1734,11 @@ msgstr "الدكاترة"
 
 #: .\unicap\app\reports\context.py:351
 #: .\unicap\templates\app\board\dashboard.html:38
-#: .\unicap\templates\app\board\optimize-modal.html:19
+#: .\unicap\templates\app\board\optimize-modal.html:20
 #: .\unicap\templates\app\reports\capacity.html:59
-#: .\unicap\templates\app\reports\faculties.html:31
+#: .\unicap\templates\app\reports\faculties.html:59
 #: .\unicap\templates\components\board\board.html:39
-#: .\unicap\templates\components\board\board.html:78
+#: .\unicap\templates\components\board\board.html:84
 #: .\unicap\templates\components\chapters\chapters\details.html:25
 #: .\unicap\templates\components\edu\faculties\cells.html:37
 msgid "compliant"
@@ -1725,10 +1747,10 @@ msgstr "ممتثل"
 #: .\unicap\app\reports\context.py:353 .\unicap\app\reports\defaults.py:115
 #: .\unicap\app\reports\defaults.py:425
 #: .\unicap\templates\app\board\dashboard.html:173
-#: .\unicap\templates\app\board\optimize-modal.html:18
-#: .\unicap\templates\app\board\recommend-modal.html:46
+#: .\unicap\templates\app\board\optimize-modal.html:19
+#: .\unicap\templates\app\board\recommend-modal.html:45
 #: .\unicap\templates\app\reports\capacity.html:59
-#: .\unicap\templates\app\reports\faculties.html:31
+#: .\unicap\templates\app\reports\faculties.html:59
 #: .\unicap\templates\components\chapters\chapters\details.html:25
 #: .\unicap\templates\components\edu\faculties\details.html:42
 msgid "violations"
@@ -1737,7 +1759,7 @@ msgstr "المخالفات"
 #: .\unicap\app\reports\defaults.py:74 .\unicap\app\views\faculties.py:70
 #: .\unicap\templates\app\reports\capacity-pivot.html:80
 #: .\unicap\templates\app\reports\capacity.html:31
-#: .\unicap\templates\components\board\board.html:87
+#: .\unicap\templates\components\board\board.html:93
 msgid "per PhD"
 msgstr "لكل دكتور"
 
@@ -1747,36 +1769,36 @@ msgstr "لكل دكتور"
 #: .\unicap\templates\app\board\dashboard.html:36
 #: .\unicap\templates\app\reports\capacity-pivot.html:35
 #: .\unicap\templates\app\reports\capacity.html:37
-#: .\unicap\templates\app\reports\faculties.html:20
+#: .\unicap\templates\app\reports\faculties.html:48
 #: .\unicap\templates\app\reports\staff-pivot.html:96
-#: .\unicap\templates\app\reports\staff.html:100
+#: .\unicap\templates\app\reports\staff.html:103
 #: .\unicap\templates\components\board\board.html:37
 #: .\unicap\templates\components\chapters\chapters\details.html:24
 msgid "compliance"
 msgstr "الامتثال"
 
 #: .\unicap\app\reports\defaults.py:145 .\unicap\app\reports\defaults.py:310
-#: .\unicap\app\views\contracts.py:40 .\unicap\app\views\employees.py:36
+#: .\unicap\app\views\contracts.py:42 .\unicap\app\views\employees.py:36
 #: .\unicap\templates\app\reports\audit.html:98
 #: .\unicap\templates\app\reports\staff.html:56
 msgid "terms"
 msgstr "الشروط"
 
-#: .\unicap\app\reports\defaults.py:146 .\unicap\app\views\contracts.py:41
+#: .\unicap\app\reports\defaults.py:146 .\unicap\app\views\contracts.py:43
 #: .\unicap\app\views\employees.py:37
 #: .\unicap\templates\app\reports\staff.html:57
 msgid "status"
 msgstr "الحالة"
 
 #: .\unicap\app\reports\defaults.py:162
-#: .\unicap\templates\app\reports\staff.html:82
+#: .\unicap\templates\app\reports\staff.html:85
 #: .\unicap\templates\components\edu\faculties\details.html:75
 msgid "head counts"
 msgstr "الأعداد"
 
 #: .\unicap\app\reports\defaults.py:223 .\unicap\app\reports\defaults.py:342
 #: .\unicap\app\reports\defaults.py:357
-#: .\unicap\templates\app\board\recommend-modal.html:75
+#: .\unicap\templates\app\board\recommend-modal.html:74
 #: .\unicap\templates\app\reports\capacity-pivot.html:56
 #: .\unicap\templates\app\reports\staff-pivot.html:62
 #: .\unicap\templates\app\reports\staff-pivot.html:81
@@ -1840,7 +1862,12 @@ msgstr "المدرسون الموقّعون"
 msgid "%(faculty)s is not in this chapter"
 msgstr "%(faculty)s ليست في هذا الفصل"
 
-#: .\unicap\app\reports\docx.py:45
+#: .\unicap\app\reports\documents.py:125
+#| msgid "this chapter already has a faculty with this name."
+msgid "this chapter has no faculty yet."
+msgstr "لا توجد كلية في هذا الفصل بعد."
+
+#: .\unicap\app\reports\docx.py:50
 #, python-format
 msgid "The Word template cannot be used: %(error)s"
 msgstr "تعذّر استخدام قالب Word: %(error)s"
@@ -1881,32 +1908,31 @@ msgid "each faculty is listed once: %(names)s"
 msgstr "كل كلية تُذكر مرة واحدة: %(names)s"
 
 #: .\unicap\app\sites.py:11 .\unicap\app\sites.py:12 .\unicap\app\sites.py:13
-#: .\unicap\templates\components\layout\header.html:176
+#: .\unicap\templates\components\layout\header.html:178
 msgid "administration"
 msgstr "الإدارة"
 
-#: .\unicap\app\templatetags\domain.py:79
+#: .\unicap\app\snapshot.py:453
+msgid "choose another employee: this one cannot make that move."
+msgstr "اختر مدرّساً آخر: هذا المدرّس لا يمكنه تنفيذ ذلك التنقل."
+
+#: .\unicap\app\templatetags\domain.py:82
 msgid "MA"
 msgstr "ماجستير"
 
-#: .\unicap\app\templatetags\domain.py:82
+#: .\unicap\app\templatetags\domain.py:85
 #: .\unicap\templates\app\reports\capacity-pivot.html:55
 msgid "PT"
 msgstr "جزئي"
 
-#: .\unicap\app\templatetags\domain.py:84
+#: .\unicap\app\templatetags\domain.py:87
 #: .\unicap\templates\app\reports\capacity-pivot.html:53
 msgid "FT staff"
-msgstr "متفرغ ملاك"
+msgstr "كلي ملاك"
 
-#: .\unicap\app\templatetags\domain.py:84
-#: .\unicap\templates\app\reports\capacity-pivot.html:54
-msgid "FT borrowed"
-msgstr "متفرغ معار"
-
-#: .\unicap\app\texts.py:67
-msgid ", "
-msgstr "، "
+#: .\unicap\app\templatetags\domain.py:87
+msgid "FT"
+msgstr "كلي"
 
 #: .\unicap\app\views\backups.py:60
 msgid "this backup cannot be taken."
@@ -1928,7 +1954,6 @@ msgid "restored. What it replaced is saved as: %(backup)s"
 msgstr "تمت الاستعادة. ما استُبدل محفوظ في: %(backup)s"
 
 #: .\unicap\app\views\backups.py:138
-#| msgid "this backup is incomplete."
 msgid "this backup's file is gone."
 msgstr "ملف هذه النسخة الاحتياطية لم يعد موجوداً."
 
@@ -1936,22 +1961,22 @@ msgstr "ملف هذه النسخة الاحتياطية لم يعد موجودا
 msgid "backup deleted."
 msgstr "حُذفت النسخة الاحتياطية."
 
-#: .\unicap\app\views\board.py:84
+#: .\unicap\app\views\board.py:85
 #, python-format
 msgid "%(name)s on %(place)s: %(status)s · capacity would be %(capacity)s"
 msgstr "%(name)s في %(place)s: %(status)s · ستصبح الطاقة %(capacity)s"
 
-#: .\unicap\app\views\board.py:120
+#: .\unicap\app\views\board.py:121
 #, python-format
 msgid "%(count)s contract(s) are unsigned now."
 msgstr "أصبحت %(count)s عقود غير موقّعة."
 
-#: .\unicap\app\views\board.py:141
+#: .\unicap\app\views\board.py:179
 #, python-format
 msgid "%(count)s contract(s) re-signed."
 msgstr "أعيد توقيع %(count)s عقود."
 
-#: .\unicap\app\views\board.py:199 .\unicap\unicap\constants.py:52
+#: .\unicap\app\views\board.py:239 .\unicap\unicap\constants.py:52
 msgid "board"
 msgstr "اللوحة"
 
@@ -1985,11 +2010,13 @@ msgstr "نسخ %(name)s"
 
 #: .\unicap\app\views\contracts.py:18 .\unicap\app\views\employees.py:18
 #: .\unicap\app\views\specializations.py:18
+#: .\unicap\templates\app\board\index.html:96
 msgid "activate"
 msgstr "تفعيل"
 
 #: .\unicap\app\views\contracts.py:19 .\unicap\app\views\employees.py:19
 #: .\unicap\app\views\specializations.py:19
+#: .\unicap\templates\app\board\index.html:95
 msgid "deactivate"
 msgstr "إيقاف"
 
@@ -1997,9 +2024,28 @@ msgstr "إيقاف"
 msgid "unsign"
 msgstr "إلغاء التوقيع"
 
-#: .\unicap\app\views\contracts.py:34
+#: .\unicap\app\views\contracts.py:21
+msgid "lock to their faculty"
+msgstr "قفل على كلياتها"
+
+#: .\unicap\app\views\contracts.py:22
+#: .\unicap\templates\app\board\index.html:100
+msgid "unlock"
+msgstr "إلغاء القفل"
+
+#: .\unicap\app\views\contracts.py:36
 msgid "order"
 msgstr "الترتيب"
+
+#: .\unicap\app\views\contracts.py:149
+#, python-format
+msgid "%(name)s is locked to its faculty."
+msgstr "%(name)s مقفل على كليته."
+
+#: .\unicap\app\views\contracts.py:150
+#, python-format
+msgid "%(name)s is unlocked."
+msgstr "أُلغي قفل %(name)s."
 
 #: .\unicap\app\views\crud.py:319
 #, python-format
@@ -2021,50 +2067,50 @@ msgstr "%(what)s جديد"
 msgid "%(count)s deleted."
 msgstr "حُذف %(count)s."
 
-#: .\unicap\app\views\crud.py:389
+#: .\unicap\app\views\crud.py:401
 #, python-format
 msgid "%(name)s is on."
 msgstr "فُعّل %(name)s."
 
-#: .\unicap\app\views\crud.py:389
+#: .\unicap\app\views\crud.py:403
 #, python-format
 msgid "%(name)s is off."
 msgstr "عُطّل %(name)s."
 
-#: .\unicap\app\views\crud.py:416
+#: .\unicap\app\views\crud.py:430
 #, python-format
 msgid "%(what)s sample"
 msgstr "نموذج %(what)s"
 
-#: .\unicap\app\views\crud.py:425
+#: .\unicap\app\views\crud.py:439
 msgid "Choose a file."
 msgstr "اختر ملفاً."
 
-#: .\unicap\app\views\crud.py:433
+#: .\unicap\app\views\crud.py:447
 #, python-format
 msgid "%(count)s row(s) imported."
 msgstr "استُورد %(count)s صف."
 
-#: .\unicap\app\views\crud.py:442
+#: .\unicap\app\views\crud.py:456
 #, python-format
 msgid "import %(what)s"
 msgstr "استيراد %(what)s"
 
-#: .\unicap\app\views\crud.py:457
+#: .\unicap\app\views\crud.py:471
 #, python-format
 msgid "Only .xlsx and .csv files can be imported, not %(name)s."
 msgstr "يمكن استيراد ملفات ‎.xlsx و‎.csv فقط، وليس %(name)s."
 
-#: .\unicap\app\views\crud.py:466
+#: .\unicap\app\views\crud.py:480
 #, python-format
 msgid "%(name)s cannot be read: %(error)s"
 msgstr "تعذّرت قراءة %(name)s: %(error)s"
 
-#: .\unicap\app\views\crud.py:510
+#: .\unicap\app\views\crud.py:524
 msgid "check the fields to change."
 msgstr "حدّد الحقول التي تريد تغييرها."
 
-#: .\unicap\app\views\crud.py:517 .\unicap\app\views\crud.py:550
+#: .\unicap\app\views\crud.py:531 .\unicap\app\views\crud.py:564
 #, python-format
 msgid "%(count)s row(s) changed."
 msgstr "تغيّر %(count)s صف."
@@ -2074,8 +2120,8 @@ msgid "welcome"
 msgstr "أهلاً بك"
 
 #: .\unicap\app\views\dashboard.py:24
-#: .\unicap\templates\components\layout\header.html:22
-#: .\unicap\templates\components\layout\header.html:23
+#: .\unicap\templates\components\layout\header.html:24
+#: .\unicap\templates\components\layout\header.html:25
 #: .\unicap\unicap\constants.py:51
 msgid "dashboard"
 msgstr "لوحة المعلومات"
@@ -2097,13 +2143,17 @@ msgid "now · target · max"
 msgstr "الحالي · الهدف · الأعلى"
 
 #: .\unicap\app\views\reports.py:99
-#: .\unicap\templates\app\reports\faculties.html:11
+#: .\unicap\templates\app\reports\faculties.html:12
 #: .\unicap\unicap\constants.py:64
 msgid "faculty reports"
 msgstr "تقارير الكليات"
 
+#: .\unicap\app\views\reports.py:124
+#| msgid "faculties"
+msgid "all faculties"
+msgstr "كل الكليات"
+
 #: .\unicap\templates\403.html:2
-#| msgid "not calculated"
 msgid "not allowed"
 msgstr "غير مسموح"
 
@@ -2113,7 +2163,6 @@ msgid ""
 msgstr "غير مسموح لك بفتح هذه الصفحة: اطلب الصلاحية من أحد المدراء."
 
 #: .\unicap\templates\404.html:2
-#| msgid "not counted"
 msgid "page not found"
 msgstr "الصفحة غير موجودة"
 
@@ -2140,7 +2189,6 @@ msgstr ""
 
 #: .\unicap\templates\500.html:21
 #: .\unicap\templates\components\layout\error-page.html:21
-#| msgid "open the board"
 msgid "back to the dashboard"
 msgstr "العودة إلى لوحة المعلومات"
 
@@ -2150,7 +2198,7 @@ msgstr "العودة إلى لوحة المعلومات"
 #: .\unicap\templates\app\crud\delete-modal.html:5
 #: .\unicap\templates\app\crud\delete-modal.html:28
 #: .\unicap\templates\app\crud\details-modal.html:9
-#: .\unicap\templates\app\crud\index.html:112
+#: .\unicap\templates\app\crud\index.html:123
 #: .\unicap\templates\app\crud\table.html:137
 msgid "delete"
 msgstr "حذف"
@@ -2163,8 +2211,8 @@ msgstr "حذف النسخة الاحتياطية %(backup)s؟ لا يمكن ال
 #: .\unicap\templates\app\backups\delete-modal.html:6
 #: .\unicap\templates\app\backups\restore-modal.html:23
 #: .\unicap\templates\app\backups\upload-modal.html:10
-#: .\unicap\templates\app\board\optimize-modal.html:49
-#: .\unicap\templates\app\board\reset-modal.html:8
+#: .\unicap\templates\app\board\optimize-modal.html:93
+#: .\unicap\templates\app\board\reset-modal.html:14
 #: .\unicap\templates\app\chapters\duplicate-modal.html:10
 #: .\unicap\templates\app\crud\bulk-action-modal.html:20
 #: .\unicap\templates\app\crud\bulk-edit-modal.html:35
@@ -2196,9 +2244,9 @@ msgid "all"
 msgstr "الكل"
 
 #: .\unicap\templates\app\backups\index.html:50
-#: .\unicap\templates\app\board\index.html:30
-#: .\unicap\templates\app\board\reset-modal.html:9
-#: .\unicap\templates\app\crud\index.html:26
+#: .\unicap\templates\app\board\index.html:33
+#: .\unicap\templates\app\board\reset-modal.html:15
+#: .\unicap\templates\app\crud\index.html:37
 msgid "reset"
 msgstr "إعادة ضبط"
 
@@ -2281,8 +2329,8 @@ msgid "%(n)s unsigned"
 msgstr "%(n)s غير موقّع"
 
 #: .\unicap\templates\app\board\dashboard.html:31
-#: .\unicap\templates\app\board\optimize-modal.html:16
-#: .\unicap\templates\app\board\recommend-modal.html:48
+#: .\unicap\templates\app\board\optimize-modal.html:17
+#: .\unicap\templates\app\board\recommend-modal.html:47
 #: .\unicap\templates\components\board\board.html:33
 msgid "missing to targets"
 msgstr "النقص عن الأهداف"
@@ -2312,20 +2360,20 @@ msgstr "الطاقة حسب الكلية"
 
 #: .\unicap\templates\app\board\dashboard.html:54
 #: .\unicap\templates\app\board\dashboard.html:70
-#: .\unicap\templates\components\board\board.html:92
+#: .\unicap\templates\components\board\board.html:98
 msgid "target"
 msgstr "الهدف"
 
 #: .\unicap\templates\app\board\dashboard.html:55
 #: .\unicap\templates\app\board\dashboard.html:71
-#: .\unicap\templates\app\board\optimize-modal.html:10
-#: .\unicap\templates\app\board\recommend-modal.html:43
-#: .\unicap\templates\components\board\board.html:92
+#: .\unicap\templates\app\board\optimize-modal.html:11
+#: .\unicap\templates\app\board\recommend-modal.html:42
+#: .\unicap\templates\components\board\board.html:98
 msgid "now"
 msgstr "الحالي"
 
 #: .\unicap\templates\app\board\dashboard.html:76
-#: .\unicap\templates\app\reports\faculties.html:41
+#: .\unicap\templates\app\reports\faculties.html:69
 msgid "no faculty yet."
 msgstr "لا توجد كليات بعد."
 
@@ -2355,13 +2403,13 @@ msgstr "كل العقود"
 
 #: .\unicap\templates\app\board\dashboard.html:157
 #: .\unicap\templates\app\board\dashboard.html:163
-#: .\unicap\templates\app\board\index.html:51
+#: .\unicap\templates\app\board\index.html:61
 msgid "not counted"
 msgstr "غير محتسب"
 
 #: .\unicap\templates\app\board\dashboard.html:159
 #: .\unicap\templates\app\board\dashboard.html:165
-#: .\unicap\templates\app\board\index.html:53
+#: .\unicap\templates\app\board\index.html:63
 msgid "not calculated"
 msgstr "خارج الحساب"
 
@@ -2369,72 +2417,119 @@ msgstr "خارج الحساب"
 msgid "every faculty is compliant."
 msgstr "كل الكليات ممتثلة."
 
-#: .\unicap\templates\app\board\index.html:11
+#: .\unicap\templates\app\board\index.html:14
 msgid "find a teacher"
 msgstr "ابحث عن مدرّس"
 
-#: .\unicap\templates\app\board\index.html:24
+#: .\unicap\templates\app\board\index.html:27
 msgid "preview the moves before applying them"
 msgstr "معاينة التنقلات قبل تطبيقها"
 
-#: .\unicap\templates\app\board\index.html:26
-#: .\unicap\templates\app\board\optimize-modal.html:5
+#: .\unicap\templates\app\board\index.html:29
+#: .\unicap\templates\app\board\optimize-modal.html:6
 msgid "optimize"
 msgstr "تحسين"
 
-#: .\unicap\templates\app\board\index.html:33
+#: .\unicap\templates\app\board\index.html:36
 msgid "the contracts to sign to solve every problem"
 msgstr "العقود الواجب توقيعها لحل كل المشكلات"
 
-#: .\unicap\templates\app\board\index.html:34
-#: .\unicap\templates\app\board\recommend-modal.html:23
+#: .\unicap\templates\app\board\index.html:37
+#: .\unicap\templates\app\board\recommend-modal.html:22
 msgid "recommend"
 msgstr "اقتراح"
 
-#: .\unicap\templates\app\board\index.html:37
-msgid "copy this chapter with all of its data to try another scenario"
-msgstr "انسخ هذا الفصل بكل بياناته لتجربة سيناريو آخر"
+#: .\unicap\templates\app\board\index.html:45
+msgid "leave full screen"
+msgstr "الخروج من ملء الشاشة"
 
-#: .\unicap\templates\app\board\index.html:38
-msgid "duplicate chapter"
-msgstr "نسخ الفصل"
+#: .\unicap\templates\app\board\index.html:45
+msgid "full screen: the whole screen, every faculty side by side"
+msgstr "ملء الشاشة: الشاشة كلها، وكل الكليات جنباً إلى جنب"
 
 #: .\unicap\templates\app\board\index.html:49
-msgid "drag a card to another lane · click: details · double-click: on / off"
-msgstr "اسحب بطاقة إلى عمود آخر · نقرة: التفاصيل · نقرتان: تفعيل / تعطيل"
+msgid "full screen"
+msgstr "ملء الشاشة"
 
-#: .\unicap\templates\app\board\optimize-modal.html:10
-#: .\unicap\templates\app\board\recommend-modal.html:43
+#: .\unicap\templates\app\board\index.html:59
+msgid ""
+"drag a card to another lane · click: details · right-click: more · double-"
+"click a faculty: edit"
+msgstr ""
+"اسحب بطاقة إلى عمود آخر · نقرة: التفاصيل · نقرة يمنى: المزيد · نقرتان على "
+"كلية: تعديل"
+
+#: .\unicap\templates\app\board\index.html:86
+#: .\unicap\templates\app\crud\table.html:113
+msgid "details"
+msgstr "التفاصيل"
+
+#: .\unicap\templates\app\board\index.html:90
+#: .\unicap\templates\app\crud\details-modal.html:15
+#: .\unicap\templates\app\crud\table.html:125
+msgid "edit"
+msgstr "تعديل"
+
+#: .\unicap\templates\app\board\index.html:99
+msgid "lock to its faculty"
+msgstr "قفل على كليته"
+
+#: .\unicap\templates\app\board\index.html:111
+msgid "make it a master"
+msgstr "جعله ماجستير"
+
+#: .\unicap\templates\app\board\index.html:112
+msgid "make it a PhD"
+msgstr "جعله دكتوراه"
+
+#: .\unicap\templates\app\board\index.html:124
+msgid "make it parttime"
+msgstr "جعله جزئياً"
+
+#: .\unicap\templates\app\board\index.html:125
+msgid "make it fulltime"
+msgstr "جعله كلياً"
+
+#: .\unicap\templates\app\board\index.html:137
+msgid "make it borrowed"
+msgstr "جعله معاراً"
+
+#: .\unicap\templates\app\board\index.html:138
+msgid "make it staff"
+msgstr "جعله ملاكاً"
+
+#: .\unicap\templates\app\board\optimize-modal.html:11
+#: .\unicap\templates\app\board\recommend-modal.html:42
 msgid "after"
 msgstr "بعد"
 
-#: .\unicap\templates\app\board\optimize-modal.html:12
-#: .\unicap\templates\components\board\board.html:87
+#: .\unicap\templates\app\board\optimize-modal.html:13
+#: .\unicap\templates\components\board\board.html:93
 msgid "students"
 msgstr "طلاب"
 
-#: .\unicap\templates\app\board\optimize-modal.html:14
+#: .\unicap\templates\app\board\optimize-modal.html:15
 #: .\unicap\templates\components\chapters\chapters\details.html:7
 msgid "signed contracts"
 msgstr "العقود الموقّعة"
 
-#: .\unicap\templates\app\board\optimize-modal.html:15
+#: .\unicap\templates\app\board\optimize-modal.html:16
 #: .\unicap\templates\components\board\board.html:29
 #: .\unicap\templates\components\chapters\chapters\details.html:20
 msgid "overflowing"
 msgstr "الفائض"
 
-#: .\unicap\templates\app\board\optimize-modal.html:17
+#: .\unicap\templates\app\board\optimize-modal.html:18
 msgid "staff (weakest faculty)"
 msgstr "الملاك (أضعف كلية)"
 
-#: .\unicap\templates\app\board\optimize-modal.html:19
+#: .\unicap\templates\app\board\optimize-modal.html:20
 #: .\unicap\templates\components\chapters\chapters\details.html:4
 #: .\unicap\templates\components\hr\employees\details.html:4
 msgid "yes,no"
 msgstr "نعم,لا"
 
-#: .\unicap\templates\app\board\optimize-modal.html:25
+#: .\unicap\templates\app\board\optimize-modal.html:26
 #, python-format
 msgid "%(counter)s move"
 msgid_plural "%(counter)s moves"
@@ -2445,24 +2540,66 @@ msgstr[3] "%(counter)s تنقلات"
 msgstr[4] "%(counter)s تنقلاً"
 msgstr[5] "%(counter)s تنقل"
 
+#: .\unicap\templates\app\board\optimize-modal.html:27
+#, python-format
+msgid "%(counter)s removed"
+msgid_plural "%(counter)s removed"
+msgstr[0] "لم يُزل شيء"
+msgstr[1] "أزيل واحد"
+msgstr[2] "أزيل اثنان"
+msgstr[3] "أزيلت %(counter)s"
+msgstr[4] "أزيل %(counter)s"
+msgstr[5] "أزيل %(counter)s"
+
+#: .\unicap\templates\app\board\optimize-modal.html:43
+msgid "who makes this move"
+msgstr "من ينفّذ هذا التنقل"
+
 #: .\unicap\templates\app\board\optimize-modal.html:44
+msgid ""
+"who makes this move: anyone with the same specialization, terms and faculty"
+msgstr "من ينفّذ هذا التنقل: أي مدرّس له الاختصاص والشروط والكلية نفسها"
+
+#: .\unicap\templates\app\board\optimize-modal.html:67
+#: .\unicap\templates\app\board\optimize-modal.html:68
+msgid "put this move back"
+msgstr "إعادة هذا التنقل"
+
+#: .\unicap\templates\app\board\optimize-modal.html:79
+msgid "remove this move: the contract stays where it is"
+msgstr "إزالة هذا التنقل: يبقى العقد في مكانه"
+
+#: .\unicap\templates\app\board\optimize-modal.html:80
+msgid "remove this move"
+msgstr "إزالة هذا التنقل"
+
+#: .\unicap\templates\app\board\optimize-modal.html:88
 msgid "the current placement is already the best this strategy finds."
 msgstr "التوزيع الحالي هو الأفضل الذي تجده هذه الاستراتيجية."
 
-#: .\unicap\templates\app\board\optimize-modal.html:46
+#: .\unicap\templates\app\board\optimize-modal.html:90
 msgid ""
 "a heuristic search (two starts and local moves), not a proven optimum. "
-"Employment terms never change, only faculties."
+"Employment terms never change, only faculties; locked contracts stay where "
+"they are."
 msgstr ""
 "بحث تقريبي (بدايتان وتنقلات محلية) وليس حلاً أمثل مثبتاً. شروط التعيين لا "
-"تتغير، الكليات فقط."
+"تتغير، الكليات فقط؛ والعقود المقفلة تبقى في مكانها."
 
-#: .\unicap\templates\app\board\optimize-modal.html:50
+#: .\unicap\templates\app\board\optimize-modal.html:91
+msgid ""
+"each move names who makes it: where the list holds others, they have the "
+"same specialization, terms and faculty, so the result is the same. Remove "
+"the moves you do not want: the figures above follow."
+msgstr ""
+"كل تنقل يسمّي من ينفّذه: حيث تضم القائمة غيره فلهم الاختصاص والشروط والكلية "
+"نفسها، فالنتيجة واحدة. أزل التنقلات التي لا تريدها: الأرقام أعلاه تتبعها."
+
+#: .\unicap\templates\app\board\optimize-modal.html:94
 msgid "apply these moves"
 msgstr "تطبيق هذه التنقلات"
 
 #: .\unicap\templates\app\board\problem.html:7
-#| msgid "the employee cannot be counted in this faculty"
 msgid "this page cannot be shown until it is fixed."
 msgstr "لا يمكن عرض هذه الصفحة قبل تصحيح ذلك."
 
@@ -2473,16 +2610,17 @@ msgstr "اقتراح عقود"
 #: .\unicap\templates\app\board\recommend-modal.html:11
 msgid ""
 "how many contracts, of which kind, specialization and faculty, the "
-"university should sign so that no violation is left. Nothing is saved."
+"university should sign so that no violation is left and every faculty "
+"reaches its target students. Nothing is saved."
 msgstr ""
-"كم عقداً، ومن أي نوع واختصاص وكلية، يجب أن توقع الجامعة كي لا تبقى أي "
-"مخالفة. لا يُحفظ شيء."
+"كم عقداً، ومن أي نوع واختصاص وكلية، يجب أن توقع الجامعة كي لا تبقى أي مخالفة"
+" وتبلغ كل كلية طلابها المستهدفين. لا يُحفظ شيء."
 
-#: .\unicap\templates\app\board\recommend-modal.html:35
+#: .\unicap\templates\app\board\recommend-modal.html:34
 msgid "nothing to sign: no problem is left."
 msgstr "لا شيء للتوقيع: لم تبقَ أي مشكلة."
 
-#: .\unicap\templates\app\board\recommend-modal.html:36
+#: .\unicap\templates\app\board\recommend-modal.html:35
 #, python-format
 msgid "sign %(counter)s contract"
 msgid_plural "sign %(counter)s contracts"
@@ -2493,27 +2631,28 @@ msgstr[3] "توقيع %(counter)s عقود"
 msgstr[4] "توقيع %(counter)s عقداً"
 msgstr[5] "توقيع %(counter)s عقد"
 
-#: .\unicap\templates\app\board\recommend-modal.html:38
+#: .\unicap\templates\app\board\recommend-modal.html:37
 msgid ""
 "some problems need more than new contracts (max teachers, max shares, max "
-"students): see what is left below."
+"students): see what is left below, and the students still missing to the "
+"targets above."
 msgstr ""
 "بعض المشكلات تحتاج أكثر من عقود جديدة (الحد الأعلى للمدرّسين أو النسب أو "
-"الطلاب): انظر ما تبقى أدناه."
+"الطلاب): انظر ما تبقى أدناه، والنقص عن الأهداف أعلاه."
 
-#: .\unicap\templates\app\board\recommend-modal.html:47
+#: .\unicap\templates\app\board\recommend-modal.html:46
 msgid "current students without a seat"
 msgstr "الطلاب الحاليون دون مقعد"
 
-#: .\unicap\templates\app\board\recommend-modal.html:61
+#: .\unicap\templates\app\board\recommend-modal.html:60
 msgid "count"
 msgstr "العدد"
 
-#: .\unicap\templates\app\board\recommend-modal.html:83
+#: .\unicap\templates\app\board\recommend-modal.html:82
 msgid "left after signing"
 msgstr "ما يبقى بعد التوقيع"
 
-#: .\unicap\templates\app\board\recommend-modal.html:91
+#: .\unicap\templates\app\board\recommend-modal.html:90
 msgid ""
 "a greedy search, faculty by faculty: each step signs the contract that helps"
 " the most for the strategy. Masters are suggested by the PhD they are worth "
@@ -2522,11 +2661,11 @@ msgstr ""
 "بحث جشع، كلية تلو الأخرى: كل خطوة توقع العقد الأكثر فائدة حسب الاستراتيجية. "
 "ويُقترح حملة الماجستير بعدد ما يعادل دكتوراً واحداً معاً."
 
-#: .\unicap\templates\app\board\recommend-modal.html:97
+#: .\unicap\templates\app\board\recommend-modal.html:96
 #: .\unicap\templates\app\crud\details-modal.html:12
 #: .\unicap\templates\components\layout\error-toast.html:17
 #: .\unicap\templates\components\layout\filters-sidebar.html:43
-#: .\unicap\templates\components\layout\modal-body.html:35
+#: .\unicap\templates\components\layout\modal-body.html:36
 #: .\unicap\templates\components\layout\toast.html:18
 msgid "close"
 msgstr "إغلاق"
@@ -2543,6 +2682,17 @@ msgid ""
 msgstr ""
 "جعل كل العقود الموقّعة (%(signed)s) في %(name)s غير موقّعة؟ تبقى شروطها؛ "
 "تُفرّغ الكليات فقط."
+
+#: .\unicap\templates\app\board\reset-modal.html:10
+#, python-format
+msgid "%(counter)s locked contract stays in its faculty."
+msgid_plural "%(counter)s locked contracts stay in their faculties."
+msgstr[0] "لا عقود مقفلة."
+msgstr[1] "يبقى عقد مقفل واحد في كليته."
+msgstr[2] "يبقى عقدان مقفلان في كليتيهما."
+msgstr[3] "تبقى %(counter)s عقود مقفلة في كلياتها."
+msgstr[4] "يبقى %(counter)s عقداً مقفلاً في كلياتها."
+msgstr[5] "يبقى %(counter)s عقد مقفل في كلياتها."
 
 #: .\unicap\templates\app\board\welcome.html:5
 msgid "Welcome to UniCap"
@@ -2635,16 +2785,11 @@ msgstr[3] "حذف هذه الصفوف الـ%(counter)s؟ لا يمكن التر
 msgstr[4] "حذف هذه الصفوف الـ%(counter)s؟ لا يمكن التراجع."
 msgstr[5] "حذف هذه الصفوف الـ%(counter)s؟ لا يمكن التراجع."
 
-#: .\unicap\templates\app\crud\details-modal.html:15
-#: .\unicap\templates\app\crud\table.html:125
-msgid "edit"
-msgstr "تعديل"
-
-#: .\unicap\templates\app\crud\filters-badge.html:10
+#: .\unicap\templates\app\crud\filters-badge.html:16
 msgid "clear the filters (search and sorting stay)"
 msgstr "مسح عوامل التصفية (يبقى البحث والترتيب)"
 
-#: .\unicap\templates\app\crud\filters-badge.html:11
+#: .\unicap\templates\app\crud\filters-badge.html:17
 msgid "clear the filters"
 msgstr "مسح عوامل التصفية"
 
@@ -2672,8 +2817,8 @@ msgstr ""
 " شيء."
 
 #: .\unicap\templates\app\crud\import-modal.html:9
-#: .\unicap\templates\app\crud\index.html:136
-#: .\unicap\templates\app\crud\index.html:138
+#: .\unicap\templates\app\crud\index.html:147
+#: .\unicap\templates\app\crud\index.html:149
 msgid "columns"
 msgstr "الأعمدة"
 
@@ -2701,72 +2846,72 @@ msgstr ""
 msgid "import"
 msgstr "استيراد"
 
-#: .\unicap\templates\app\crud\index.html:25
+#: .\unicap\templates\app\crud\index.html:35
 msgid "clear every filter"
 msgstr "مسح كل عوامل التصفية"
 
-#: .\unicap\templates\app\crud\index.html:59
+#: .\unicap\templates\app\crud\index.html:70
 msgid "words, or a query like"
 msgstr "كلمات، أو استعلام مثل"
 
-#: .\unicap\templates\app\crud\index.html:71
+#: .\unicap\templates\app\crud\index.html:82
 msgid "selected"
 msgstr "محدد"
 
-#: .\unicap\templates\app\crud\index.html:98
+#: .\unicap\templates\app\crud\index.html:109
 msgid "edit fields"
 msgstr "تعديل الحقول"
 
-#: .\unicap\templates\app\crud\index.html:125
-#: .\unicap\templates\app\crud\index.html:128
+#: .\unicap\templates\app\crud\index.html:136
+#: .\unicap\templates\app\crud\index.html:139
 #: .\unicap\templates\components\layout\filters-sidebar.html:25
 #: .\unicap\templates\components\layout\filters-sidebar.html:29
 msgid "filters"
 msgstr "التصفية"
 
-#: .\unicap\templates\app\crud\index.html:141
+#: .\unicap\templates\app\crud\index.html:152
 msgid "drag to reorder, check to show"
 msgstr "اسحب لإعادة الترتيب، وحدّد للإظهار"
 
-#: .\unicap\templates\app\crud\index.html:163
+#: .\unicap\templates\app\crud\index.html:174
 msgid "reset columns"
 msgstr "إعادة ضبط الأعمدة"
 
-#: .\unicap\templates\app\crud\index.html:170
+#: .\unicap\templates\app\crud\index.html:181
 msgid "export / import"
 msgstr "تصدير / استيراد"
 
-#: .\unicap\templates\app\crud\index.html:172
+#: .\unicap\templates\app\crud\index.html:183
 msgid "files"
 msgstr "الملفات"
 
-#: .\unicap\templates\app\crud\index.html:176
+#: .\unicap\templates\app\crud\index.html:187
 msgid "export to Excel"
 msgstr "تصدير إلى Excel"
 
-#: .\unicap\templates\app\crud\index.html:179
+#: .\unicap\templates\app\crud\index.html:190
 msgid "export to CSV"
 msgstr "تصدير إلى CSV"
 
-#: .\unicap\templates\app\crud\index.html:190
+#: .\unicap\templates\app\crud\index.html:201
 msgid "import a file"
 msgstr "استيراد ملف"
 
-#: .\unicap\templates\app\crud\index.html:204
+#: .\unicap\templates\app\crud\index.html:215
 #, python-format
 msgid "back up the %(what)s"
 msgstr "نسخ %(what)s احتياطياً"
 
-#: .\unicap\templates\app\crud\index.html:204
+#: .\unicap\templates\app\crud\index.html:215
 msgid "back up this chapter"
 msgstr "نسخ هذا الفصل احتياطياً"
 
-#: .\unicap\templates\app\crud\index.html:210
+#: .\unicap\templates\app\crud\index.html:221
 msgid "restore from a backup"
 msgstr "الاستعادة من نسخة احتياطية"
 
-#: .\unicap\templates\app\crud\index.html:226
-#: .\unicap\templates\app\crud\index.html:228
+#: .\unicap\templates\app\crud\index.html:237
+#: .\unicap\templates\app\crud\index.html:239
 #: .\unicap\templates\components\layout\sidebar.html:73
 #: .\unicap\templates\components\layout\sidebar.html:74
 msgid "new"
@@ -2786,47 +2931,44 @@ msgstr "تحديد"
 
 #: .\unicap\templates\app\crud\table.html:90
 #: .\unicap\templates\app\crud\table.html:91
+#: .\unicap\templates\components\board\cards.html:75
 msgid "actions"
 msgstr "الإجراءات"
-
-#: .\unicap\templates\app\crud\table.html:113
-msgid "details"
-msgstr "التفاصيل"
 
 #: .\unicap\templates\app\crud\table.html:150
 msgid "nothing matches the search and filters."
 msgstr "لا شيء يطابق البحث والتصفية."
 
-#: .\unicap\templates\app\crud\table.html:151
+#: .\unicap\templates\app\crud\table.html:160
 msgid "clear filters"
 msgstr "مسح التصفية"
 
-#: .\unicap\templates\app\crud\table.html:153
+#: .\unicap\templates\app\crud\table.html:162
 msgid "nothing here yet."
 msgstr "لا شيء هنا بعد."
 
-#: .\unicap\templates\app\crud\table.html:166
+#: .\unicap\templates\app\crud\table.html:175
 #, python-format
 msgid "%(shown)s of %(total)s %(what)s"
 msgstr "%(shown)s من %(total)s %(what)s"
 
-#: .\unicap\templates\app\crud\table.html:188
+#: .\unicap\templates\app\crud\table.html:197
 msgid "pages"
 msgstr "الصفحات"
 
-#: .\unicap\templates\app\crud\table.html:190
+#: .\unicap\templates\app\crud\table.html:199
 msgid "first page"
 msgstr "الصفحة الأولى"
 
-#: .\unicap\templates\app\crud\table.html:194
+#: .\unicap\templates\app\crud\table.html:203
 msgid "previous page"
 msgstr "الصفحة السابقة"
 
-#: .\unicap\templates\app\crud\table.html:199
+#: .\unicap\templates\app\crud\table.html:208
 msgid "next page"
 msgstr "الصفحة التالية"
 
-#: .\unicap\templates\app\crud\table.html:203
+#: .\unicap\templates\app\crud\table.html:212
 msgid "last page"
 msgstr "الصفحة الأخيرة"
 
@@ -2835,19 +2977,23 @@ msgstr "الصفحة الأخيرة"
 msgid "detailed"
 msgstr "تفصيلي"
 
+#: .\unicap\templates\app\reports\capacity-pivot.html:54
+msgid "FT borrowed"
+msgstr "كلي معار"
+
 #: .\unicap\templates\app\reports\capacity.html:13
-#: .\unicap\templates\app\reports\faculties.html:35
+#: .\unicap\templates\app\reports\faculties.html:63
 #: .\unicap\templates\app\reports\staff.html:11
 msgid "pivot"
 msgstr "ملخص"
 
 #: .\unicap\templates\app\reports\capacity.html:23
 msgid "specialized FT staff"
-msgstr "اختصاصي متفرغ ملاك"
+msgstr "اختصاصي كلي ملاك"
 
 #: .\unicap\templates\app\reports\capacity.html:24
 msgid "specialized FT borrowed"
-msgstr "اختصاصي متفرغ معار"
+msgstr "اختصاصي كلي معار"
 
 #: .\unicap\templates\app\reports\capacity.html:25
 msgid "specialized PT"
@@ -2855,11 +3001,11 @@ msgstr "اختصاصي جزئي"
 
 #: .\unicap\templates\app\reports\capacity.html:26
 msgid "supported FT staff"
-msgstr "داعم متفرغ ملاك"
+msgstr "داعم كلي ملاك"
 
 #: .\unicap\templates\app\reports\capacity.html:27
 msgid "supported FT borrowed"
-msgstr "داعم متفرغ معار"
+msgstr "داعم كلي معار"
 
 #: .\unicap\templates\app\reports\capacity.html:28
 msgid "supported PT"
@@ -2879,24 +3025,55 @@ msgstr "كل خلية: المحتسب / الموقّع. العقود خارج ا
 msgid "hover a number for its teachers."
 msgstr "مرّر المؤشر فوق أي رقم لعرض أسماء مدرسيه."
 
-#: .\unicap\templates\app\reports\faculties.html:21
+#: .\unicap\templates\app\reports\faculties.html:17
+msgid "every faculty in one file, each from a new page"
+msgstr "كل الكليات في ملف واحد، كل كلية في صفحة جديدة"
+
+#: .\unicap\templates\app\reports\faculties.html:18
+#| msgid "export"
+msgid "export all"
+msgstr "تصدير الكل"
+
+#: .\unicap\templates\app\reports\faculties.html:22
+#| msgid "staff report"
+msgid "staff reports"
+msgstr "تقارير الكادر"
+
+#: .\unicap\templates\app\reports\faculties.html:24
+#: .\unicap\templates\app\reports\faculties.html:32
+#: .\unicap\templates\components\reports\actions.html:14
+msgid "Word"
+msgstr "Word"
+
+#: .\unicap\templates\app\reports\faculties.html:27
+#: .\unicap\templates\app\reports\faculties.html:35
+#: .\unicap\templates\components\reports\actions.html:17
+msgid "PDF"
+msgstr "PDF"
+
+#: .\unicap\templates\app\reports\faculties.html:30
+#| msgid "pivot"
+msgid "pivots"
+msgstr "الملخصات"
+
+#: .\unicap\templates\app\reports\faculties.html:49
 #: .\unicap\unicap\constants.py:56
 msgid "reports"
 msgstr "التقارير"
 
-#: .\unicap\templates\app\reports\faculties.html:34
+#: .\unicap\templates\app\reports\faculties.html:62
 #: .\unicap\templates\components\edu\faculties\details.html:5
 msgid "staff report"
 msgstr "تقرير الكادر"
 
 #: .\unicap\templates\app\reports\staff-pivot.html:102
-#: .\unicap\templates\app\reports\staff.html:106
+#: .\unicap\templates\app\reports\staff.html:109
 #: .\unicap\templates\components\edu\faculties\details.html:49
 msgid "compliant: no violation."
 msgstr "ممتثل: لا توجد مخالفات."
 
-#: .\unicap\templates\app\reports\staff.html:75
-#: .\unicap\templates\components\edu\faculties\details.html:134
+#: .\unicap\templates\app\reports\staff.html:78
+#: .\unicap\templates\components\edu\faculties\details.html:136
 msgid "no contract is signed here."
 msgstr "لا يوجد عقد موقّع هنا."
 
@@ -2905,7 +3082,7 @@ msgid "see all"
 msgstr "عرض الكل"
 
 #: .\unicap\templates\app\search\results.html:27
-#: .\unicap\templates\components\search-select.html:49
+#: .\unicap\templates\components\search-select.html:50
 msgid "no match"
 msgstr "لا نتائج"
 
@@ -2914,17 +3091,39 @@ msgstr "لا نتائج"
 msgid "faculties allow"
 msgstr "ما تسمح به الكليات"
 
-#: .\unicap\templates\components\board\board.html:72
+#: .\unicap\templates\components\board\board.html:78
 msgid "drag to reorder lanes"
 msgstr "اسحب لإعادة ترتيب الأعمدة"
 
-#: .\unicap\templates\components\board\board.html:101
+#: .\unicap\templates\components\board\board.html:107
+msgid ""
+"drag: make this row taller or shorter · double-click: back to its own height"
+msgstr "اسحب: لتكبير هذا الصف أو تصغيره · نقرتان: العودة إلى ارتفاعه"
+
+#: .\unicap\templates\components\board\board.html:115
 msgid "no faculty in this chapter yet: add one to sign contracts to it."
 msgstr "لا توجد كلية في هذا الفصل بعد: أضف كلية لتوقيع العقود عليها."
 
-#: .\unicap\templates\components\board\board.html:113
+#: .\unicap\templates\components\board\board.html:135
+msgid "drop here to sign without scrolling"
+msgstr "أفلت هنا للتوقيع دون تمرير"
+
+#: .\unicap\templates\components\board\board.html:157
 msgid "issues"
 msgstr "المشكلات"
+
+#: .\unicap\templates\components\board\cards.html:19
+#: .\unicap\templates\components\board\cards.html:20
+msgid "find here"
+msgstr "ابحث هنا"
+
+#: .\unicap\templates\components\board\cards.html:57
+msgid "locked to this faculty"
+msgstr "مقفل على هذه الكلية"
+
+#: .\unicap\templates\components\board\cards.html:57
+msgid "locked once signed"
+msgstr "يُقفل عند توقيعه"
 
 #: .\unicap\templates\components\chapters\chapters\cells.html:5
 #: .\unicap\templates\components\chapters\chapters\details.html:4
@@ -3101,7 +3300,7 @@ msgstr "اكتب للبحث"
 msgid "employee off"
 msgstr "المدرّس معطّل"
 
-#: .\unicap\templates\components\hr\contracts\details.html:17
+#: .\unicap\templates\components\hr\contracts\details.html:18
 msgid ""
 "when a group overflows, the contracts signed last are the ones not counted."
 msgstr "عندما تفيض مجموعة، فالعقود الموقّعة أخيراً هي التي لا تُحتسب."
@@ -3130,46 +3329,46 @@ msgstr "إلغاء التثبيت"
 msgid "pin beside the table"
 msgstr "تثبيت بجانب الجدول"
 
-#: .\unicap\templates\components\layout\header.html:11
-#: .\unicap\templates\components\layout\header.html:12
+#: .\unicap\templates\components\layout\header.html:13
+#: .\unicap\templates\components\layout\header.html:14
 msgid "toggle sidebar"
 msgstr "إظهار / إخفاء الشريط الجانبي"
 
-#: .\unicap\templates\components\layout\header.html:18
+#: .\unicap\templates\components\layout\header.html:20
 msgid "breadcrumb"
 msgstr "مسار التنقل"
 
-#: .\unicap\templates\components\layout\header.html:56
-#: .\unicap\templates\components\layout\header.html:57
+#: .\unicap\templates\components\layout\header.html:58
+#: .\unicap\templates\components\layout\header.html:59
 msgid "search everything"
 msgstr "البحث في كل شيء"
 
-#: .\unicap\templates\components\layout\header.html:101
+#: .\unicap\templates\components\layout\header.html:103
 msgid "no chapter yet"
 msgstr "لا يوجد فصل بعد"
 
-#: .\unicap\templates\components\layout\header.html:114
-#: .\unicap\templates\components\layout\header.html:115
+#: .\unicap\templates\components\layout\header.html:116
+#: .\unicap\templates\components\layout\header.html:117
 msgid "theme"
 msgstr "المظهر"
 
-#: .\unicap\templates\components\layout\header.html:124
+#: .\unicap\templates\components\layout\header.html:126
 msgid "light"
 msgstr "فاتح"
 
-#: .\unicap\templates\components\layout\header.html:128
+#: .\unicap\templates\components\layout\header.html:130
 msgid "dark"
 msgstr "داكن"
 
-#: .\unicap\templates\components\layout\header.html:132
+#: .\unicap\templates\components\layout\header.html:134
 msgid "system"
 msgstr "حسب النظام"
 
-#: .\unicap\templates\components\layout\header.html:161
+#: .\unicap\templates\components\layout\header.html:163
 msgid "user menu"
 msgstr "قائمة المستخدم"
 
-#: .\unicap\templates\components\layout\header.html:182
+#: .\unicap\templates\components\layout\header.html:184
 msgid "log out"
 msgstr "تسجيل الخروج"
 
@@ -3202,11 +3401,11 @@ msgstr "التنقل الرئيسي"
 msgid "close menu"
 msgstr "إغلاق القائمة"
 
-#: .\unicap\templates\components\layout\sidebar.html:92
+#: .\unicap\templates\components\layout\sidebar.html:94
 msgid "collapse sidebar"
 msgstr "طي الشريط الجانبي"
 
-#: .\unicap\templates\components\layout\sidebar.html:98
+#: .\unicap\templates\components\layout\sidebar.html:100
 msgid "collapse"
 msgstr "طي"
 
@@ -3217,14 +3416,6 @@ msgstr "تصدير"
 #: .\unicap\templates\components\reports\actions.html:11
 msgid "print"
 msgstr "طباعة"
-
-#: .\unicap\templates\components\reports\actions.html:14
-msgid "Word"
-msgstr "Word"
-
-#: .\unicap\templates\components\reports\actions.html:17
-msgid "PDF"
-msgstr "PDF"
 
 #: .\unicap\templates\registration\login.html:9
 #: .\unicap\templates\registration\login.html:36
@@ -3271,8 +3462,23 @@ msgstr "الإنجليزية"
 msgid "Arabic"
 msgstr "العربية"
 
-#~ msgid "print staff"
-#~ msgstr "طباعة الكادر"
+#~ msgid "copy this chapter with all of its data to try another scenario"
+#~ msgstr "انسخ هذا الفصل بكل بياناته لتجربة سيناريو آخر"
+
+#~ msgid "duplicate chapter"
+#~ msgstr "نسخ الفصل"
+
+#~ msgid "meet student targets"
+#~ msgstr "بلوغ أهداف الطلاب"
+
+#~ msgid "Reach every faculty's target students first, then maximize."
+#~ msgstr "بلوغ هدف كل كلية أولاً، ثم زيادة الطلاب."
+
+#~ msgid "also reach every target"
+#~ msgstr "بلوغ كل الأهداف أيضاً"
+
+#~ msgid "besides solving the violations, reach every faculty's target students"
+#~ msgstr "إضافة إلى حل المخالفات، بلوغ العدد المستهدف من الطلاب في كل كلية"
 
 #~ msgid "print pivot"
 #~ msgstr "طباعة الملخص"

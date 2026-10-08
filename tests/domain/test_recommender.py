@@ -62,15 +62,47 @@ class TestRecommend:
         assert recommendation.after.capacity >= 35
         assert recommendation.before.capacity == 10
 
-    def test_targets_only_when_asked(self) -> None:
+    def test_a_target_is_required(self) -> None:
+        # compliant already (no current students), but 20 students short of its target
         dentistry = faculty(
             "Dentistry", specialized(DENTISTRY), students_per_phd=10, target_students=30
         )
 
         chapter = chapter_of(dentistry, [fulltime_staff(DENTISTRY, dentistry)])
 
-        assert recommend(chapter).contracts == 0
-        assert recommend(chapter, meet_targets=True).after.target_shortfall == 0
+        recommendation = recommend(chapter)
+
+        assert recommendation.before.is_compliant
+        assert recommendation.contracts == 2
+        assert recommendation.after.target_shortfall == 0
+        assert recommendation.is_solved
+
+    def test_a_target_beyond_the_current_students_is_reached(self) -> None:
+        dentistry = faculty(
+            "Dentistry",
+            specialized(DENTISTRY),
+            students_per_phd=10,
+            current_students=20,
+            target_students=50,
+        )
+
+        recommendation = recommend(chapter_of(dentistry))
+
+        assert recommendation.after.capacity == 50  # not 20: the target, not only the seats
+        assert recommendation.is_solved
+
+    def test_a_target_hires_cannot_reach_is_left_unsolved(self) -> None:
+        dentistry = faculty(
+            "Dentistry",
+            specialized(DENTISTRY, max_teachers=2),
+            students_per_phd=10,
+            target_students=50,
+        )
+
+        recommendation = recommend(chapter_of(dentistry))
+
+        assert recommendation.after.is_compliant
+        assert not recommendation.is_solved
 
     def test_a_low_staff_ratio_needs_staff(self) -> None:
         dentistry = faculty("Dentistry", specialized(DENTISTRY), min_staff_percentage=50)
@@ -186,10 +218,10 @@ def test_hires_never_leave_a_faculty_further_from_compliance(
     item = random_faculty(rng)
     chapter = Chapter.assemble("2026", random_contracts(rng, item), faculties=(item,))
 
-    recommendation = recommend(chapter, strategy, meet_targets=rng.random() > 0.5)
+    recommendation = recommend(chapter, strategy)
 
     def distance(report: ChapterReport) -> int:
-        return gap_of(report.faculties[0], meet_targets=recommendation.meet_targets).distance
+        return gap_of(report.faculties[0]).distance
 
     assert distance(recommendation.after) <= distance(recommendation.before)
     assert recommendation.is_solved == (distance(recommendation.after) == 0)

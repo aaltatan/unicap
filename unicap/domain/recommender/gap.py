@@ -3,8 +3,8 @@
 Every problem is a number of people or of students:
   people  teachers missing to every minimum: min_teachers, min specialized / supported,
           min shares, min staff percentage
-  seats   current students without a seat, plus (when targets count) students missing to
-          target_students
+  seats   current students without a seat, and students missing to target_students
+          (a faculty with a target must reach it, not only seat its current students)
 
 `distance` puts them on one scale, whole teachers: the seats need one PhD per
 `students_per_phd` students. A minimum rounded to whole people can stay missed after a
@@ -43,13 +43,13 @@ class Gap:
         return self.distance == 0
 
 
-def gap_of(report: FacultyReport, *, meet_targets: bool) -> Gap:
+def gap_of(report: FacultyReport) -> Gap:
     calculation = report.calculation
 
     people = calculation.teacher_shortage + calculation.share_shortage
     people += calculation.staff_shortage
 
-    seats = calculation.seat_shortage + (calculation.target_shortfall if meet_targets else 0)
+    seats = calculation.seat_shortage + calculation.target_shortfall
 
     spp = report.faculty.students_per_phd
 

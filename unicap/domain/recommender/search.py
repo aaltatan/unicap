@@ -43,7 +43,6 @@ class Recommendation:
     hires: tuple[Hire, ...]
     before: ChapterReport
     after: ChapterReport
-    meet_targets: bool = False
 
     @property
     def contracts(self) -> int:
@@ -52,11 +51,8 @@ class Recommendation:
 
     @property
     def is_solved(self) -> bool:
-        """No problem is left once the hires are signed."""
-        if not self.after.is_compliant:
-            return False
-
-        return not self.meet_targets or self.after.target_shortfall == 0
+        """No problem is left once the hires are signed: compliant, and every target reached."""
+        return self.after.is_compliant and self.after.target_shortfall == 0
 
     def hires_of(self, faculty: Faculty) -> tuple[Hire, ...]:
         return tuple(hire for hire in self.hires if hire.faculty == faculty)
@@ -67,16 +63,16 @@ def recommend(
     strategy: RecommendationStrategy = DEFAULT,
     *,
     kinds: frozenset[HireKind] = ALL_KINDS,
-    meet_targets: bool = False,
     max_hires: int = 200,
 ) -> Recommendation:
     """Recommend the contracts to sign so that the chapter's problems are solved.
+
+    A problem is a violation, or a faculty below its target students.
 
     Args:
         chapter: the chapter as it is (its current placement is kept).
         strategy: which helping contract comes first.
         kinds: the kinds of contract the university is willing to sign.
-        meet_targets: also reach every faculty's target_students.
         max_hires: the most contracts tried per faculty.
 
     Example:
@@ -87,7 +83,7 @@ def recommend(
     """
     ids = count(-1, -1)  # new employees get ids no row has
 
-    search = _Search(chapter, strategy, kinds, meet_targets=meet_targets)
+    search = _Search(chapter, strategy, kinds)
 
     signed = [
         pair
@@ -108,7 +104,6 @@ def recommend(
         hires=_grouped(signed),
         before=evaluate_chapter(chapter),
         after=evaluate_chapter(after),
-        meet_targets=meet_targets,
     )
 
 
@@ -120,13 +115,10 @@ class _Search:
         chapter: Chapter,
         strategy: RecommendationStrategy,
         kinds: frozenset[HireKind],
-        *,
-        meet_targets: bool,
     ) -> None:
         self.chapter = chapter
         self.strategy = strategy
         self.kinds = sorted(kinds)
-        self.meet_targets = meet_targets
 
     def hires_for(
         self, faculty: ChapterFaculty, *, max_hires: int, ids: Iterator[int]
@@ -216,7 +208,7 @@ class _Search:
     def gap(self, faculty: ChapterFaculty, contracts: list[Contract]) -> Gap:
         report = evaluate_faculty(faculty, contracts)
 
-        return gap_of(report, meet_targets=self.meet_targets)
+        return gap_of(report)
 
 
 def _contracts(

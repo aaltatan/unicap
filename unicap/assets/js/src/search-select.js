@@ -3,7 +3,9 @@
  *
  * The native select stays in the form (hidden) and is what is submitted, so the server
  * side does not change; the text input above it filters its options as you type
- * (↑ ↓ to move, Enter to pick, Esc to close). Every typed word must appear, in any order,
+ * (↑ ↓ to move, Enter to pick, Esc to close). The list opens on a click, on typing or on
+ * ↑ ↓, not on focus alone: tabbing through a form (or a modal focusing its first field)
+ * never drops a list over the next fields. Every typed word must appear, in any order,
  * ignoring case, Arabic diacritics, spelling variants and a leading article.
  */
 

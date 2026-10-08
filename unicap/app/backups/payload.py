@@ -78,6 +78,7 @@ CONTRACT_FIELDS = (
     "employment_type",
     "degree",
     "is_active",
+    "is_locked",  # a backup made before the lock existed holds none: the row keeps its own
     "position",
     "notes",
 )

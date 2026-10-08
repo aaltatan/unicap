@@ -4,6 +4,12 @@
     <p class="text-sm first-letter:uppercase">
       {% blocktranslate with name=chapter.name %}make all {{ signed }} signed contract(s) of {{ name }} unsigned? Their terms stay; only the faculties are cleared.{% endblocktranslate %}
     </p>
+    {% if locked %}
+    <p class="mt-2 flex items-center gap-1.5 text-sm text-neutral-500">
+      {% heroicon_mini "lock-closed" size=14 class="shrink-0" %}
+      <span class="first-letter:uppercase">{% blocktranslate count counter=locked %}{{ counter }} locked contract stays in its faculty.{% plural %}{{ counter }} locked contracts stay in their faculties.{% endblocktranslate %}</span>
+    </p>
+    {% endif %}
     <c-slot name="footer">
       <button type="button" class="btn btn-default" @click="closeModal()">{% translate 'cancel' %}</button>
       <button type="submit" class="btn btn-danger" {% if not signed %}disabled{% endif %}>{% heroicon_outline "arrow-uturn-left" size=16 %} {% translate 'reset' %}</button>

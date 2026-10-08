@@ -7,7 +7,7 @@ from .context import (
     faculty_pivot_context,
 )
 from .defaults import build_defaults, default_path
-from .docx import CONTENT_TYPES, ReportTemplateError, attachment, check, render
+from .docx import CONTENT_TYPES, ReportTemplateError, attachment, check, join, render
 from .pdf import PdfError, to_pdf
 
 __all__ = [
@@ -24,6 +24,7 @@ __all__ = [
     "default_path",
     "faculty_context",
     "faculty_pivot_context",
+    "join",
     "render",
     "to_pdf",
 ]

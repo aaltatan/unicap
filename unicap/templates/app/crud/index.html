@@ -22,7 +22,18 @@
         <button type="submit" class="btn btn-primary flex-1">
           {% heroicon_outline "funnel" size=16 %} {% translate 'apply' %}
         </button>
-        <a href="{{ index_url }}" class="btn btn-default" data-url-reset title="{% translate 'clear every filter' %}">
+        <a
+          href="{{ index_url }}"
+          class="btn btn-default"
+          data-url-reset
+          hx-get="{{ index_url }}"
+          hx-target="#table"
+          hx-swap="innerHTML"
+          hx-push-url="true"
+          hx-indicator="#spinner"
+          @click="clearFilters({ search: true })"
+          title="{% translate 'clear every filter' %}"
+        >
           {% heroicon_outline "arrow-path" size=16 %} {% translate 'reset' %}
         </a>
       </div>

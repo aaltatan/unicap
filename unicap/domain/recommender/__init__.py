@@ -1,7 +1,7 @@
 """Recommend the contracts a university should sign to solve its problems.
 
-A problem is a violation (a minimum missed, current students without a seat) and, when
-asked, a faculty below its target students. The recommender adds new contracts to the
+A problem is a violation (a minimum missed, current students without a seat) or a faculty
+below its target students: a target is required. The recommender adds new contracts to the
 faculties as they are (it never moves anyone: the optimizer does that) and tells how many
 of which kind, specialization and faculty solve the most.
 

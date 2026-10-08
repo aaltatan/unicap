@@ -148,7 +148,16 @@
               {% heroicon_outline resource.icon size=32 class="text-neutral-300 dark:text-neutral-600" %}
               {% if total %}
               <p class="first-letter:uppercase">{% translate 'nothing matches the search and filters.' %}</p>
-              <a href="{{ index_url }}" class="btn btn-default" data-url-reset>{% translate 'clear filters' %}</a>
+              <a
+                href="{{ index_url }}"
+                class="btn btn-default"
+                data-url-reset
+                hx-get="{{ index_url }}"
+                hx-target="#table"
+                hx-swap="innerHTML"
+                hx-push-url="true"
+                @click="clearFilters({ search: true })"
+              >{% translate 'clear filters' %}</a>
               {% else %}
               <p class="first-letter:uppercase">{% translate 'nothing here yet.' %}</p>
               {% endif %}

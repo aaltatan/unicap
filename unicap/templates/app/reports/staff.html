@@ -61,8 +61,11 @@
             {% for contract, status in report.in_staff_order %}
             <tr class="break-inside-avoid">
               <td class="tabular-nums text-neutral-500">{{ forloop.counter }}</td>
-              <td class="font-medium">{{ contract.employee.name }}</td>
-              <td>{{ contract.employee.specialization.name }}</td>
+              {# the employee and the specialization open their own details, as everywhere else #}
+              {% with row=rows|get_item:contract.employee.id %}
+              <td class="font-medium">{% if row %}<c-object-link :obj="row.employee" :allowed="perms.app.view_employee" />{% else %}{{ contract.employee.name }}{% endif %}</td>
+              <td>{% if row %}<c-object-link :obj="row.employee.specialization" :allowed="perms.app.view_specialization" />{% else %}{{ contract.employee.specialization.name }}{% endif %}</td>
+              {% endwith %}
               <td>{% with kind=contract|specialization_type %}<c-type-tag :kind="kind" />{% endwith %}</td>
               <td>{{ contract|terms }}</td>
               <td><span class="badge {{ status|status_badge }}">{{ status|status_label }}</span></td>

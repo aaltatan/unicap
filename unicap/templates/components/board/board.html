@@ -41,13 +41,14 @@
     </div>
   </div>
 
-  <div class="grid items-start gap-3 lg:grid-cols-[17rem_1fr]">
+  {# full screen: every lane a column beside the others, as tall as the screen #}
+  <div class="grid items-start gap-3 lg:grid-cols-[17rem_1fr]" :class="fullscreen ? '!flex' : ''">
     {% with lane=lanes.0 %}
-    <section class="lane lg:sticky lg:top-16 lg:max-h-[calc(100svh-5rem)]" :class="laneClass('{{ lane.key }}')">
+    <section class="lane lg:sticky lg:top-16 lg:max-h-[calc(100svh-5rem)]" :class="[laneClass('{{ lane.key }}'), fullscreen ? '!static w-64 shrink-0' : '']">
       <header class="flex items-center gap-2 border-b border-neutral-200 px-3 py-2 dark:border-neutral-800">
         {% heroicon_outline "inbox-stack" size=18 class="text-neutral-400" %}
         <h2 class="text-sm font-semibold first-letter:uppercase">{% translate 'unsigned' %}</h2>
-        <span class="badge badge-neutral ms-auto">{{ lane.cards|length }}</span>
+        <span class="badge badge-neutral ms-auto tabular-nums" data-lane-count x-text="laneCount('{{ lane.key }}', {{ lane.cards|length }})">{{ lane.cards|length }}</span>
       </header>
       {% include "components/board/cards.html" with lane_height="max-h-[min(28rem,60svh)] lg:max-h-none lg:min-h-0" %}
     </section>
@@ -58,13 +59,18 @@
       x-sort="save()"
       x-sort:config="{ handle: '.lane-handle', animation: 150, forceFallback: true, fallbackOnBody: true, fallbackTolerance: 3 }"
       class="grid items-start gap-3 sm:grid-cols-2 2xl:grid-cols-3"
+      :class="fullscreen ? 'scroll !flex min-w-0 flex-1 overflow-x-auto pb-2' : ''"
     >
       {% for lane in lanes|slice:"1:" %}
       <section
         class="lane"
-        :class="laneClass('{{ lane.key }}')"
+        :class="[laneClass('{{ lane.key }}'), fullscreen ? 'min-w-72 max-w-md flex-1 basis-0' : '']"
         data-key="{{ lane.key }}"
         x-sort:item="'{{ lane.key }}'"
+        {% if can_edit_faculties %}
+        data-edit="{% url 'edu:faculties:update' lane.faculty_id %}"
+        @dblclick="editLane($event, $el.dataset.edit)"
+        {% endif %}
       >
         {% with faculty=lane.report.faculty report_=lane.report %}
         <header class="space-y-1 border-b border-neutral-200 px-3 py-2 dark:border-neutral-800">
@@ -79,7 +85,7 @@
               {% else %}
               <span class="badge badge-danger" title="{% for violation in report_.violations %}{{ violation|violation_text }}&#10;{% endfor %}">{% heroicon_mini "exclamation-triangle" size=12 %} {{ report_.violations|length }}</span>
               {% endif %}
-              <span class="badge badge-neutral">{{ lane.cards|length }}</span>
+              <span class="badge badge-neutral tabular-nums" data-lane-count x-text="laneCount('{{ lane.key }}', {{ lane.cards|length }})">{{ lane.cards|length }}</span>
             </span>
           </div>
           <p class="text-xs">
@@ -94,6 +100,14 @@
         </header>
         {% endwith %}
         {% include "components/board/cards.html" %}
+        {# the lane's bottom edge: drag it to make its whole row taller or shorter #}
+        <div
+          class="lane-resize"
+          data-lane-resize
+          title="{% translate 'drag: make this row taller or shorter · double-click: back to its own height' %}"
+          @pointerdown.prevent="resizeRow($event, $el.closest('section'))"
+          @dblclick.stop="resetRow($el.closest('section'))"
+        ></div>
       </section>
       {% empty %}
       <div class="card col-span-full flex flex-col items-center gap-2 p-8 text-center text-sm text-neutral-500">
@@ -104,6 +118,35 @@
       {% endfor %}
     </div>
   </div>
+
+  {% if can_move %}
+  {% comment %}
+    While a card is dragged: every lane as a drop target, so a faculty out of sight needs
+    no scrolling (same colors and hint as the lanes themselves). It takes the page header's
+    strip, the one place no lane is ever under: a dock anywhere else would cover lanes.
+  {% endcomment %}
+  <div
+    x-show="dragging"
+    x-cloak
+    data-dock
+    class="scroll fixed inset-x-0 top-0 z-[56] flex h-14 items-stretch gap-1.5 overflow-x-auto border-b border-neutral-300 bg-white px-3 py-1.5 shadow-lg dark:border-neutral-700 dark:bg-neutral-900"
+  >
+    <p class="flex w-28 shrink-0 items-center text-[11px] leading-tight text-neutral-500 first-letter:uppercase">{% translate 'drop here to sign without scrolling' %}</p>
+    {% for lane in lanes %}
+    <div
+      class="dock-target"
+      :class="laneClass('{{ lane.key }}')"
+      data-lane="{{ lane.key }}"
+      x-sort="drop($item, $el.dataset.lane)"
+      x-sort:group="cards"
+      x-sort:config="sortConfig"
+    >
+      <span class="pointer-events-none truncate font-semibold">{% if lane.report %}{{ lane.report.faculty.name }}{% else %}{% translate 'unsigned' %}{% endif %}</span>
+      {% if lane.report %}<span class="pointer-events-none tabular-nums text-neutral-500">{{ lane.report.capacity }} · {{ lane.cards|length }}</span>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
 
   <!-- issues: violations and contracts not counted, with the reason -->
   {% if not report.is_compliant or report.overflowing %}

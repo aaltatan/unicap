@@ -74,14 +74,17 @@ def terms(contract: Contract) -> str:
 
 @register.filter
 def short_terms(contract: Contract) -> str:
-    """`FT staff`, `FT borrowed`, `PT` or `MA`: fits on a one-line board card."""
+    """`FT staff`, `FT`, `PT` or `MA`: fits on a one-line board card.
+
+    Staff is said, borrowed is not: the shorter the terms, the more of the name shows.
+    """
     if not contract.is_phd:
         return _("MA")
 
     if not contract.is_fulltime:
         return _("PT")
 
-    return _("FT staff") if contract.is_staff else _("FT borrowed")
+    return _("FT staff") if contract.is_staff else _("FT")
 
 
 @register.filter

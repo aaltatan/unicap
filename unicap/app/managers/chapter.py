@@ -1,4 +1,4 @@
-from collections.abc import Iterable, Iterator, Mapping
+from collections.abc import Collection, Iterable, Iterator, Mapping
 from contextlib import contextmanager
 from typing import TYPE_CHECKING, Any
 
@@ -282,20 +282,43 @@ class ChapterManager(BaseManager.from_queryset(ChapterQuerySet)):  # type: ignor
         return related
 
     def reset(self, chapter: "Chapter") -> int:
-        """Make every contract of the chapter unsigned (the board's Reset)."""
-        with self.validated(chapter.pk):
-            return chapter.contracts.exclude(faculty=None).update(faculty=None)
+        """Make every contract of the chapter unsigned (the board's Reset).
 
-    def apply_placements(self, chapter: "Chapter", placements: Mapping[int, int | None]) -> int:
+        Contracts locked to their faculty stay signed.
+        """
+        with self.validated(chapter.pk):
+            return chapter.contracts.signed().movable().update(faculty=None)
+
+    def apply_placements(
+        self,
+        chapter: "Chapter",
+        placements: Mapping[int, int | None],
+        *,
+        substitutes: Mapping[int, int] | None = None,
+        removed: Collection[int] = (),
+    ) -> int:
         """Sign each contract id to its faculty id (None: unsigned); re-signed go last.
+
+        Args:
+            chapter: whose contracts are placed.
+            placements: contract id -> faculty id (None: unsigned).
+            substitutes: contract id -> the id of the contract that makes its move in its
+                place (the domain's `substitutes_for`: the same in everything but who).
+            removed: the contract ids left where they are, whatever `placements` says.
 
         Returns how many contracts moved.
 
         Raises:
-            UserError: a faculty id is not one of the chapter's; nothing is saved.
+            UserError: a faculty id is not one of the chapter's, a substitute is not one of
+                its contract's, or a contract is locked to another faculty; nothing is saved.
             DomainError: the placement breaks a domain rule; nothing is saved.
         """
         moved = 0
+
+        if substitutes or removed:
+            placements = self.get_snapshot(chapter.pk).resolved(
+                placements, removed=removed, substitutes=substitutes
+            )
 
         asked = {faculty_id for faculty_id in placements.values() if faculty_id is not None}
         owned = set(chapter.faculties.filter(pk__in=asked).values_list("pk", flat=True))
@@ -306,7 +329,11 @@ class ChapterManager(BaseManager.from_queryset(ChapterQuerySet)):  # type: ignor
         with self.validated(chapter.pk):
             position = self.next_position(chapter)
 
-            for contract in chapter.contracts.filter(pk__in=list(placements)).order_by("position"):
+            placed = chapter.contracts.filter(pk__in=list(placements))
+
+            chapter.contracts.check_placements(placements)
+
+            for contract in placed.order_by("position"):
                 faculty_id = placements[contract.pk]
 
                 if contract.faculty_id == faculty_id:

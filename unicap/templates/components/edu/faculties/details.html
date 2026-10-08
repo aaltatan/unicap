@@ -99,7 +99,7 @@
       <tbody class="tabular-nums">
         {% for share in obj.shares.all %}
         <tr>
-          <td>{{ share.specialization.name }}</td>
+          <td><c-object-link :obj="share.specialization" :allowed="perms.app.view_specialization" /></td>
           <td><span class="badge {% if share.specialization_type == 'specialized' %}badge-info{% else %}badge-neutral{% endif %}">{{ share.get_specialization_type_display }}</span></td>
           <td class="text-end">{% if share.percentage is not None %}{{ share.percentage|number }}%{% else %}—{% endif %}</td>
           <td class="text-end">{{ share.min_percentage|number|default:"—" }} – {{ share.max_percentage|number|default:"—" }}</td>
@@ -123,9 +123,11 @@
     <ul class="grid gap-1.5 sm:grid-cols-2">
       {% for contract, status in report.in_staff_order %}
       <li class="flex items-center gap-2 rounded-md border border-neutral-200 px-2 py-1.5 text-sm dark:border-neutral-800">
-        <span class="font-medium">{{ contract.employee.name }}</span>
+        {% with row=rows|get_item:contract.employee.id %}
+        <span class="font-medium">{% if row %}<c-object-link :obj="row.employee" :allowed="perms.app.view_employee" />{% else %}{{ contract.employee.name }}{% endif %}</span>
         {% with kind=contract|specialization_type %}<c-type-tag :kind="kind" />{% endwith %}
-        <span class="text-xs text-neutral-500">{{ contract|terms }} · {{ contract.employee.specialization.name }}</span>
+        <span class="text-xs text-neutral-500">{{ contract|terms }} · {% if row %}<c-object-link :obj="row.employee.specialization" :allowed="perms.app.view_specialization" />{% else %}{{ contract.employee.specialization.name }}{% endif %}</span>
+        {% endwith %}
         <span class="badge {{ status|status_badge }} ms-auto">{{ status|status_label }}</span>
       </li>
       {% endfor %}

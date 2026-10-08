@@ -93,6 +93,7 @@ class ErrorCode(StrEnum):
     NO_CONTRACT = auto()
     NEGATIVE = auto()
     MASTERS_PER_PHD_NOT_POSITIVE = auto()
+    CONTRACT_LOCKED = auto()
 
 
 class TeacherKind(StrEnum):

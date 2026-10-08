@@ -211,18 +211,43 @@ class TestStrategies:
 
         assert evaluate_chapter(optimized).capacity == 30
 
-    def test_meet_targets_before_maximizing(self) -> None:
+    def test_targets_come_before_maximizing(self) -> None:
         rich, targeted = _faculty("Rich", 30), _faculty("Targeted", 10, target_students=20)
 
-        chapter = _dentists(3, rich, targeted)
+        report = evaluate_chapter(optimize(_dentists(3, rich, targeted)))
 
-        by_students = evaluate_chapter(optimize(chapter, Strategy.MAXIMIZE_STUDENTS))
+        # all three in Rich would give 90, but Targeted must reach its 20 first
+        assert (report.capacity, report.target_shortfall) == (50, 0)
 
-        by_targets = evaluate_chapter(optimize(chapter, Strategy.MEET_TARGETS))
+    @pytest.mark.parametrize("strategy", list(Strategy))
+    def test_every_strategy_reaches_the_targets(self, strategy: Strategy) -> None:
+        rich, targeted = _faculty("Rich", 30), _faculty("Targeted", 10, target_students=20)
 
-        assert (by_students.capacity, by_students.target_shortfall) == (90, 20)
+        report = evaluate_chapter(optimize(_dentists(3, rich, targeted), strategy))
 
-        assert (by_targets.capacity, by_targets.target_shortfall) == (50, 0)
+        assert report.target_shortfall == 0
+
+    def test_a_target_is_more_than_seating_the_current_students(self) -> None:
+        growing = _faculty("Growing", 10, current_students=10, target_students=30)
+
+        other = _faculty("Other", 30)
+
+        report = evaluate_chapter(optimize(_dentists(3, growing, other)))
+
+        # one dentist seats the 10 current students; the target needs all three
+        assert report.report_of(growing.faculty).capacity == 30
+
+    @pytest.mark.parametrize("strategy", list(Strategy))
+    def test_a_target_never_costs_a_violation(self, strategy: Strategy) -> None:
+        targeted = _faculty("Targeted", 10, target_students=20)
+
+        crowded = _faculty("Crowded", 10, current_students=20)
+
+        report = evaluate_chapter(optimize(_dentists(2, targeted, crowded), strategy))
+
+        assert report.is_compliant
+
+        assert report.report_of(crowded.faculty).capacity == 20
 
     def test_teacher_usage_signs_teachers_that_add_no_students(self) -> None:
         full = _faculty("Full", 10, max_students=10)

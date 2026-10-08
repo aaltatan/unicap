@@ -152,6 +152,65 @@ def test_the_faculty_print_page_lists_its_staff(
     assert html.css_first(f"a[href='{reverse('reports:staff-docx', args=(faculty.pk,))}']")
 
 
+def test_the_print_page_links_each_teacher_and_specialization(
+    admin_client: Client, faculty: Faculty
+) -> None:
+    response = admin_client.get(reverse("reports:staff", args=(faculty.pk,)))
+
+    rows = HTMLParser(response.content).css("table")[0].css("tbody tr")
+    contracts = {c.employee.name: c for c in faculty.contracts.with_relations()}
+
+    assert len(rows) == len(contracts)
+
+    for row in rows:
+        name, specialization = (
+            row.css("td")[1].css_first("button"),
+            row.css("td")[2].css_first("button"),
+        )
+        contract = contracts[name.text(strip=True)]
+
+        # as every other link to a row: its details, in the modal
+        assert name.attributes["hx-get"] == contract.employee.get_absolute_url()
+        assert name.attributes["hx-target"] == "#modal-container"
+        assert specialization.attributes["hx-get"] == (
+            contract.employee.specialization.get_absolute_url()
+        )
+        assert specialization.text(strip=True) == contract.employee.specialization.name
+
+
+def test_the_print_page_names_without_links_who_may_not_open_them(
+    client: Client, chapter: Chapter, faculty: Faculty
+) -> None:
+    from django.contrib.auth.models import Permission  # noqa: PLC0415
+
+    from unicap.app.models import User  # noqa: PLC0415
+
+    user = User.objects.create_user("faculties-only", password="password")  # noqa: S106
+    user.user_permissions.set(Permission.objects.filter(codename="view_faculty"))
+    client.force_login(user)
+
+    html = HTMLParser(client.get(reverse("reports:staff", args=(faculty.pk,))).content)
+
+    table = html.css("table")[0]
+
+    assert not table.css("button")
+    assert all(name in table.text() for name in staff_names(faculty))
+
+
+def test_the_faculty_details_link_its_teachers_and_specializations(
+    admin_client: Client, faculty: Faculty
+) -> None:
+    response = admin_client.get(faculty.get_absolute_url(), HTTP_HX_REQUEST="true")
+
+    links = {
+        button.attributes["hx-get"] for button in HTMLParser(response.content).css("button[hx-get]")
+    }
+
+    for contract in faculty.contracts.with_relations():
+        assert contract.employee.get_absolute_url() in links
+        assert contract.employee.specialization.get_absolute_url() in links
+
+
 def test_the_faculty_staff_downloads_a_docx(admin_client: Client, faculty: Faculty) -> None:
     response = admin_client.get(reverse("reports:staff-docx", args=(faculty.pk,)))
 

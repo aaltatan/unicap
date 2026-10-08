@@ -10,7 +10,8 @@ from .base import ChapterForeignKeyWidget, ChapterResource
 class ContractResource(ChapterResource):
     """Contracts; the employee and faculty by name (no faculty: unsigned).
 
-    A new contract, or one whose faculty changes, is signed last.
+    A new contract, or one whose faculty changes, is signed last; a locked one cannot change
+    its faculty (unless the row unlocks it).
     """
 
     employee = fields.Field(
@@ -33,6 +34,7 @@ class ContractResource(ChapterResource):
             "contract_type",
             "employment_type",
             "is_active",
+            "is_locked",
             "notes",
         )
         export_order = fields
@@ -41,9 +43,12 @@ class ContractResource(ChapterResource):
         skip_unchanged = True
 
     def before_save_instance(self, instance: Contract, row: Any, **kwargs: Any) -> None:
-        previous = (
-            Contract.objects.filter(pk=instance.pk).values_list("faculty_id", flat=True).first()
-        )
+        stored = Contract.objects.filter(pk=instance.pk)
+
+        previous = stored.values_list("faculty_id", flat=True).first()
+
+        if instance.is_locked:
+            Contract.objects.check_movable(stored, instance.faculty_id)
 
         if instance.pk is None or previous != instance.faculty_id:
             last = Contract.objects.filter(chapter=self.chapter).aggregate(last=Max("position"))

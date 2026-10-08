@@ -36,3 +36,18 @@ class ContractQuerySet(BaseQuerySet):
     def unsigned(self) -> Self:
         """Contracts not signed to any faculty (the board's unsigned lane)."""
         return self.filter(faculty__isnull=True)
+
+    def pinned(self) -> Self:
+        """Contracts that stay in their faculty: locked and signed (`Contract.is_pinned`)."""
+        return self.filter(is_locked=True, faculty__isnull=False)
+
+    def movable(self) -> Self:
+        """Contracts that may be signed elsewhere or unsigned: every one that is not pinned."""
+        return self.exclude(is_locked=True, faculty__isnull=False)
+
+    def moving_to(self, faculty_id: int | None) -> Self:
+        """Contracts that signing to `faculty_id` (None: unsigned) would take out of their place."""
+        if faculty_id is None:
+            return self.filter(faculty__isnull=False)
+
+        return self.exclude(faculty_id=faculty_id)

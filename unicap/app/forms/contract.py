@@ -22,6 +22,7 @@ class ContractForm(ChapterOwnedForm):
             "contract_type",
             "employment_type",
             "is_active",
+            "is_locked",
             "notes",
         )
         widgets = {"notes": forms.Textarea(attrs={"rows": 2, "x-autosize": ""})}

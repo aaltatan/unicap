@@ -8,12 +8,11 @@
     hx-indicator="#recommend-spinner"
   >
     <p class="text-sm text-neutral-600 first-letter:uppercase dark:text-neutral-300">
-      {% translate 'how many contracts, of which kind, specialization and faculty, the university should sign so that no violation is left. Nothing is saved.' %}
+      {% translate 'how many contracts, of which kind, specialization and faculty, the university should sign so that no violation is left and every faculty reaches its target students. Nothing is saved.' %}
     </p>
     <div class="grid gap-3 sm:grid-cols-2">
       <div class="space-y-3">
         <c-field :field="form.strategy" />
-        <c-field :field="form.meet_targets" />
         <c-field :field="form.optimize_first" />
       </div>
       <c-field :field="form.kinds" />
@@ -35,7 +34,7 @@
         {% if not r.contracts %}{% translate 'nothing to sign: no problem is left.' %}
         {% else %}{% blocktranslate count counter=r.contracts %}sign {{ counter }} contract{% plural %}sign {{ counter }} contracts{% endblocktranslate %}{% endif %}
       </span>
-      {% if not r.is_solved %}<span class="first-letter:uppercase">{% translate 'some problems need more than new contracts (max teachers, max shares, max students): see what is left below.' %}</span>{% endif %}
+      {% if not r.is_solved %}<span class="first-letter:uppercase">{% translate 'some problems need more than new contracts (max teachers, max shares, max students): see what is left below, and the students still missing to the targets above.' %}</span>{% endif %}
     </div>
 
     <div class="overflow-x-auto">

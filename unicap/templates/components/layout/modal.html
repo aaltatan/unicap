@@ -14,7 +14,7 @@
     id="modal-container"
     x-ref="container"
     class="max-w-full"
-    x-trap.noscroll="modalOpen"
+    x-trap.noscroll.noautofocus="modalOpen"
     @click.outside="modalOpen && pressedOutside && closeModal()"
   ></div>
 </div>

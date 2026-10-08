@@ -50,9 +50,12 @@ class Board:
     def outcome(self) -> Outcome:
         return Outcome.of(self.total, self.chapter_max, self.moves, self.scores.values())
 
-    def is_calculated(self, contract: Contract) -> bool:
-        """Tell whether a contract takes part (where it counts is each faculty's say)."""
-        return contract.is_included
+    def is_movable(self, contract: Contract) -> bool:
+        """Tell whether the search may place a contract: it takes part and is not locked in.
+
+        (Where a contract counts is each faculty's say.)
+        """
+        return contract.is_included and not contract.is_pinned
 
     def key(self) -> Key:
         return self.strategy.key(self.outcome())
@@ -141,7 +144,7 @@ class Board:
         moved = False
 
         for contract in list(self.contract_of.values()):
-            if not self.is_calculated(contract):
+            if not self.is_movable(contract):
                 continue
 
             current = self.faculty_of[contract.employee]

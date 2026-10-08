@@ -158,9 +158,17 @@ class ContractAdmin(ValidatedAdmin):
         "contract_type",
         "employment_type",
         "is_active",
+        "is_locked",
         "position",
     )
-    list_filter = ("chapter", "degree", "contract_type", "employment_type", "is_active")
+    list_filter = (
+        "chapter",
+        "degree",
+        "contract_type",
+        "employment_type",
+        "is_active",
+        "is_locked",
+    )
     search_fields = ("employee__name", "faculty__name", "notes")
     autocomplete_fields = ("employee", "faculty")
 

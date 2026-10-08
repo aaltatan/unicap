@@ -7,6 +7,12 @@
   href="{{ filters_reset_url }}"
   class="btn btn-default btn-icon rounded-s-none border-s-0 text-neutral-500 hover:text-rose-600 dark:hover:text-rose-400"
   data-url-reset
+  hx-get="{{ filters_reset_url }}"
+  hx-target="#table"
+  hx-swap="innerHTML"
+  hx-push-url="true"
+  hx-indicator="#spinner"
+  @click="clearFilters()"
   title="{% translate 'clear the filters (search and sorting stay)' %}"
   aria-label="{% translate 'clear the filters' %}"
 >{% heroicon_mini "x-mark" size=16 %}</a>{% endif %}</span>{% endif %}

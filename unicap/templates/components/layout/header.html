@@ -4,9 +4,11 @@
 <header
   class="print:hidden sticky top-0 z-30 flex h-14 shrink-0 items-center gap-2 border-b border-neutral-200 bg-white/80 px-3 backdrop-blur dark:border-neutral-800 dark:bg-neutral-900/80"
 >
+  {# small screens only, where the sidebar is off the screen: on large ones its own "collapse" button does it #}
   <button
     type="button"
-    class="btn btn-ghost btn-icon"
+    class="btn btn-ghost btn-icon lg:hidden"
+    data-nav-toggle
     @click="toggleNav()"
     title="{% translate 'toggle sidebar' %} (Alt+S)"
     aria-label="{% translate 'toggle sidebar' %}"

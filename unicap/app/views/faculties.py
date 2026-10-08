@@ -7,7 +7,7 @@ from django.views.decorators.http import require_http_methods, require_POST
 from .. import filters, forms, resources
 from ..constants import faculty as constants
 from ..decorators import chapter_required
-from ..models import Faculty, FacultySettings
+from ..models import Contract, Faculty, FacultySettings
 from ..querysets.base import BaseQuerySet
 from ..requests import AppRequest, ChapterRequest
 from . import crud
@@ -101,7 +101,9 @@ def details(request: ChapterRequest, pk: int) -> HttpResponse:
 
     [faculty] = Faculty.objects.attach_reports([faculty], request.chapter.pk)
 
-    return crud.render_details(request, RESOURCE, faculty)
+    rows = Contract.objects.by_employee(request.chapter.pk, faculty.pk)
+
+    return crud.render_details(request, RESOURCE, faculty, {"rows": rows})
 
 
 @require_http_methods(["GET", "POST"])

@@ -52,6 +52,9 @@ class ContractFilter(BaseFilterSet):
         choices=EmploymentTypeChoices.choices,
     )
     is_active = boolean_choice(_("is active"), yes=_("on"), no=_("off"), field_name="is_active")
+    is_locked = boolean_choice(
+        _("locked to its faculty"), yes=_("locked"), no=_("not locked"), field_name="is_locked"
+    )
 
     class Meta:
         model = Contract

@@ -39,7 +39,14 @@ from unicap.domain.models import (
     Share,
     Specialization,
 )
-from unicap.domain.optimizer import Outcome, Score, Strategy, optimize, outcome_of
+from unicap.domain.optimizer import (
+    Outcome,
+    Score,
+    Strategy,
+    optimize,
+    outcome_of,
+    substitutes_for,
+)
 from unicap.domain.ordering import in_staff_order, staff_order
 from unicap.domain.recommender import (
     Hire,
@@ -101,4 +108,5 @@ __all__ = [
     "round_count",
     "salary_class",
     "staff_order",
+    "substitutes_for",
 ]

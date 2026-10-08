@@ -14,7 +14,7 @@ def start_as_signed(chapter: Chapter, strategy: Strategy) -> Board:
     faculties = board.faculties
 
     signed, unsigned = partition(
-        lambda c: c.faculty in faculties or not board.is_calculated(c), chapter.contracts
+        lambda c: c.faculty in faculties or not board.is_movable(c), chapter.contracts
     )
 
     for contract in signed:
@@ -38,7 +38,7 @@ def start_by_fit(chapter: Chapter, strategy: Strategy) -> Board:
     )
 
     for contract in specialized_first:
-        if not board.is_calculated(contract):  # left out: stays where it is
+        if not board.is_movable(contract):  # left out or locked in: stays where it is
             board.move(contract, contract.faculty if contract.faculty in faculties else None)
 
             continue

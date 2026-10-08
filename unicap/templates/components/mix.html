@@ -2,8 +2,10 @@
 {% comment %}
   A faculty's signed teachers as percentages (the domain's `Mix`), beside its staff percentage:
   specialized / supported, fulltime / parttime, PhDs / masters; each bar is the first of the pair.
+  One under the other, or (`class`: grid columns) side by side: a gap, not a margin, sets them
+  apart, so side by side they stay on one line.
 {% endcomment %}
-<div class="space-y-1.5 text-xs {{ class }}">
+<div class="grid gap-y-1.5 text-xs {{ class }}" data-mix>
   {% for row in mix|mix_rows %}
   <div>
     <div class="flex justify-between gap-2 tabular-nums">

@@ -3,10 +3,30 @@
   A lane's cards scroll inside the lane (its height is capped), so a long lane never pushes
   the others down the page: every lane stays in reach while dragging (SortableJS scrolls
   the lane under the pointer near its edges).
+
+  A card carries what its menu shows (`data-*`: the contract's terms as they are, and the
+  switches the domain refuses, `data-blocked`); the menu itself is the board's, drawn once.
+
+  The lane's own search hides the cards that do not match it (`data-search`: the name, the
+  specialization, the type and the terms); what is typed is the board's, so it stays
+  through every redraw.
 {% endcomment %}
+<div class="border-b border-neutral-200 px-2 py-1 dark:border-neutral-800" data-lane-search>
+  <input
+    type="search"
+    class="input py-0.5 text-xs"
+    x-model="laneSearch['{{ lane.key }}']"
+    placeholder="{% translate 'find here' %}…"
+    aria-label="{% translate 'find here' %}: {% if lane.report %}{{ lane.report.faculty.name }}{% else %}{% translate 'unsigned' %}{% endif %}"
+    autocomplete="off"
+    @keydown.escape.stop="laneSearch['{{ lane.key }}'] = ''"
+  />
+</div>
 <div
   class="scroll flex min-h-24 flex-1 flex-col gap-1 overflow-y-auto overscroll-contain p-2 {{ lane_height|default:'max-h-[min(28rem,60svh)]' }}"
+  :class="fullscreen ? '!max-h-[calc(100svh-19rem)]' : ''"
   data-lane="{{ lane.key }}"
+  x-effect="sizeLane($el)"
   {% if can_move %}
   x-sort="drop($item, $el.dataset.lane)"
   x-sort:group="cards"
@@ -15,19 +35,46 @@
 >
   {% for card in lane.cards %}
   <div
-    class="board-card {{ card.status|status_class }} {% if not card.contract.is_included %}excluded{% endif %}"
+    class="board-card group {{ card.status|status_class }} {% if not card.contract.is_included %}excluded{% endif %} {% if card.contract.is_pinned %}!cursor-default{% endif %}"
     x-sort:item="{{ card.employee_id }}"
     data-employee="{{ card.employee_id }}"
+    data-name="{{ card.contract.employee.name }}"
+    data-search="{{ card.contract.employee.name }} {{ card.contract.employee.specialization.name }} {% with kind=card.contract|specialization_type %}{% if kind %}{{ kind|type_label }}{% endif %}{% endwith %} {{ card.contract|terms }} {{ card.contract|short_terms }}"
+    data-details="{% url 'hr:contracts:details' card.contract_id %}"
+    data-edit="{% url 'hr:contracts:update' card.contract_id %}"
+    data-active="{{ card.contract.is_active|yesno:'1,0' }}"
+    data-lock="{{ card.contract.is_locked|yesno:'1,0' }}"
+    data-degree="{{ card.contract.degree.value }}"
+    data-contract-type="{{ card.contract.contract_type.value }}"
+    data-employment-type="{{ card.contract.employment_type.value }}"
+    data-blocked="{{ card.blocked_switches|join:' ' }}"
+    {# locked to its faculty: the card cannot be dragged (the server refuses the move too) #}
+    {% if card.contract.is_pinned %}x-sort:ignore{% endif %}
     {# `typeof`: while dragged, the card's copy sits on <body>, outside the board's scope #}
-    :class="typeof matches !== 'function' || matches('{{ card.contract.employee.name|escapejs }}') ? '' : 'opacity-20'"
-    @click="clickCard('{% url 'hr:contracts:details' card.contract_id %}')"
-    @dblclick="doubleClickCard({{ card.employee_id }})"
-    title="{{ card.contract|named_type }} · {{ card.contract.employee.specialization.name }} · {{ card.contract|terms }} · {{ card.status|status_label }}"
+    :class="typeof cardClass === 'function' ? cardClass('{{ lane.key }}', $el) : ''"
+    @click="openCard($el)"
+    @contextmenu="openMenu($event, $el)"
+    title="{{ card.contract|named_type }} · {{ card.contract.employee.specialization.name }} · {{ card.contract|terms }} · {{ card.status|status_label }}{% if card.contract.is_pinned %} · {% translate 'locked to this faculty' %}{% elif card.contract.is_locked %} · {% translate 'locked once signed' %}{% endif %}"
   >
     <span class="truncate font-medium">{{ card.contract.employee.name }}</span>
-    {% with kind=card.contract|specialization_type %}<c-type-tag :kind="kind" class="shrink-0 px-1 py-0 text-[10px]" />{% endwith %}
-    <span class="hidden truncate text-[10px] opacity-60 xl:inline">{{ card.contract.employee.specialization.name }}</span>
-    <span class="ms-auto shrink-0 rounded bg-black/5 px-1 text-[10px] font-semibold dark:bg-white/10">{{ card.contract|short_terms }}</span>
+    {% if card.contract.is_locked %}<span data-locked class="shrink-0 {% if card.contract.is_pinned %}opacity-70{% else %}opacity-40{% endif %}">{% heroicon_mini "lock-closed" size=12 %}</span>{% endif %}
+    {# in a faculty, the type says enough (the title holds the rest): the name takes the room #}
+    {% if lane.faculty_id is None %}<span class="hidden truncate text-[10px] opacity-60 xl:inline">{{ card.contract.employee.specialization.name }}</span>{% endif %}
+    {# at the card's end, in line from card to card: specialized / supported, then the terms #}
+    <div class="ms-auto flex shrink-0 items-center gap-1.5" data-card-end>
+      {% with kind=card.contract|specialization_type %}<c-type-tag :kind="kind" class="px-1 py-0 text-[10px]" />{% endwith %}
+      <span class="rounded bg-black/5 px-1 text-[10px] font-semibold dark:bg-white/10">{{ card.contract|short_terms }}</span>
+    </div>
+    {# the card's menu, for a pointer without a right button (touch) and for the keyboard #}
+    <button
+      type="button"
+      class="-me-1 shrink-0 cursor-pointer rounded opacity-40 hover:bg-black/10 hover:opacity-100 focus-visible:opacity-100 group-hover:opacity-100 dark:hover:bg-white/10"
+      x-sort:ignore
+      data-card-menu
+      aria-haspopup="menu"
+      aria-label="{% translate 'actions' %}"
+      @click.stop="openMenu($event, $el.closest('.board-card'))"
+    >{% heroicon_mini "ellipsis-vertical" size=14 %}</button>
   </div>
   {% endfor %}
 </div>

@@ -5,9 +5,37 @@
   <div class="card p-5 text-sm text-rose-700">{{ problem }}</div>
   {% else %}
   <div class="space-y-4">
-    <div>
-      <p class="text-xs font-medium uppercase tracking-wider text-neutral-500">{{ chapter.name }}</p>
-      <h2 class="text-2xl font-semibold tracking-tight first-letter:uppercase">{% translate 'faculty reports' %}</h2>
+    <div class="flex flex-wrap items-end gap-2">
+      <div>
+        <p class="text-xs font-medium uppercase tracking-wider text-neutral-500">{{ chapter.name }}</p>
+        <h2 class="text-2xl font-semibold tracking-tight first-letter:uppercase">{% translate 'faculty reports' %}</h2>
+      </div>
+      {% if faculties %}
+      {# every faculty's report in one file, each from a new page #}
+      <div class="relative ms-auto print:hidden" x-data="dropdown" @click.outside="close()" @keydown.escape.window="close()" data-export-all>
+        <button type="button" class="btn btn-primary" @click="toggle()" aria-haspopup="menu" :aria-expanded="open" title="{% translate 'every faculty in one file, each from a new page' %}">
+          {% heroicon_outline "arrow-down-tray" size=16 %} {% translate 'export all' %}
+          {% heroicon_mini "chevron-down" size=16 %}
+        </button>
+        <div class="menu end-0 min-w-56" role="menu" x-show="open" x-cloak>
+          <p class="px-2.5 py-1 text-xs font-semibold text-neutral-500 first-letter:uppercase">{% translate 'staff reports' %}</p>
+          <a class="menu-item" role="menuitem" href="{% url 'reports:all-staff-docx' %}" @click="close()">
+            {% heroicon_outline "document-text" size=16 %} {% translate 'Word' %}
+          </a>
+          <a class="menu-item" role="menuitem" href="{% url 'reports:all-staff-pdf' %}" @click="close()">
+            {% heroicon_outline "document-arrow-down" size=16 %} {% translate 'PDF' %}
+          </a>
+          <div class="my-1 border-t border-neutral-200 dark:border-neutral-700"></div>
+          <p class="px-2.5 py-1 text-xs font-semibold text-neutral-500 first-letter:uppercase">{% translate 'pivots' %}</p>
+          <a class="menu-item" role="menuitem" href="{% url 'reports:all-staff-pivot-docx' %}" @click="close()">
+            {% heroicon_outline "document-text" size=16 %} {% translate 'Word' %}
+          </a>
+          <a class="menu-item" role="menuitem" href="{% url 'reports:all-staff-pivot-pdf' %}" @click="close()">
+            {% heroicon_outline "document-arrow-down" size=16 %} {% translate 'PDF' %}
+          </a>
+        </div>
+      </div>
+      {% endif %}
     </div>
     <div class="card overflow-x-auto">
       <table class="data-table">

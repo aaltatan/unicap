@@ -5,7 +5,8 @@ so they run in a sandboxed Jinja2 environment (no access to Python internals), a
 so names holding `&` or `<` stay valid XML.
 """
 
-from collections.abc import Mapping
+from collections.abc import Mapping, Sequence
+from copy import deepcopy
 from io import BytesIO
 from pathlib import Path
 from typing import IO, Any
@@ -14,7 +15,10 @@ from zipfile import BadZipFile
 from django.http import FileResponse
 from django.utils.text import get_valid_filename
 from django.utils.translation import gettext as _
+from docx import Document
 from docx.opc.exceptions import PackageNotFoundError
+from docx.oxml import OxmlElement
+from docx.oxml.ns import qn
 from docxtpl import DocxTemplate
 from jinja2 import TemplateError
 from jinja2.sandbox import SandboxedEnvironment
@@ -68,6 +72,45 @@ def render(source: Source, context: Mapping[str, Any]) -> bytes:
     return output.getvalue()
 
 
+def join(documents: Sequence[bytes]) -> bytes:
+    """Several .docx files filled from the same template, as one: each starts a new page.
+
+    Only for documents of one template: they share its styles, images, header, footer and
+    page setup (all kept from the first), so the others' contents are moved in as they are.
+
+    Raises:
+        ValueError: no document to join.
+
+    Example:
+        ```python
+        content = join([render(path, context) for context in contexts])
+        ```
+    """
+    if not documents:
+        msg = "join() needs at least one document"
+        raise ValueError(msg)
+
+    first, *others = (Document(BytesIO(content)) for content in documents)
+
+    body = first.element.body
+    page_setup = body.sectPr  # the body's last element, when there: it stays last
+
+    for other in others:
+        contents = [
+            deepcopy(element) for element in other.element.body if element.tag != qn("w:sectPr")
+        ]
+
+        for element in _on_a_new_page(contents):
+            if page_setup is not None:
+                page_setup.addprevious(element)
+            else:
+                body.append(element)
+
+    output = BytesIO()
+    first.save(output)
+    return output.getvalue()
+
+
 def check(source: Source) -> None:
     """Parse the template without filling it: its Jinja tags must be valid.
 
@@ -78,6 +121,20 @@ def check(source: Source) -> None:
         DocxTemplate(source).get_undeclared_template_variables(jinja_env=environment())
     except _ERRORS as error:
         raise ReportTemplateError(error) from error
+
+
+def _on_a_new_page(contents: list[Any]) -> list[Any]:
+    """`contents` (a document's body elements), starting a new page.
+
+    Its first paragraph breaks the page before itself; contents starting with anything else
+    (a table) get an empty paragraph that does.
+    """
+    if not contents or contents[0].tag != qn("w:p"):
+        contents = [OxmlElement("w:p"), *contents]
+
+    contents[0].get_or_add_pPr().pageBreakBefore_val = True
+
+    return contents
 
 
 def attachment(content: bytes, *names: str, extension: str = "docx") -> FileResponse:

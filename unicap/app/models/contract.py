@@ -16,6 +16,8 @@ class Contract(NotedModel):
 
     `position` is the signing order inside the chapter: when a group overflows, the
     contracts signed last are the ones not counted.
+
+    `is_locked`: once signed, the contract stays in its faculty (the domain's rule).
     """
 
     chapter = models.ForeignKey(
@@ -57,6 +59,11 @@ class Contract(NotedModel):
         default=DegreeChoices.PHD,
     )
     is_active = models.BooleanField(verbose_name=_("is active"), default=True)
+    is_locked = models.BooleanField(
+        verbose_name=_("locked to its faculty"),
+        default=False,
+        help_text=_("once signed, the contract cannot be moved to another faculty or unsigned"),
+    )
     position = models.PositiveIntegerField(verbose_name=_("signing order"), default=0)
 
     objects: ContractManager = ContractManager()
@@ -114,6 +121,7 @@ class Contract(NotedModel):
             faculty,
             degree=domain.Degree(self.degree),
             is_active=self.is_active,
+            is_locked=self.is_locked,
         )
 
     @classmethod
@@ -142,6 +150,7 @@ class Contract(NotedModel):
         contract.employment_type = value.employment_type.value
         contract.degree = value.degree.value
         contract.is_active = value.is_active
+        contract.is_locked = value.is_locked
         contract.position = position
         return contract
 
@@ -158,3 +167,6 @@ class Contract(NotedModel):
 
     def get_toggle_url(self) -> str:
         return reverse("hr:contracts:toggle", kwargs={"pk": self.pk})
+
+    def get_toggle_lock_url(self) -> str:
+        return reverse("hr:contracts:toggle-lock", kwargs={"pk": self.pk})

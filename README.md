@@ -17,13 +17,28 @@ rows; duplicating one copies all of it.
   Cards are green when the ministry counts the contract, red when it does not, grey while
   unsigned, faded when left out of the calculation. While a card is dragged, the lane
   under it is outlined with the color it *would* get there and the hint says what the
-  capacity would become (the server evaluates every possible drop). Click a card for its
-  details, double-click to switch its contract on or off, drag lane headers to reorder
-  lanes. Lane headers show capacity, students per PhD, staff % vs minimum and
-  now · target · max; an *Issues* panel explains every violation and uncounted contract.
+  capacity would become (the server evaluates every possible drop). While dragging, a
+  **dock** over the page header repeats every lane as a drop target (a faculty out
+  of sight needs no scrolling), and **full screen** (the device's) lays the lanes out side
+  by side, as tall as the screen. Drag a lane's bottom edge to make its row taller or
+  shorter (remembered; double-click it to reset). Every lane has its own search
+  box: the cards that do not match (name, specialization, type, terms) are hidden. A card
+  shows the name first: then
+  specialized / supported and its terms (`FT staff`, `FT`, `PT`, `MA`), the rest on hover. Click a card for its details; right-click it (or its "⋮") for its
+  menu: details, edit, and its switches (on / off, lock / unlock, PhD / master, fulltime /
+  parttime, staff / borrowed; what the rules refuse is greyed out). Double-click a
+  faculty's lane to edit it, drag lane headers to reorder lanes. Lane headers show
+  capacity, students per PhD, staff % vs minimum and now · target · max; an *Issues* panel
+  explains every violation and uncounted contract.
 - **Optimizer**: pick a strategy (maximize students, fewest changes, less salaries, best
   staff percentage, ...), preview the before / after figures and every move, then apply.
-  **Reset** unsigns every contract; **Duplicate chapter** copies it to try another scenario.
+  Every strategy first makes the chapter compliant, then reaches every faculty's target
+  students. Every move names its employee in a list: when others are just like them (the
+  same specialization, terms and faculty), choose who makes it. Remove the moves you do not
+  want (and put them back): the figures follow the moves kept. The **recommender** tells which
+  new contracts to sign so that no violation is left and every target is reached.
+  **Reset** unsigns every contract. To try another scenario, **duplicate** the chapter from
+  the chapters table.
 - **Reports** (their own sidebar section, under `/reports/`), each a page with one *export*
   menu (print, Word, PDF) and an admin-editable Word template:
   - **Capacity report**: the seven head counts (counted / signed) per faculty; its **pivot**
@@ -32,6 +47,8 @@ rows; duplicating one copies all of it.
     chapter's capacity, with the numbers used (`33 PhD equivalents × 20 students per PhD`)
     and the contracts not counted, each with its reason.
   - **Faculty reports**: each faculty's staff by name, or its pivot (counted by specialization).
+    **Export all** writes every faculty's report (staff, or pivots) into one Word or PDF
+    file, each faculty from a new page.
   A PDF is the Word report converted by LibreOffice (`SOFFICE_PATH`), or by Word on Windows
   without it.
 - **Staff mix**: beside every staff percentage, the faculty's signed teachers as percentages
@@ -46,15 +63,22 @@ rows; duplicating one copies all of it.
   - row selection with bulk delete (one transaction: all or none);
   - a related row's name in a cell (an employee's faculty, a contract's specialization)
     opens that row's modal;
-  - create / edit / details / delete in modals, "save & new", `Alt+N` for new;
-  - on / off switches for specializations, employees and contracts;
+  - create / edit / details / delete in modals, "save & new", `Alt+N` for new; a modal
+    focuses its first field (its close button when it has none); a searched select opens
+    its list on a click or on typing, not on focus;
+  - on / off switches for specializations, employees and contracts, and a lock switch for
+    contracts;
   - export to Excel / CSV (what is filtered) and import (xlsx / csv, rows by name, all or none).
+- **Contract form**: optionally, lock the contract to its faculty: once signed it is neither
+  moved to another faculty nor unsigned (the board, bulk edits, imports, Reset and the
+  optimizer all leave it there) until it is unlocked.
 - **Employee form**: optionally, the faculties the employee cannot be counted in. Signed to
   one of them, the contract is never counted there (it still lowers the staff percentage),
   and the optimizer never signs it there.
 - **Faculty form**: numbers plus its accepted specializations (specialized / supported,
   share %, min / max, teacher bounds) as rows you drag into order.
-- **Layout**: navigation sidebar on the start side (collapsible to icons, `Alt+S`; hover a
+- **Layout**: navigation sidebar on the start side (collapsible to icons with its own
+  button or `Alt+S`; on small screens the header's menu button opens it; hover a
   table's link for its "new" button), keyboard shortcuts on English and Arabic keyboards,
   chapter switcher in the header, toasts, HTMX partial updates everywhere.
 - **Light / dark / system** themes, **English / Arabic** with full **RTL** layout.

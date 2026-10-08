@@ -373,20 +373,34 @@ def render_delete(
     return render(request, "app/crud/delete-modal.html", context)
 
 
-def render_toggle(
+def render_toggle(  # noqa: PLR0913 - the row, its switch and what to say
     request: AppRequest,
     obj: Model,
     *,
-    toggle: Callable[[Model], Model],
+    toggle: Callable[[Any], Model],
+    field: str = "is_active",
+    on: StrOrPromise | None = None,
+    off: StrOrPromise | None = None,
 ) -> HttpResponse:
-    """Switch a row on or off, then let tables and the board redraw."""
+    """Switch a row's flag, then let tables and the board redraw.
+
+    Args:
+        request: the POST of the switch.
+        obj: the row.
+        toggle: the manager call that switches it.
+        field: the flag switched (read after, to say which way it went).
+        on: the message once it is on (default: "... is on."), with `%(name)s`.
+        off: the message once it is off.
+    """
     try:
         toggle(obj)
     except (DomainError, UserError) as error:
         messages.error(request, error_text(error))
     else:
         message = (
-            _("%(name)s is on.") if getattr(obj, "is_active", False) else _("%(name)s is off.")
+            (on or _("%(name)s is on."))
+            if getattr(obj, field, False)
+            else (off or _("%(name)s is off."))
         )
         messages.success(request, message % {"name": obj})
 

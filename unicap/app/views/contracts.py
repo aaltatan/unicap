@@ -13,11 +13,13 @@ from ..requests import ChapterRequest
 from . import crud
 
 RESOURCE = crud.Resource(
-    bulk_fields=("faculty", "contract_type", "employment_type", "degree", "is_active"),
+    bulk_fields=("faculty", "contract_type", "employment_type", "degree", "is_active", "is_locked"),
     bulk_actions=(
         crud.BulkAction("activate", _("activate"), "check-circle", {"is_active": True}),
         crud.BulkAction("deactivate", _("deactivate"), "no-symbol", {"is_active": False}),
         crud.BulkAction("unsign", _("unsign"), "arrow-uturn-left", {"faculty": None}),
+        crud.BulkAction("lock", _("lock to their faculty"), "lock-closed", {"is_locked": True}),
+        crud.BulkAction("unlock", _("unlock"), "lock-open", {"is_locked": False}),
     ),
     settings=ContractSettings,
     app="hr",
@@ -40,6 +42,7 @@ RESOURCE = crud.Resource(
         crud.Column("terms", _("terms"), "contract_type"),
         crud.Column("status", _("status")),
         crud.Column("is_active", _("on"), "is_active"),
+        crud.Column("is_locked", _("locked"), "is_locked"),
         crud.Column("notes", _("notes"), "notes"),
     ),
 )
@@ -132,6 +135,20 @@ def bulk_delete(request: ChapterRequest) -> HttpResponse:
 @chapter_required
 def toggle(request: ChapterRequest, pk: int) -> HttpResponse:
     return crud.render_toggle(request, _get(request, pk), toggle=Contract.objects.toggle_active)
+
+
+@require_POST
+@permission_required("app.change_contract", raise_exception=True)
+@chapter_required
+def toggle_lock(request: ChapterRequest, pk: int) -> HttpResponse:
+    return crud.render_toggle(
+        request,
+        _get(request, pk),
+        toggle=lambda contract: Contract.objects.switch(contract, "is_locked"),
+        field="is_locked",
+        on=_("%(name)s is locked to its faculty."),
+        off=_("%(name)s is unlocked."),
+    )
 
 
 @require_http_methods(["GET", "POST"])

@@ -15,4 +15,5 @@ urlpatterns = [
     path(route="<int:pk>/update/", view=views.update, name="update"),
     path(route="<int:pk>/delete/", view=views.delete, name="delete"),
     path(route="<int:pk>/toggle/", view=views.toggle, name="toggle"),
+    path(route="<int:pk>/toggle-lock/", view=views.toggle_lock, name="toggle-lock"),
 ]

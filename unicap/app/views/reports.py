@@ -22,7 +22,7 @@ from unicap.domain import DomainError
 from ..choices import ReportChoices
 from ..decorators import chapter_required
 from ..exceptions import UserError
-from ..models import Faculty
+from ..models import Contract, Faculty
 from ..querysets.base import BaseQuerySet
 from ..reports import attachment, default_path, documents
 from ..reports.docx import DOCX_CONTENT_TYPE
@@ -111,6 +111,22 @@ def faculties(request: ChapterRequest) -> HttpResponse:
 @require_GET
 @permission_required("app.view_faculty", raise_exception=True)
 @chapter_required
+def faculties_file(request: ChapterRequest, report: str, extension: str) -> HttpResponseBase:
+    """A report of every faculty of the chapter in one Word or PDF file."""
+    try:
+        content = documents.faculties_document(request.chapter, report, get_language(), extension)
+    except (DomainError, UserError) as error:
+        messages.error(request, error_text(error))
+        return redirect("reports:faculties")
+
+    title = str(ReportChoices(report).label)
+
+    return attachment(content, title, _("all faculties"), request.chapter.name, extension=extension)
+
+
+@require_GET
+@permission_required("app.view_faculty", raise_exception=True)
+@chapter_required
 def staff(request: ChapterRequest, pk: int) -> HttpResponse:
     """A printable page for the faculty: its numbers and its own staff."""
     faculty = _faculty(request, pk, Faculty.objects.with_shares())
@@ -119,11 +135,14 @@ def staff(request: ChapterRequest, pk: int) -> HttpResponse:
 
     _name, template = FACULTY_PAGES[ReportChoices.FACULTY_STAFF]
 
-    return render(
-        request,
-        template,
-        {"page_title": faculty.name, "chapter": request.chapter, "obj": faculty},
-    )
+    context = {
+        "page_title": faculty.name,
+        "chapter": request.chapter,
+        "obj": faculty,
+        "rows": Contract.objects.by_employee(request.chapter.pk, faculty.pk),
+    }
+
+    return render(request, template, context)
 
 
 @require_GET

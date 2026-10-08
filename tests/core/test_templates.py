@@ -34,3 +34,22 @@ def test_no_component_is_given_a_filtered_dynamic_attribute() -> None:
     }
 
     assert not found
+
+
+def test_fulltime_is_said_one_way_in_arabic() -> None:
+    """`كلي`, everywhere: the catalog holds no other word for it."""
+    import polib  # noqa: PLC0415
+    from django.conf import settings  # noqa: PLC0415
+
+    catalog = polib.pofile(str(settings.BASE_DIR / "locale" / "ar" / "LC_MESSAGES" / "django.po"))
+
+    texts = {
+        entry.msgid: " ".join([entry.msgstr, *entry.msgstr_plural.values()])
+        for entry in catalog
+        if not entry.obsolete
+    }
+
+    assert not [msgid for msgid, text in texts.items() if "متفرغ" in text]
+    assert texts["fulltime"] == "كلي"
+    assert texts["FT staff"] == "كلي ملاك"
+    assert all("كلي" in text for msgid, text in texts.items() if "fulltime" in msgid.lower())
